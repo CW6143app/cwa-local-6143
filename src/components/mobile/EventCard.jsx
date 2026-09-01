@@ -13,9 +13,9 @@ export default function EventCard({ event, index = 0 }) {
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.45, delay: index * 0.06, ease: [0.22, 1, 0.36, 1] }}
       whileTap={{ scale: 0.985 }}
-      className="flex gap-4 rounded-3xl bg-white p-5 shadow-[0_1px_2px_rgba(11,37,69,0.06),0_12px_32px_-20px_rgba(11,37,69,0.35)]"
-    >
-      <div className="flex h-16 w-16 shrink-0 flex-col items-center justify-center rounded-2xl bg-[#0b2545] text-white">
+      className="flex gap-4 rounded-3xl bg-white p-5 shadow-[0_1px_2px_rgba(11,37,69,0.06),0_12px_32px_-20px_rgba(11,37,69,0.35)]">
+      
+      <div className="flex h-16 w-16 shrink-0 flex-col items-center justify-center rounded-2xl text-white bg-[#0d0c0c]">
         <span className="text-xl font-semibold leading-none">{event.day}</span>
         <span className="mt-1 text-[10px] uppercase tracking-[0.18em] text-white/70">
           {event.month}
@@ -34,6 +34,6 @@ export default function EventCard({ event, index = 0 }) {
         </p>
         <p className="mt-3 text-xs leading-relaxed text-slate-400">{event.note}</p>
       </div>
-    </motion.a>
-  );
+    </motion.a>);
+
 }
