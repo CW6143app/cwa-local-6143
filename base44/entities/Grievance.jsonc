@@ -134,7 +134,11 @@
     "explain_grievance"
   ],
   "rls": {
-    "create": null,
+    "create": {
+      "user_condition": {
+        "role": "user"
+      }
+    },
     "read": {
       "created_by_id": "{{user.id}}"
     },
