@@ -1,5 +1,4 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import PageHeader from "@/components/mobile/PageHeader";
@@ -20,35 +19,23 @@ export default function Resources() {
               {g.group}
             </h2>
             <div className="mt-3 overflow-hidden rounded-3xl bg-white shadow-[0_1px_2px_rgba(11,37,69,0.06),0_12px_32px_-20px_rgba(11,37,69,0.35)]">
-              {g.links.map((l, i) => {
-                const inner = (
-                  <>
-                    <span className="text-sm font-medium text-[#0b2545]">{l.label}</span>
-                    <ArrowUpRight className="w-4 h-4 shrink-0 text-slate-300" />
-                  </>
-                );
-                const cls = "flex items-center justify-between gap-3 border-b border-black/5 px-5 py-4 last:border-0";
-                return l.internal ? (
-                  <Link key={l.label} to={l.internal} className={cls}>
-                    {inner}
-                  </Link>
-                ) : (
-                  <motion.a
-                    key={l.label}
-                    href={l.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    initial={{ opacity: 0, y: 10 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.35, delay: gi * 0.04 + i * 0.03 }}
-                    whileTap={{ backgroundColor: "rgba(11,37,69,0.04)" }}
-                    className={cls}
-                  >
-                    {inner}
-                  </motion.a>
-                );
-              })}
+              {g.links.map((l, i) => (
+                <motion.a
+                  key={l.label}
+                  href={l.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  initial={{ opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.35, delay: gi * 0.04 + i * 0.03 }}
+                  whileTap={{ backgroundColor: "rgba(11,37,69,0.04)" }}
+                  className="flex items-center justify-between gap-3 border-b border-black/5 px-5 py-4 last:border-0"
+                >
+                  <span className="text-sm font-medium text-[#0b2545]">{l.label}</span>
+                  <ArrowUpRight className="w-4 h-4 shrink-0 text-slate-300" />
+                </motion.a>
+              ))}
             </div>
           </div>
         ))}

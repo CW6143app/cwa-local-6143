@@ -1,5 +1,4 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import { MapPin, Globe, ArrowUpRight } from "lucide-react";
 import PageHeader from "@/components/mobile/PageHeader";
 import { SITE, SOCIALS } from "@/lib/siteData";
@@ -48,12 +47,14 @@ export default function About() {
           </div>
         </div>
 
-        <Link
-          to="/grievance"
+        <a
+          href="https://cwa6143.org/grievance"
+          target="_blank"
+          rel="noreferrer"
           className="block rounded-2xl bg-[#c8102e] py-4 text-center text-xs font-semibold uppercase tracking-[0.2em] text-white"
         >
           File a grievance
-        </Link>
+        </a>
       </div>
     </div>
   );
