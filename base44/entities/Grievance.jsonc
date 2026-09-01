@@ -1,0 +1,136 @@
+{
+  "name": "Grievance",
+  "type": "object",
+  "properties": {
+    "local_grievance_num": {
+      "type": "string",
+      "title": "Local Grievance #"
+    },
+    "name_of_grievant": {
+      "type": "string",
+      "title": "Name of Grievant"
+    },
+    "ncs": {
+      "type": "string",
+      "title": "NCS"
+    },
+    "home_address": {
+      "type": "string",
+      "title": "Home Address"
+    },
+    "cell": {
+      "type": "string",
+      "title": "Cell #"
+    },
+    "city": {
+      "type": "string",
+      "title": "City"
+    },
+    "zip": {
+      "type": "string",
+      "title": "Zip"
+    },
+    "last4_ssn": {
+      "type": "string",
+      "title": "Last 4 of Soc. Sec. #"
+    },
+    "gender": {
+      "type": "string",
+      "enum": [
+        "M",
+        "F",
+        "Other"
+      ],
+      "title": "Gender"
+    },
+    "email": {
+      "type": "string",
+      "format": "email",
+      "title": "Email"
+    },
+    "job_title": {
+      "type": "string",
+      "title": "Job Title"
+    },
+    "department": {
+      "type": "string",
+      "title": "Department"
+    },
+    "suits_id": {
+      "type": "string",
+      "title": "SUITS ID"
+    },
+    "work_location": {
+      "type": "string",
+      "title": "Work Location"
+    },
+    "first_level_mgr": {
+      "type": "string",
+      "title": "1st Level Mgr."
+    },
+    "date_of_incident": {
+      "type": "string",
+      "format": "date",
+      "title": "Date of Incident"
+    },
+    "incident_type": {
+      "type": "array",
+      "title": "Incident Type",
+      "items": {
+        "type": "string",
+        "enum": [
+          "PN",
+          "WR",
+          "DML",
+          "Susp/Term",
+          "Other"
+        ]
+      }
+    },
+    "explain_other": {
+      "type": "string",
+      "title": "Explain (other)"
+    },
+    "explain_grievance": {
+      "type": "string",
+      "title": "Explain your grievance"
+    },
+    "settlement_expected": {
+      "type": "string",
+      "title": "What settlement is expected"
+    },
+    "violation_of_articles": {
+      "type": "string",
+      "title": "Violation of Article(s) or Past practice"
+    },
+    "auth_personal_records": {
+      "type": "boolean",
+      "title": "Permission granted for Personal Records",
+      "default": false
+    },
+    "auth_medical_records": {
+      "type": "boolean",
+      "title": "Permission granted for Medical Records",
+      "default": false
+    },
+    "signature_date": {
+      "type": "string",
+      "format": "date",
+      "title": "Signature Date"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "submitted",
+        "in_review",
+        "resolved"
+      ],
+      "default": "submitted",
+      "title": "Status"
+    }
+  },
+  "required": [
+    "name_of_grievant",
+    "explain_grievance"
+  ]
+}
