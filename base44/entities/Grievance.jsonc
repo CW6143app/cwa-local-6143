@@ -134,42 +134,19 @@
     "explain_grievance"
   ],
   "rls": {
-    "create": null,
+    "create": {
+      "user_condition": {
+        "role": "user"
+      }
+    },
     "read": {
-      "$or": [
-        {
-          "created_by_id": "{{user.id}}"
-        },
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        }
-      ]
+      "created_by_id": "{{user.id}}"
     },
     "update": {
-      "$or": [
-        {
-          "created_by_id": "{{user.id}}"
-        },
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        }
-      ]
+      "created_by_id": "{{user.id}}"
     },
     "delete": {
-      "$or": [
-        {
-          "created_by_id": "{{user.id}}"
-        },
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        }
-      ]
+      "created_by_id": "{{user.id}}"
     }
   }
 }
