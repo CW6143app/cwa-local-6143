@@ -132,7 +132,7 @@ export default function Grievance() {
   return (
     <div className="pb-8">
       {/* Header */}
-      <div className="px-6 pt-10 pb-6 bg-[hsl(var(--foreground))]">
+      <div className="px-6 pt-10 pb-6 opacity-100 bg-[#b31414]">
         <div className="flex items-center gap-4">
           <img
             src="https://cwa6143.org/sites/default/files/styles/logo/public/logos/cwa-logo-80x38_5.png.webp?itok=wTtU3j7j"
