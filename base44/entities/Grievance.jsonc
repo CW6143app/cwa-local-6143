@@ -1,0 +1,58 @@
+{
+  "name": "Grievance",
+  "type": "object",
+  "properties": {
+    "full_name": {
+      "type": "string",
+      "title": "Full name",
+      "description": "Member filing the grievance"
+    },
+    "email": {
+      "type": "string",
+      "format": "email",
+      "title": "Email"
+    },
+    "job_title": {
+      "type": "string",
+      "title": "Job title"
+    },
+    "department": {
+      "type": "string",
+      "title": "Department / Work location"
+    },
+    "supervisor_name": {
+      "type": "string",
+      "title": "Supervisor name"
+    },
+    "incident_date": {
+      "type": "string",
+      "format": "date",
+      "title": "Date of incident"
+    },
+    "contract_article": {
+      "type": "string",
+      "title": "Contract article violated",
+      "description": "Article number or title believed violated"
+    },
+    "description": {
+      "type": "string",
+      "title": "Description of grievance",
+      "description": "What happened and the remedy requested"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "submitted",
+        "in_review",
+        "resolved"
+      ],
+      "default": "submitted",
+      "title": "Status"
+    }
+  },
+  "required": [
+    "full_name",
+    "email",
+    "description"
+  ]
+}
