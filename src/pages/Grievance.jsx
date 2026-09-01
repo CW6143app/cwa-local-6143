@@ -34,7 +34,7 @@ const EMPTY = {
   violation_of_articles: "",
   auth_personal_records: false,
   auth_medical_records: false,
-  signature_date: "",
+  signature_date: ""
 };
 
 function Row({ children, className = "" }) {
@@ -49,8 +49,8 @@ function Field({ label, flex = "1", required, children }) {
         {required && <span className="text-[#c8102e]"> *</span>}
       </Label>
       {children}
-    </div>
-  );
+    </div>);
+
 }
 
 function SectionTitle({ num, label }) {
@@ -58,8 +58,8 @@ function SectionTitle({ num, label }) {
     <div className="flex items-start gap-2 mt-1">
       <span className="text-sm font-semibold text-[#0b2545] shrink-0 w-5">{num}.</span>
       <span className="text-sm font-semibold text-[#0b2545]">{label}</span>
-    </div>
-  );
+    </div>);
+
 }
 
 function Divider() {
@@ -78,7 +78,7 @@ export default function Grievance() {
       setForm((f) => ({
         ...f,
         name_of_grievant: u.full_name || "",
-        email: u.email || "",
+        email: u.email || ""
       }));
     }).catch(() => {});
   }, []);
@@ -88,9 +88,9 @@ export default function Grievance() {
   const toggleIncidentType = (type) => {
     setForm((f) => ({
       ...f,
-      incident_type: f.incident_type.includes(type)
-        ? f.incident_type.filter((t) => t !== type)
-        : [...f.incident_type, type],
+      incident_type: f.incident_type.includes(type) ?
+      f.incident_type.filter((t) => t !== type) :
+      [...f.incident_type, type]
     }));
   };
 
@@ -114,8 +114,8 @@ export default function Grievance() {
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          className="rounded-3xl bg-white p-8 text-center shadow-[0_1px_2px_rgba(11,37,69,0.06),0_12px_32px_-20px_rgba(11,37,69,0.35)]"
-        >
+          className="rounded-3xl bg-white p-8 text-center shadow-[0_1px_2px_rgba(11,37,69,0.06),0_12px_32px_-20px_rgba(11,37,69,0.35)]">
+          
           <CheckCircle2 className="mx-auto w-14 h-14 text-[#c8102e]" />
           <h2 className="mt-4 text-xl font-semibold text-[#0b2545]">Grievance Submitted</h2>
           <p className="mt-2 text-sm text-slate-500 leading-relaxed">
@@ -125,20 +125,20 @@ export default function Grievance() {
             Back to home
           </Button>
         </motion.div>
-      </div>
-    );
+      </div>);
+
   }
 
   return (
     <div className="pb-8">
       {/* Header */}
-      <div className="bg-[#0b2545] px-6 pt-10 pb-6">
+      <div className="px-6 pt-10 pb-6 bg-[hsl(var(--foreground))]">
         <div className="flex items-center gap-4">
           <img
             src="https://cwa6143.org/sites/default/files/styles/logo/public/logos/cwa-logo-80x38_5.png.webp?itok=wTtU3j7j"
             alt="CWA"
-            className="h-10 w-auto brightness-0 invert"
-          />
+            className="h-10 w-auto brightness-0 invert" />
+          
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-white/50">Local 6143</p>
             <h1 className="text-xl font-semibold text-white leading-tight">Grievance Form</h1>
@@ -205,19 +205,19 @@ export default function Grievance() {
             <Row className="mt-2">
               <Field label="Gender" flex="0 0 auto">
                 <div className="flex gap-3 h-9 items-center">
-                  {["M", "F", "Other"].map((g) => (
-                    <label key={g} className="flex items-center gap-1.5 text-sm cursor-pointer">
+                  {["M", "F", "Other"].map((g) =>
+                  <label key={g} className="flex items-center gap-1.5 text-sm cursor-pointer">
                       <input
-                        type="radio"
-                        name="gender"
-                        value={g}
-                        checked={form.gender === g}
-                        onChange={() => setForm((f) => ({ ...f, gender: g }))}
-                        className="accent-[#c8102e]"
-                      />
+                      type="radio"
+                      name="gender"
+                      value={g}
+                      checked={form.gender === g}
+                      onChange={() => setForm((f) => ({ ...f, gender: g }))}
+                      className="accent-[#c8102e]" />
+                    
                       {g}
                     </label>
-                  ))}
+                  )}
                 </div>
               </Field>
               <Field label="Email" flex="2" required>
@@ -265,24 +265,24 @@ export default function Grievance() {
           <div>
             <Label className="text-xs font-medium text-[#0b2545]">Incident Type (select all that apply)</Label>
             <div className="flex flex-wrap gap-3 mt-2">
-              {INCIDENT_TYPES.map((t) => (
-                <label key={t} className="flex items-center gap-1.5 text-sm cursor-pointer">
+              {INCIDENT_TYPES.map((t) =>
+              <label key={t} className="flex items-center gap-1.5 text-sm cursor-pointer">
                   <input
-                    type="checkbox"
-                    checked={form.incident_type.includes(t)}
-                    onChange={() => toggleIncidentType(t)}
-                    className="accent-[#c8102e] w-4 h-4"
-                  />
+                  type="checkbox"
+                  checked={form.incident_type.includes(t)}
+                  onChange={() => toggleIncidentType(t)}
+                  className="accent-[#c8102e] w-4 h-4" />
+                
                   {t}
                 </label>
-              ))}
+              )}
             </div>
           </div>
-          {form.incident_type.includes("Other") && (
-            <Field label="Explain (Other)">
+          {form.incident_type.includes("Other") &&
+          <Field label="Explain (Other)">
               <Input value={form.explain_other} onChange={set("explain_other")} className="h-9" />
             </Field>
-          )}
+          }
           <Field label="Explain your grievance" required>
             <Textarea
               value={form.explain_grievance}
@@ -290,8 +290,8 @@ export default function Grievance() {
               required
               rows={6}
               placeholder="Describe what happened..."
-              className="resize-none"
-            />
+              className="resize-none" />
+            
           </Field>
           <Field label="Signature Date">
             <Input value={form.signature_date} onChange={set("signature_date")} type="date" className="h-9" />
@@ -306,8 +306,8 @@ export default function Grievance() {
             onChange={set("settlement_expected")}
             rows={3}
             placeholder="Describe the remedy requested..."
-            className="resize-none mt-2"
-          />
+            className="resize-none mt-2" />
+          
         </div>
 
         {/* Field 9 */}
@@ -318,8 +318,8 @@ export default function Grievance() {
             onChange={set("violation_of_articles")}
             rows={3}
             placeholder="e.g. Article 4: Basis of Compensation..."
-            className="resize-none mt-2"
-          />
+            className="resize-none mt-2" />
+          
         </div>
 
         {/* Authorization */}
@@ -340,8 +340,8 @@ export default function Grievance() {
                 type="checkbox"
                 checked={form.auth_personal_records}
                 onChange={(e) => setForm((f) => ({ ...f, auth_personal_records: e.target.checked }))}
-                className="accent-[#c8102e] w-4 h-4"
-              />
+                className="accent-[#c8102e] w-4 h-4" />
+              
               Personal Records
             </label>
             <label className="flex items-center gap-2 text-sm cursor-pointer">
@@ -349,29 +349,29 @@ export default function Grievance() {
                 type="checkbox"
                 checked={form.auth_medical_records}
                 onChange={(e) => setForm((f) => ({ ...f, auth_medical_records: e.target.checked }))}
-                className="accent-[#c8102e] w-4 h-4"
-              />
+                className="accent-[#c8102e] w-4 h-4" />
+              
               Medical Records
             </label>
           </div>
         </div>
 
-        {error && (
-          <div className="rounded-xl bg-[#c8102e]/10 p-3 text-sm text-[#c8102e]">{error}</div>
-        )}
+        {error &&
+        <div className="rounded-xl bg-[#c8102e]/10 p-3 text-sm text-[#c8102e]">{error}</div>
+        }
 
         <Button
           type="submit"
           disabled={loading}
-          className="h-12 w-full bg-[#c8102e] text-white hover:bg-[#c8102e]/90 text-sm font-semibold"
-        >
-          {loading ? (
-            <><Loader2 className="mr-2 w-4 h-4 animate-spin" /> Submitting…</>
-          ) : (
-            <><FileText className="mr-2 w-4 h-4" /> Submit Grievance</>
-          )}
+          className="h-12 w-full bg-[#c8102e] text-white hover:bg-[#c8102e]/90 text-sm font-semibold">
+          
+          {loading ?
+          <><Loader2 className="mr-2 w-4 h-4 animate-spin" /> Submitting…</> :
+
+          <><FileText className="mr-2 w-4 h-4" /> Submit Grievance</>
+          }
         </Button>
       </form>
-    </div>
-  );
+    </div>);
+
 }
