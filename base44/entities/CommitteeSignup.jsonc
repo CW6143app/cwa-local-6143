@@ -20,22 +20,25 @@
       "title": "Phone"
     },
     "committee": {
-      "type": "string",
-      "enum": [
-        "Legislative Committee",
-        "Safety Committee",
-        "Organizing Committee",
-        "Education Committee",
-        "Membership Committee",
-        "Bylaws Committee",
-        "Finance Committee",
-        "Community Services/Activities Committee",
-        "Civil Rights and Equity Committee",
-        "Women's Committee",
-        "Building Committee",
-        "Election Committee"
-      ],
-      "title": "Committee"
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "Legislative Committee",
+          "Safety Committee",
+          "Organizing Committee",
+          "Education Committee",
+          "Membership Committee",
+          "Bylaws Committee",
+          "Finance Committee",
+          "Community Services/Activities Committee",
+          "Civil Rights and Equity Committee",
+          "Women's Committee",
+          "Building Committee",
+          "Election Committee"
+        ]
+      },
+      "title": "Committees"
     },
     "status": {
       "type": "string",

@@ -28,7 +28,7 @@ export default function CommitteeSignup() {
     last_name: "",
     email: "",
     phone: "",
-    committee: "",
+    committee: [],
   });
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
@@ -36,11 +36,19 @@ export default function CommitteeSignup() {
 
   const update = (k, v) => setForm((f) => ({ ...f, [k]: v }));
 
+  const toggleCommittee = (c) =>
+    setForm((f) => ({
+      ...f,
+      committee: f.committee.includes(c)
+        ? f.committee.filter((x) => x !== c)
+        : [...f.committee, c],
+    }));
+
   const submit = async (e) => {
     e.preventDefault();
     setError("");
-    if (!form.first_name || !form.last_name || !form.email || !form.committee) {
-      setError("Please fill in all required fields.");
+    if (!form.first_name || !form.last_name || !form.email || form.committee.length === 0) {
+      setError("Please fill in all required fields and pick at least one committee.");
       return;
     }
     setSubmitting(true);
@@ -70,7 +78,7 @@ export default function CommitteeSignup() {
             You're signed up!
           </h2>
           <p className="mt-2 text-sm text-slate-600">
-            Thanks for volunteering for the {form.committee}. A member of the
+            Thanks for volunteering for {form.committee.join(", ")}. A member of the
             Local will reach out to you soon.
           </p>
         </motion.div>
@@ -137,20 +145,34 @@ export default function CommitteeSignup() {
           </div>
           <div>
             <label className="mb-1 block text-xs font-semibold text-[#0b2545]">
-              Committee *
+              Committees * <span className="font-normal text-slate-400">(select all that apply)</span>
             </label>
-            <select
-              className={inputClass}
-              value={form.committee}
-              onChange={(e) => update("committee", e.target.value)}
-            >
-              <option value="">Select a committee</option>
-              {COMMITTEES.map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </select>
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+              {COMMITTEES.map((c) => {
+                const checked = form.committee.includes(c);
+                return (
+                  <button
+                    type="button"
+                    key={c}
+                    onClick={() => toggleCommittee(c)}
+                    className={`flex items-center gap-2 rounded-xl border px-3 py-2.5 text-left text-sm transition-colors ${
+                      checked
+                        ? "border-[#c8102e] bg-[#c8102e]/5 text-[#0b2545]"
+                        : "border-black/10 bg-white text-[#0b2545] hover:border-black/20"
+                    }`}
+                  >
+                    <span
+                      className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border ${
+                        checked ? "border-[#c8102e] bg-[#c8102e]" : "border-black/20 bg-white"
+                      }`}
+                    >
+                      {checked && <CheckCircle2 className="h-3.5 w-3.5 text-white" />}
+                    </span>
+                    {c}
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           {error && <p className="text-sm font-medium text-red-600">{error}</p>}
