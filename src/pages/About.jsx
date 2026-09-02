@@ -34,13 +34,6 @@ export default function About() {
         <BoardMembers />
 
         <AccountSettings />
-
-        <Link
-          to="/grievance"
-          className="block rounded-2xl bg-[#c8102e] py-4 text-center text-xs font-semibold uppercase tracking-[0.2em] text-white"
-        >
-          File a grievance
-        </Link>
       </div>
     </div>
   );

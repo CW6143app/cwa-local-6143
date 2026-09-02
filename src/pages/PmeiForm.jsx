@@ -9,7 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Loader2, CheckCircle2, Lightbulb } from "lucide-react";
 
 const EMPTY = {
-  name: "",
+  first_name: "",
+  last_name: "",
   job_title: "",
   contact_number: "",
   problem_description: "",
@@ -92,9 +93,14 @@ export default function PmeiForm() {
       <form onSubmit={handleSubmit} className="px-5 pt-6 space-y-5">
         {/* Personal Info */}
         <div className="rounded-2xl bg-white p-5 shadow-[0_1px_2px_rgba(11,37,69,0.06),0_8px_24px_-12px_rgba(11,37,69,0.2)] space-y-4">
-          <Field label="Name" required>
-            <Input value={form.name} onChange={set("name")} required className="h-9" placeholder="Your full name" />
-          </Field>
+          <div className="flex gap-3">
+            <Field label="First Name" required>
+              <Input value={form.first_name} onChange={set("first_name")} required className="h-9" placeholder="First name" />
+            </Field>
+            <Field label="Last Name" required>
+              <Input value={form.last_name} onChange={set("last_name")} required className="h-9" placeholder="Last name" />
+            </Field>
+          </div>
           <Field label="Job Title">
             <Input value={form.job_title} onChange={set("job_title")} className="h-9" placeholder="Your job title" />
           </Field>

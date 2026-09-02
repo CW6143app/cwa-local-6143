@@ -2,9 +2,13 @@
   "name": "PmeiSubmission",
   "type": "object",
   "properties": {
-    "name": {
+    "first_name": {
       "type": "string",
-      "title": "Name"
+      "title": "First Name"
+    },
+    "last_name": {
+      "type": "string",
+      "title": "Last Name"
     },
     "job_title": {
       "type": "string",
@@ -34,7 +38,8 @@
     }
   },
   "required": [
-    "name",
+    "first_name",
+    "last_name",
     "problem_description"
   ],
   "rls": {

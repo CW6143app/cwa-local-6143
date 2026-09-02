@@ -169,7 +169,7 @@ export default function PmeiDashboard() {
                 <tbody className="divide-y divide-slate-100">
                   {filtered.map((s) => (
                     <tr key={s.id} className="hover:bg-slate-50 transition-colors">
-                      <td className="px-4 py-3 font-semibold text-slate-900">{s.name || "—"}</td>
+                      <td className="px-4 py-3 font-semibold text-slate-900">{[s.first_name, s.last_name].filter(Boolean).join(" ") || "—"}</td>
                       <td className="px-4 py-3 text-slate-600">{s.job_title || "—"}</td>
                       <td className="px-4 py-3 text-slate-600">{s.contact_number || "—"}</td>
                       <td className="px-4 py-3 text-slate-600">{s.created_date ? new Date(s.created_date).toLocaleDateString() : "—"}</td>
@@ -203,7 +203,7 @@ export default function PmeiDashboard() {
                     className="w-full flex items-center justify-between p-4 text-left"
                   >
                     <div className="min-w-0">
-                      <p className="font-semibold text-slate-900 truncate">{s.name || "—"}</p>
+                      <p className="font-semibold text-slate-900 truncate">{[s.first_name, s.last_name].filter(Boolean).join(" ") || "—"}</p>
                       <p className="text-xs text-slate-400 mt-0.5">{s.job_title || "No title"}</p>
                     </div>
                     <div className="flex items-center gap-2 flex-shrink-0">

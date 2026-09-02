@@ -59,8 +59,6 @@ export default function Home() {
         </div>
       </div>
 
-      <FollowLocal />
-
       {tab === "news" ? (
         <>
           <section className="px-6 pt-9">
@@ -98,6 +96,17 @@ export default function Home() {
           <UpdateInfoForm />
         </section>
       )}
+
+      <section className="px-6 pt-2 pb-6">
+        <Link
+          to="/grievance"
+          className="block rounded-2xl bg-[#c8102e] py-4 text-center text-xs font-semibold uppercase tracking-[0.2em] text-white"
+        >
+          File a grievance
+        </Link>
+      </section>
+
+      <FollowLocal />
     </div>
   );
 }
