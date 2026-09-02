@@ -1,6 +1,7 @@
 import React from "react";
 import { Link, useLocation, Outlet } from "react-router-dom";
 import { Home, CalendarDays, BookOpen, Info } from "lucide-react";
+import DarkModeToggle from "@/components/mobile/DarkModeToggle";
 
 const TABS = [
   { to: "/", label: "Home", icon: Home },
@@ -13,9 +14,10 @@ export default function Shell() {
   const { pathname } = useLocation();
   return (
     <div className="min-h-screen bg-[#f6f5f2] flex justify-center">
-      <div className="w-full max-w-[480px] bg-[#f6f5f2] pb-24 shadow-sm" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+      <div className="w-full max-w-[480px] bg-[#f6f5f2] pb-24 shadow-sm relative dark:bg-[#0a1420]" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+        <DarkModeToggle />
         <Outlet />
-        <nav className="fixed bottom-0 w-full max-w-[480px] border-t border-black/10 bg-white/90 backdrop-blur-xl" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+        <nav className="fixed bottom-0 w-full max-w-[480px] border-t border-black/10 bg-white/90 backdrop-blur-xl dark:border-white/10 dark:bg-[#0a1420]/90" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
           <div className="grid grid-cols-4">
             {TABS.map(({ to, label, icon: Icon }) => {
               const active = pathname === to;

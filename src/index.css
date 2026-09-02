@@ -44,38 +44,38 @@
   }
 
   .dark {
-    --background: 0 0% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 9%;
-    --secondary: 0 0% 14.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 0 0% 14.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --ring: 0 0% 83.1%;
+    --background: 222 24% 7%;
+    --foreground: 220 20% 92%;
+    --card: 222 20% 11%;
+    --card-foreground: 220 20% 92%;
+    --popover: 222 20% 11%;
+    --popover-foreground: 220 20% 92%;
+    --primary: 351 84% 51%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 222 16% 18%;
+    --secondary-foreground: 220 20% 92%;
+    --muted: 222 16% 18%;
+    --muted-foreground: 220 10% 62%;
+    --accent: 222 16% 20%;
+    --accent-foreground: 220 20% 92%;
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 222 16% 22%;
+    --input: 222 16% 22%;
+    --ring: 351 84% 51%;
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-background: 222 24% 7%;
+    --sidebar-foreground: 220 20% 92%;
+    --sidebar-primary: 351 84% 51%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-accent: 222 16% 18%;
+    --sidebar-accent-foreground: 220 20% 92%;
+    --sidebar-border: 222 16% 22%;
+    --sidebar-ring: 351 84% 51%;
   }
 }
 
@@ -107,3 +107,19 @@
     -webkit-touch-callout: none;
   }
 }
+
+/* Dark mode overrides for CWA hardcoded colors */
+.dark .bg-white { background-color: hsl(222 20% 11%); }
+.dark .bg-white\/90 { background-color: hsla(222, 20%, 11%, 0.92); }
+.dark .bg-\[\#f6f5f2\] { background-color: hsl(222 24% 7%); }
+.dark .text-\[\#0b2545\] { color: hsl(220 25% 90%); }
+.dark .text-slate-500 { color: hsl(220 10% 62%); }
+.dark .text-slate-400 { color: hsl(220 10% 58%); }
+.dark .text-slate-300 { color: hsl(220 10% 72%); }
+.dark .border-black\/5 { border-color: hsl(222 16% 22%); }
+.dark .border-black\/8 { border-color: hsl(222 16% 22%); }
+.dark .border-black\/10 { border-color: hsl(222 16% 22%); }
+.dark .border-\[\#0b2545\] { border-color: hsl(220 30% 45%); }
+.dark .bg-black\/5 { background-color: hsla(0, 0%, 100%, 0.06); }
+.dark .hover\:bg-black\/5:hover { background-color: hsla(0, 0%, 100%, 0.06); }
+.dark .placeholder\:text-slate-400::placeholder { color: hsl(220 10% 50%); }

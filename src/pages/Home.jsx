@@ -7,10 +7,11 @@ import { SITE, STORIES, EVENTS } from "@/lib/siteData";
 import StoryCard from "@/components/mobile/StoryCard";
 import EventCard from "@/components/mobile/EventCard";
 import UpdateInfoForm from "@/components/mobile/UpdateInfoForm";
+import FollowLocal from "@/components/mobile/FollowLocal";
 
 const TABS = [
   { id: "news", label: "News" },
-  { id: "update", label: "Update Info" }
+  { id: "update", label: "Update Contact Info" }
 ];
 
 export default function Home() {
@@ -57,6 +58,8 @@ export default function Home() {
           ))}
         </div>
       </div>
+
+      <FollowLocal />
 
       {tab === "news" ? (
         <>
