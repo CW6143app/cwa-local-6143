@@ -108,20 +108,27 @@ export const EXEC_BOARD = [
     name: "Tarea Smith",
     title: "Secretary-Treasurer",
     email: "tareasmith@cwa6143.org",
+    phone: "7657307265",
     image: "https://cwa6143.org/sites/default/files/styles/featured_image_small/public/2023-07/tareas_pic.jpeg.webp?h=a2cb7c1a&itok=P15mdtPX",
   },
   {
     name: "Jeremy Garcia",
     title: "Vice-President 1",
+    email: "jeremygarcia@cwa6143.org",
+    phone: "4095049809",
   },
   {
     name: "Jo Angela Barroso",
     title: "Vice-President 2",
+    email: "joangelaherrera@cwa6143.org",
+    phone: "2102897441",
     image: "https://cwa6143.org/sites/default/files/styles/featured_image_small/public/2023-07/joangelas_pic_1.jpg.webp?h=8d5e1f87&itok=U557XpSB",
   },
   {
     name: "Jesse Espinosa",
     title: "Vice President 3 (Mobility)",
+    email: "jesseespinosa@cwa6143.org",
+    phone: "2107650552",
   },
 ];
 
