@@ -1,0 +1,18 @@
+{
+  "name": "CWA Local 6143",
+  "short_name": "CWA 6143",
+  "description": "Union news, events, grievance filing, and member resources for CWA Local 6143.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f6f5f2",
+  "theme_color": "#c8102e",
+  "icons": [
+    {
+      "src": "https://media.base44.com/images/public/6a96f9a8ac8dfadbcb9d319b/8889d6eae_generated_image.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
