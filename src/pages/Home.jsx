@@ -64,10 +64,10 @@ export default function Home() {
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
-            className={`flex-1 h-10 rounded-full text-xs font-semibold transition-colors bg-[hsl(var(--destructive-foreground))] text-[hsl(var(--background))] ${
+            className={`flex-1 h-10 rounded-full text-xs font-semibold transition-colors ${
             tab === t.id ?
             "bg-[#c8102e] text-white" :
-            "hover:bg-black/5"}`
+            "bg-black/5 text-[#0b2545] hover:bg-black/10"}`
             }>
             
               {t.label}
@@ -75,7 +75,7 @@ export default function Home() {
           )}
           <Link
             to="/grievance"
-            className="flex-1 h-10 rounded-full text-xs font-semibold transition-colors text-white hover:bg-[#0b2545]/90 flex items-center justify-center bg-[hsl(var(--destructive-foreground))]">
+            className="flex-1 h-10 rounded-full text-xs font-semibold transition-colors text-white hover:bg-[#0b2545]/90 flex items-center justify-center bg-[#0b2545]">
             
             File a Grievance
           </Link>

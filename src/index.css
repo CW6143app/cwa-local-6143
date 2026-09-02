@@ -121,5 +121,7 @@
 .dark .border-black\/10 { border-color: hsl(222 16% 22%); }
 .dark .border-\[\#0b2545\] { border-color: hsl(220 30% 45%); }
 .dark .bg-black\/5 { background-color: hsla(0, 0%, 100%, 0.06); }
+.dark .bg-black\/10 { background-color: hsla(0, 0%, 100%, 0.12); }
 .dark .hover\:bg-black\/5:hover { background-color: hsla(0, 0%, 100%, 0.06); }
+.dark .hover\:bg-black\/10:hover { background-color: hsla(0, 0%, 100%, 0.12); }
 .dark .placeholder\:text-slate-400::placeholder { color: hsl(220 10% 50%); }
