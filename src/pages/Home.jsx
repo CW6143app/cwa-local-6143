@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Image } from "@/components/ui/image";
+import { base44 } from "@/api/base44Client";
 import { SITE, STORIES, EVENTS } from "@/lib/siteData";
 import StoryCard from "@/components/mobile/StoryCard";
 import EventCard from "@/components/mobile/EventCard";
@@ -16,6 +17,21 @@ const TABS = [
 
 export default function Home() {
   const [tab, setTab] = useState("news");
+  const [syncedStories, setSyncedStories] = useState([]);
+  const [syncedEvents, setSyncedEvents] = useState([]);
+
+  useEffect(() => {
+    Promise.all([
+      base44.entities.SyncedStory.list("sort_order", 8).catch(() => []),
+      base44.entities.SyncedEvent.list("sort_order", 4).catch(() => []),
+    ]).then(([s, e]) => {
+      setSyncedStories(Array.isArray(s) ? s : []);
+      setSyncedEvents(Array.isArray(e) ? e : []);
+    });
+  }, []);
+
+  const stories = syncedStories.length ? syncedStories : STORIES;
+  const events = syncedEvents.length ? syncedEvents : EVENTS;
 
   return (
     <div>
@@ -74,8 +90,8 @@ export default function Home() {
               </h2>
             </div>
             <div className="mt-5 space-y-5">
-              {STORIES.map((s, i) =>
-            <StoryCard key={s.title} story={s} index={i} />
+              {stories.map((s, i) =>
+            <StoryCard key={s.title || s.id} story={s} index={i} />
             )}
             </div>
           </section>
@@ -85,8 +101,8 @@ export default function Home() {
               Upcoming Events
             </h2>
             <div className="mt-5 space-y-4">
-              {EVENTS.slice(0, 2).map((e, i) =>
-            <EventCard key={e.month} event={e} index={i} />
+              {events.slice(0, 2).map((e, i) =>
+            <EventCard key={(e.month || "") + (e.day || "")} event={e} index={i} />
             )}
             </div>
             <Link

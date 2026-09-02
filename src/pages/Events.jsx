@@ -1,9 +1,20 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import PageHeader from "@/components/mobile/PageHeader";
 import EventCard from "@/components/mobile/EventCard";
+import { base44 } from "@/api/base44Client";
 import { EVENTS } from "@/lib/siteData";
 
 export default function Events() {
+  const [synced, setSynced] = useState([]);
+
+  useEffect(() => {
+    base44.entities.SyncedEvent.list("sort_order", 20)
+      .then((data) => setSynced(Array.isArray(data) ? data : []))
+      .catch(() => setSynced([]));
+  }, []);
+
+  const events = synced.length ? synced : EVENTS;
+
   return (
     <div>
       <PageHeader
@@ -12,7 +23,7 @@ export default function Events() {
         subtitle="Monthly membership meetings are hybrid — join us in person or by Zoom." />
       
       <div className="space-y-4 px-6">
-        {EVENTS.map((e, i) =>
+        {events.map((e, i) =>
         <EventCard key={`${e.month}-${e.day}`} event={e} index={i} />
         )}
       </div>

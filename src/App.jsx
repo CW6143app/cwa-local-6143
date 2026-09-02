@@ -16,6 +16,7 @@ import Grievance from '@/pages/Grievance';
 import GrievanceDashboard from '@/pages/GrievanceDashboard';
 import PmeiForm from '@/pages/PmeiForm';
 import PmeiDashboard from '@/pages/PmeiDashboard';
+import SyncDashboard from '@/pages/SyncDashboard';
 import AdminRoute from '@/components/AdminRoute';
 
 const AuthenticatedApp = () => {
@@ -49,6 +50,7 @@ const AuthenticatedApp = () => {
       <Route element={<AdminRoute />}>
         <Route path="/admin/grievances" element={<GrievanceDashboard />} />
         <Route path="/admin/pmei" element={<PmeiDashboard />} />
+        <Route path="/admin/sync" element={<SyncDashboard />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
