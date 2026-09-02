@@ -9,6 +9,7 @@ import StoryCard from "@/components/mobile/StoryCard";
 import EventCard from "@/components/mobile/EventCard";
 import UpdateInfoForm from "@/components/mobile/UpdateInfoForm";
 import FollowLocal from "@/components/mobile/FollowLocal";
+import PushOptIn from "@/components/mobile/PushOptIn";
 
 const TABS = [
 { id: "news", label: "News" },
@@ -83,6 +84,10 @@ export default function Home() {
 
       {tab === "news" ?
       <>
+          <section className="px-6 pt-6">
+            <PushOptIn />
+          </section>
+
           <section className="px-6 pt-9">
             <div className="flex items-baseline justify-between">
               <h2 className="text-xs font-semibold uppercase tracking-[0.24em] text-[#0b2545]">

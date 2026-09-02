@@ -5,7 +5,6 @@ import PageHeader from "@/components/mobile/PageHeader";
 import { SITE } from "@/lib/siteData";
 import AccountSettings from "@/components/mobile/AccountSettings";
 import BoardMembers from "@/components/mobile/BoardMembers";
-import PushOptIn from "@/components/mobile/PushOptIn";
 
 export default function About() {
   return (
@@ -33,8 +32,6 @@ export default function About() {
         </div>
 
         <BoardMembers />
-
-        <PushOptIn />
 
         <AccountSettings />
       </div>
