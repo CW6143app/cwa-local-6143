@@ -53,9 +53,7 @@ const AuthenticatedApp = () => {
         <Route path="/events" element={<Events />} />
         <Route path="/resources" element={<Resources />} />
         <Route path="/about" element={<About />} />
-        <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login?returnTo=/grievance" replace />} />}>
-          <Route path="/grievance" element={<Grievance />} />
-        </Route>
+        <Route path="/grievance" element={<Grievance />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
