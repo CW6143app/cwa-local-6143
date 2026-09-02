@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
@@ -6,8 +6,16 @@ import { Image } from "@/components/ui/image";
 import { SITE, STORIES, EVENTS } from "@/lib/siteData";
 import StoryCard from "@/components/mobile/StoryCard";
 import EventCard from "@/components/mobile/EventCard";
+import UpdateInfoForm from "@/components/mobile/UpdateInfoForm";
+
+const TABS = [
+  { id: "news", label: "News" },
+  { id: "update", label: "Update Info" }
+];
 
 export default function Home() {
+  const [tab, setTab] = useState("news");
+
   return (
     <div>
       <section className="relative h-[300px] w-full overflow-hidden">
@@ -31,35 +39,62 @@ export default function Home() {
         </motion.div>
       </section>
 
-      <section className="px-6 pt-9">
-        <div className="flex items-baseline justify-between">
-          <h2 className="text-xs font-semibold uppercase tracking-[0.24em] text-[#0b2545]">
-            Featured Stories
-          </h2>
-        </div>
-        <div className="mt-5 space-y-5">
-          {STORIES.map((s, i) => (
-            <StoryCard key={s.title} story={s} index={i} />
+      {/* Tabs */}
+      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur px-6 pt-3 pb-2 border-b border-black/5">
+        <div className="flex gap-1">
+          {TABS.map((t) => (
+            <button
+              key={t.id}
+              onClick={() => setTab(t.id)}
+              className={`flex-1 h-10 rounded-full text-sm font-semibold transition-colors ${
+                tab === t.id
+                  ? "bg-[#c8102e] text-white"
+                  : "text-[#0b2545] bg-transparent hover:bg-black/5"
+              }`}
+            >
+              {t.label}
+            </button>
           ))}
         </div>
-      </section>
+      </div>
 
-      <section className="px-6 pt-10">
-        <h2 className="text-xs font-semibold uppercase tracking-[0.24em] text-[#0b2545]">
-          Upcoming Events
-        </h2>
-        <div className="mt-5 space-y-4">
-          {EVENTS.slice(0, 2).map((e, i) => (
-            <EventCard key={e.month} event={e} index={i} />
-          ))}
-        </div>
-        <Link
-          to="/events"
-          className="mt-5 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#c8102e]"
-        >
-          View all events <ArrowRight className="w-4 h-4" />
-        </Link>
-      </section>
+      {tab === "news" ? (
+        <>
+          <section className="px-6 pt-9">
+            <div className="flex items-baseline justify-between">
+              <h2 className="text-xs font-semibold uppercase tracking-[0.24em] text-[#0b2545]">
+                Featured Stories
+              </h2>
+            </div>
+            <div className="mt-5 space-y-5">
+              {STORIES.map((s, i) => (
+                <StoryCard key={s.title} story={s} index={i} />
+              ))}
+            </div>
+          </section>
+
+          <section className="px-6 pt-10">
+            <h2 className="text-xs font-semibold uppercase tracking-[0.24em] text-[#0b2545]">
+              Upcoming Events
+            </h2>
+            <div className="mt-5 space-y-4">
+              {EVENTS.slice(0, 2).map((e, i) => (
+                <EventCard key={e.month} event={e} index={i} />
+              ))}
+            </div>
+            <Link
+              to="/events"
+              className="mt-5 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#c8102e]"
+            >
+              View all events <ArrowRight className="w-4 h-4" />
+            </Link>
+          </section>
+        </>
+      ) : (
+        <section className="px-6 pt-6 pb-8">
+          <UpdateInfoForm />
+        </section>
+      )}
     </div>
   );
 }
