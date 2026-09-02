@@ -59,12 +59,9 @@ const AuthenticatedApp = () => {
 function App() {
   useEffect(() => {
     const mq = window.matchMedia('(prefers-color-scheme: dark)');
-    const stored = localStorage.getItem('cwa-theme');
     const apply = (isDark) => document.documentElement.classList.toggle('dark', isDark);
-    apply(stored ? stored === 'dark' : mq.matches);
-    const handler = (e) => {
-      if (!localStorage.getItem('cwa-theme')) apply(e.matches);
-    };
+    apply(mq.matches);
+    const handler = (e) => apply(e.matches);
     mq.addEventListener('change', handler);
     return () => mq.removeEventListener('change', handler);
   }, []);
