@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Bell, BellRing, Loader2, CheckCircle2 } from "lucide-react";
 import { messaging, VAPID_KEY } from "@/lib/firebase";
 import { getToken } from "firebase/messaging";
@@ -6,6 +6,12 @@ import { getToken } from "firebase/messaging";
 export default function PushOptIn() {
   const [status, setStatus] = useState("idle"); // idle | loading | granted | denied | unsupported
   const [token, setToken] = useState(null);
+
+  useEffect(() => {
+    if ("Notification" in window && Notification.permission === "granted") {
+      setStatus("granted");
+    }
+  }, []);
 
   const enable = async () => {
     if (!("Notification" in window)) {
@@ -35,6 +41,8 @@ export default function PushOptIn() {
       setStatus("denied");
     }
   };
+
+  if (status === "granted") return null;
 
   return (
     <div className="rounded-3xl bg-white p-6 shadow-[0_1px_2px_rgba(11,37,69,0.06),0_12px_32px_-20px_rgba(11,37,69,0.35)]">
