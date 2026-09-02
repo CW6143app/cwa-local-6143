@@ -12,6 +12,8 @@ import Events from '@/pages/Events';
 import Resources from '@/pages/Resources';
 import About from '@/pages/About';
 import Grievance from '@/pages/Grievance';
+import GrievanceDashboard from '@/pages/GrievanceDashboard';
+import AdminRoute from '@/components/AdminRoute';
 import Login from '@/pages/Login';
 import Register from '@/pages/Register';
 import ForgotPassword from '@/pages/ForgotPassword';
@@ -54,6 +56,9 @@ const AuthenticatedApp = () => {
         <Route path="/resources" element={<Resources />} />
         <Route path="/about" element={<About />} />
         <Route path="/grievance" element={<Grievance />} />
+      </Route>
+      <Route element={<AdminRoute />}>
+        <Route path="/admin/grievances" element={<GrievanceDashboard />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
