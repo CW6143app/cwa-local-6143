@@ -3,8 +3,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Image } from "@/components/ui/image";
-import { SITE } from "@/lib/siteData";
-import { useStories, useEvents } from "@/lib/useSiteContent";
+import { SITE, STORIES, EVENTS } from "@/lib/siteData";
 import StoryCard from "@/components/mobile/StoryCard";
 import EventCard from "@/components/mobile/EventCard";
 import UpdateInfoForm from "@/components/mobile/UpdateInfoForm";
@@ -17,8 +16,6 @@ const TABS = [
 
 export default function Home() {
   const [tab, setTab] = useState("news");
-  const { stories } = useStories();
-  const { events } = useEvents();
 
   return (
     <div>
@@ -77,8 +74,8 @@ export default function Home() {
               </h2>
             </div>
             <div className="mt-5 space-y-5">
-              {stories.map((s, i) =>
-            <StoryCard key={s.url || s.title} story={s} index={i} />
+              {STORIES.map((s, i) =>
+            <StoryCard key={s.title} story={s} index={i} />
             )}
             </div>
           </section>
@@ -88,8 +85,8 @@ export default function Home() {
               Upcoming Events
             </h2>
             <div className="mt-5 space-y-4">
-              {events.slice(0, 2).map((e, i) =>
-            <EventCard key={`${e.month}-${e.day}`} event={e} index={i} />
+              {EVENTS.slice(0, 2).map((e, i) =>
+            <EventCard key={e.month} event={e} index={i} />
             )}
             </div>
             <Link
