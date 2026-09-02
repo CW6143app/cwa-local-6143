@@ -10,9 +10,9 @@ import UpdateInfoForm from "@/components/mobile/UpdateInfoForm";
 import FollowLocal from "@/components/mobile/FollowLocal";
 
 const TABS = [
-  { id: "news", label: "News" },
-  { id: "update", label: "Update Contact Info" }
-];
+{ id: "news", label: "News" },
+{ id: "update", label: "Update Contact Info" }];
+
 
 export default function Home() {
   const [tab, setTab] = useState("news");
@@ -26,8 +26,8 @@ export default function Home() {
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          className="absolute inset-x-0 bottom-0 px-6 pb-7"
-        >
+          className="absolute inset-x-0 bottom-0 px-6 pb-7">
+          
           <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[#ff8a9b]">
             {SITE.city}
           </p>
@@ -43,30 +43,30 @@ export default function Home() {
       {/* Tabs */}
       <div className="sticky top-0 z-10 bg-background/95 backdrop-blur px-6 pt-3 pb-2 border-b border-black/5">
         <div className="flex gap-1">
-          {TABS.map((t) => (
-            <button
-              key={t.id}
-              onClick={() => setTab(t.id)}
-              className={`flex-1 h-10 rounded-full text-xs font-semibold transition-colors ${
-                tab === t.id
-                  ? "bg-[#c8102e] text-white"
-                  : "text-[#0b2545] bg-transparent hover:bg-black/5"
-              }`}
-            >
+          {TABS.map((t) =>
+          <button
+            key={t.id}
+            onClick={() => setTab(t.id)}
+            className={`flex-1 h-10 rounded-full text-xs font-semibold transition-colors bg-[hsl(var(--destructive-foreground))] text-[hsl(var(--background))] ${
+            tab === t.id ?
+            "bg-[#c8102e] text-white" :
+            "hover:bg-black/5"}`
+            }>
+            
               {t.label}
             </button>
-          ))}
+          )}
           <Link
             to="/grievance"
-            className="flex-1 h-10 rounded-full text-xs font-semibold transition-colors bg-[#0b2545] text-white hover:bg-[#0b2545]/90 flex items-center justify-center"
-          >
+            className="flex-1 h-10 rounded-full text-xs font-semibold transition-colors text-white hover:bg-[#0b2545]/90 flex items-center justify-center bg-[hsl(var(--destructive-foreground))]">
+            
             File a Grievance
           </Link>
         </div>
       </div>
 
-      {tab === "news" ? (
-        <>
+      {tab === "news" ?
+      <>
           <section className="px-6 pt-9">
             <div className="flex items-baseline justify-between">
               <h2 className="text-xs font-semibold uppercase tracking-[0.24em] text-[#0b2545]">
@@ -74,9 +74,9 @@ export default function Home() {
               </h2>
             </div>
             <div className="mt-5 space-y-5">
-              {STORIES.map((s, i) => (
-                <StoryCard key={s.title} story={s} index={i} />
-              ))}
+              {STORIES.map((s, i) =>
+            <StoryCard key={s.title} story={s} index={i} />
+            )}
             </div>
           </section>
 
@@ -85,25 +85,25 @@ export default function Home() {
               Upcoming Events
             </h2>
             <div className="mt-5 space-y-4">
-              {EVENTS.slice(0, 2).map((e, i) => (
-                <EventCard key={e.month} event={e} index={i} />
-              ))}
+              {EVENTS.slice(0, 2).map((e, i) =>
+            <EventCard key={e.month} event={e} index={i} />
+            )}
             </div>
             <Link
-              to="/events"
-              className="mt-5 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#c8102e]"
-            >
+            to="/events"
+            className="mt-5 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#c8102e]">
+            
               View all events <ArrowRight className="w-4 h-4" />
             </Link>
           </section>
-        </>
-      ) : (
-        <section className="px-6 pt-6 pb-8">
+        </> :
+
+      <section className="px-6 pt-6 pb-8">
           <UpdateInfoForm />
         </section>
-      )}
+      }
 
       <FollowLocal />
-    </div>
-  );
+    </div>);
+
 }
