@@ -4,13 +4,24 @@ import { base44 } from "@/api/base44Client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Loader2, CheckCircle2, UserCog } from "lucide-react";
+
+const EMPLOYERS = ["AT&T", "AT&T Mobility", "TCE"];
 
 const EMPTY = {
   full_name: "",
   email: "",
   phone: "",
-  address: ""
+  address: "",
+  suits_id: "",
+  employer: ""
 };
 
 export default function UpdateInfoForm() {
@@ -100,6 +111,28 @@ export default function UpdateInfoForm() {
         <div className="space-y-1">
           <Label className="text-xs font-medium text-[#0b2545]">Address</Label>
           <Input value={form.address} onChange={set("address")} className="h-9" placeholder="Street, City, State, Zip" />
+        </div>
+
+        <div className="space-y-1">
+          <Label className="text-xs font-medium text-[#0b2545]">SUITS ID</Label>
+          <Input value={form.suits_id} onChange={set("suits_id")} className="h-9" placeholder="Enter your SUITS ID" />
+        </div>
+
+        <div className="space-y-1">
+          <Label className="text-xs font-medium text-[#0b2545]">Employer</Label>
+          <Select
+            value={form.employer}
+            onValueChange={(val) => setForm((f) => ({ ...f, employer: val }))}
+          >
+            <SelectTrigger className="h-9">
+              <SelectValue placeholder="Select employer" />
+            </SelectTrigger>
+            <SelectContent>
+              {EMPLOYERS.map((e) => (
+                <SelectItem key={e} value={e}>{e}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         {error && (

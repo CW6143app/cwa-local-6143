@@ -18,6 +18,19 @@
     "address": {
       "type": "string",
       "title": "Address"
+    },
+    "suits_id": {
+      "type": "string",
+      "title": "SUITS ID"
+    },
+    "employer": {
+      "type": "string",
+      "enum": [
+        "AT&T",
+        "AT&T Mobility",
+        "TCE"
+      ],
+      "title": "Employer"
     }
   },
   "required": [
