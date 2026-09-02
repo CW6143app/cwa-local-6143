@@ -1,0 +1,59 @@
+{
+  "name": "NewsArticle",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "title": "Title"
+    },
+    "date": {
+      "type": "string",
+      "title": "Date"
+    },
+    "category": {
+      "type": "string",
+      "title": "Category"
+    },
+    "image": {
+      "type": "string",
+      "title": "Image URL",
+      "format": "uri"
+    },
+    "excerpt": {
+      "type": "string",
+      "title": "Excerpt"
+    },
+    "url": {
+      "type": "string",
+      "title": "Story URL",
+      "format": "uri"
+    },
+    "sync_date": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Last Synced"
+    }
+  },
+  "required": [
+    "title",
+    "url"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": null,
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

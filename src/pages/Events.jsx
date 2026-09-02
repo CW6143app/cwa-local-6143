@@ -1,9 +1,10 @@
 import React from "react";
 import PageHeader from "@/components/mobile/PageHeader";
 import EventCard from "@/components/mobile/EventCard";
-import { EVENTS } from "@/lib/siteData";
+import { useEvents } from "@/lib/useSiteContent";
 
 export default function Events() {
+  const { events } = useEvents();
   return (
     <div>
       <PageHeader
@@ -12,7 +13,7 @@ export default function Events() {
         subtitle="Monthly membership meetings are hybrid — join us in person or by Zoom." />
       
       <div className="space-y-4 px-6">
-        {EVENTS.map((e, i) =>
+        {events.map((e, i) =>
         <EventCard key={`${e.month}-${e.day}`} event={e} index={i} />
         )}
       </div>
