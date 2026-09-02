@@ -12,7 +12,7 @@ const ICONS = {
 export default function FollowLocal() {
   return (
     <section className="px-6 pt-6">
-      <h2 className="text-xs font-semibold uppercase tracking-[0.24em] text-[#0b2545] dark:text-slate-200">
+      <h2 className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#0b2545] dark:text-slate-200">
         Follow the Local
       </h2>
       <div className="mt-3 flex gap-3">
