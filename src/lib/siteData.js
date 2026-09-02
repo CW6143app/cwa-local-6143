@@ -96,6 +96,35 @@ export const EVENTS = [
   },
 ];
 
+export const EXEC_BOARD = [
+  {
+    name: "Danny DeOsio",
+    title: "President",
+    email: "danny.deosio@cwa6143.org",
+    phone: "2108572562",
+    image: "https://cwa6143.org/sites/default/files/styles/featured_image_small/public/2024-03/fb_img_1709730735888.jpg.webp?h=0b02436c&itok=jKynWH39",
+  },
+  {
+    name: "Tarea Smith",
+    title: "Secretary-Treasurer",
+    email: "tareasmith@cwa6143.org",
+    image: "https://cwa6143.org/sites/default/files/styles/featured_image_small/public/2023-07/tareas_pic.jpeg.webp?h=a2cb7c1a&itok=P15mdtPX",
+  },
+  {
+    name: "Jeremy Garcia",
+    title: "Vice-President 1",
+  },
+  {
+    name: "Jo Angela Barroso",
+    title: "Vice-President 2",
+    image: "https://cwa6143.org/sites/default/files/styles/featured_image_small/public/2023-07/joangelas_pic_1.jpg.webp?h=8d5e1f87&itok=U557XpSB",
+  },
+  {
+    name: "Jesse Espinosa",
+    title: "Vice President 3 (Mobility)",
+  },
+];
+
 export const RESOURCE_GROUPS = [
   {
     group: "Member Resources",

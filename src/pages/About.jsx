@@ -2,8 +2,9 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { MapPin, Globe, ArrowUpRight } from "lucide-react";
 import PageHeader from "@/components/mobile/PageHeader";
-import { SITE, SOCIALS } from "@/lib/siteData";
+import { SITE } from "@/lib/siteData";
 import AccountSettings from "@/components/mobile/AccountSettings";
+import BoardMembers from "@/components/mobile/BoardMembers";
 
 export default function About() {
   return (
@@ -30,24 +31,7 @@ export default function About() {
           </a>
         </div>
 
-        <div className="rounded-3xl bg-white p-6 shadow-[0_1px_2px_rgba(11,37,69,0.06),0_12px_32px_-20px_rgba(11,37,69,0.35)]">
-          <h2 className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#c8102e]">
-            Follow the Local
-          </h2>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {SOCIALS.map((s) => (
-              <a
-                key={s.label}
-                href={s.url}
-                target="_blank"
-                rel="noreferrer"
-                className="rounded-full border border-black/10 px-4 py-2 text-xs font-medium text-[#0b2545]"
-              >
-                {s.label}
-              </a>
-            ))}
-          </div>
-        </div>
+        <BoardMembers />
 
         <AccountSettings />
 
