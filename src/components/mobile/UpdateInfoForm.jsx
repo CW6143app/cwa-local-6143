@@ -16,11 +16,12 @@ import { Loader2, CheckCircle2, UserCog } from "lucide-react";
 const EMPLOYERS = ["AT&T", "AT&T Mobility", "TCE"];
 
 const EMPTY = {
-  full_name: "",
+  first_name: "",
+  last_name: "",
   email: "",
   phone: "",
   address: "",
-  suits_id: "",
+  uid: "",
   employer: ""
 };
 
@@ -32,9 +33,11 @@ export default function UpdateInfoForm() {
 
   useEffect(() => {
     base44.auth.me().then((u) => {
+      const parts = (u.full_name || "").split(" ");
       setForm((f) => ({
         ...f,
-        full_name: u.full_name || "",
+        first_name: parts[0] || "",
+        last_name: parts.slice(1).join(" ") || "",
         email: u.email || ""
       }));
     }).catch(() => {});
@@ -89,11 +92,19 @@ export default function UpdateInfoForm() {
           <h3 className="text-sm font-semibold text-[#0b2545]">Update Your Contact Info</h3>
         </div>
 
-        <div className="space-y-1">
-          <Label className="text-xs font-medium text-[#0b2545]">
-            Full Name <span className="text-[#c8102e]">*</span>
-          </Label>
-          <Input value={form.full_name} onChange={set("full_name")} required className="h-9" />
+        <div className="flex gap-3">
+          <div className="space-y-1 flex-1">
+            <Label className="text-xs font-medium text-[#0b2545]">
+              First Name <span className="text-[#c8102e]">*</span>
+            </Label>
+            <Input value={form.first_name} onChange={set("first_name")} required className="h-9" />
+          </div>
+          <div className="space-y-1 flex-1">
+            <Label className="text-xs font-medium text-[#0b2545]">
+              Last Name <span className="text-[#c8102e]">*</span>
+            </Label>
+            <Input value={form.last_name} onChange={set("last_name")} required className="h-9" />
+          </div>
         </div>
 
         <div className="space-y-1">
@@ -114,8 +125,8 @@ export default function UpdateInfoForm() {
         </div>
 
         <div className="space-y-1">
-          <Label className="text-xs font-medium text-[#0b2545]">SUITS ID</Label>
-          <Input value={form.suits_id} onChange={set("suits_id")} className="h-9" placeholder="Enter your SUITS ID" />
+          <Label className="text-xs font-medium text-[#0b2545]">Employee User ID (UID)</Label>
+          <Input value={form.uid} onChange={set("uid")} className="h-9" placeholder="Enter your UID" />
         </div>
 
         <div className="space-y-1">

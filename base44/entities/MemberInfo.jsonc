@@ -2,9 +2,13 @@
   "name": "MemberInfo",
   "type": "object",
   "properties": {
-    "full_name": {
+    "first_name": {
       "type": "string",
-      "title": "Full Name"
+      "title": "First Name"
+    },
+    "last_name": {
+      "type": "string",
+      "title": "Last Name"
     },
     "email": {
       "type": "string",
@@ -19,9 +23,9 @@
       "type": "string",
       "title": "Address"
     },
-    "suits_id": {
+    "uid": {
       "type": "string",
-      "title": "SUITS ID"
+      "title": "Employee User ID (UID)"
     },
     "employer": {
       "type": "string",
@@ -34,7 +38,8 @@
     }
   },
   "required": [
-    "full_name",
+    "first_name",
+    "last_name",
     "email"
   ],
   "rls": {
