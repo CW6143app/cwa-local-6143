@@ -14,11 +14,6 @@ import About from '@/pages/About';
 import Grievance from '@/pages/Grievance';
 import GrievanceDashboard from '@/pages/GrievanceDashboard';
 import AdminRoute from '@/components/AdminRoute';
-import Login from '@/pages/Login';
-import Register from '@/pages/Register';
-import ForgotPassword from '@/pages/ForgotPassword';
-import ResetPassword from '@/pages/ResetPassword';
-import ProtectedRoute from '@/components/ProtectedRoute';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -46,10 +41,6 @@ const AuthenticatedApp = () => {
   // Render the main app
   return (
     <Routes>
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-      <Route path="/forgot-password" element={<ForgotPassword />} />
-      <Route path="/reset-password" element={<ResetPassword />} />
       <Route element={<Shell />}>
         <Route path="/" element={<Home />} />
         <Route path="/events" element={<Events />} />
