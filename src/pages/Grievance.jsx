@@ -14,7 +14,9 @@ const INCIDENT_TYPES = ["PN", "WR", "DML", "Susp/Term", "Other"];
 
 const EMPTY = {
   local_grievance_num: "",
-  name_of_grievant: "",
+  date_of_submission: "",
+  first_name: "",
+  last_name: "",
   ncs: "",
   home_address: "",
   cell: "",
@@ -36,6 +38,7 @@ const EMPTY = {
   violation_of_articles: "",
   auth_personal_records: false,
   auth_medical_records: false,
+  signature_initials: "",
   signature_date: ""
 };
 
@@ -52,7 +55,6 @@ function Field({ label, flex = "1", required, children }) {
       </Label>
       {children}
     </div>);
-
 }
 
 function SectionTitle({ num, label }) {
@@ -61,7 +63,6 @@ function SectionTitle({ num, label }) {
       <span className="text-sm font-semibold text-[#0b2545] shrink-0 w-5">{num}.</span>
       <span className="text-sm font-semibold text-[#0b2545]">{label}</span>
     </div>);
-
 }
 
 function Divider() {
@@ -78,9 +79,11 @@ export default function Grievance() {
 
   useEffect(() => {
     if (user) {
+      const parts = (user.full_name || "").split(" ");
       setForm((f) => ({
         ...f,
-        name_of_grievant: user.full_name || "",
+        first_name: parts[0] || "",
+        last_name: parts.slice(1).join(" ") || "",
         email: user.email || ""
       }));
     }
@@ -102,7 +105,12 @@ export default function Grievance() {
     setError("");
     setLoading(true);
     try {
-      await base44.entities.Grievance.create({ ...form, status: "submitted" });
+      const { first_name, last_name, ...rest } = form;
+      await base44.entities.Grievance.create({
+        ...rest,
+        name_of_grievant: `${first_name} ${last_name}`.trim(),
+        status: "submitted"
+      });
       setDone(true);
     } catch (err) {
       setError(err.message || "Could not submit. Please try again.");
@@ -129,7 +137,6 @@ export default function Grievance() {
           </Button>
         </motion.div>
       </div>);
-
   }
 
   return (
@@ -151,24 +158,30 @@ export default function Grievance() {
 
       <form onSubmit={handleSubmit} className="px-5 pt-6 space-y-5">
 
-        {/* Grievance # */}
+        {/* Grievance # & Date of Submission */}
         <div className="rounded-2xl bg-white p-5 shadow-[0_1px_2px_rgba(11,37,69,0.06),0_8px_24px_-12px_rgba(11,37,69,0.2)] space-y-4">
           <Field label="Local Grievance #">
             <div className="flex items-center gap-2">
               <span className="text-sm font-semibold text-[#0b2545]">20</span>
               <span className="text-sm text-slate-400">-</span>
-              <Input value={form.local_grievance_num} onChange={set("local_grievance_num")} className="h-9 flex-1" placeholder="___-___" />
+              <span className="text-sm text-slate-400 italic">Assigned by Local</span>
             </div>
+          </Field>
+          <Field label="Date of Submission">
+            <Input value={form.date_of_submission} onChange={set("date_of_submission")} type="date" className="h-9" />
           </Field>
         </div>
 
-        {/* Fields 1–6 */}
+        {/* Fields 1–5 */}
         <div className="rounded-2xl bg-white p-5 shadow-[0_1px_2px_rgba(11,37,69,0.06),0_8px_24px_-12px_rgba(11,37,69,0.2)] space-y-4">
           <div>
             <SectionTitle num="1" label="Name of Grievant" />
             <Row className="mt-2">
-              <Field label="Full name" flex="2" required>
-                <Input value={form.name_of_grievant} onChange={set("name_of_grievant")} required className="h-9" />
+              <Field label="First Name" flex="1" required>
+                <Input value={form.first_name} onChange={set("first_name")} required className="h-9" />
+              </Field>
+              <Field label="Last Name" flex="1" required>
+                <Input value={form.last_name} onChange={set("last_name")} required className="h-9" />
               </Field>
               <Field label="NCS" flex="1">
                 <Input value={form.ncs} onChange={set("ncs")} className="h-9" />
@@ -186,10 +199,6 @@ export default function Grievance() {
                 <Input value={form.cell} onChange={set("cell")} type="tel" className="h-9" />
               </Field>
             </Row>
-          </div>
-          <Divider />
-          <div>
-            <SectionTitle num="3" label="City / Zip / SSN" />
             <Row className="mt-2">
               <Field label="City" flex="2">
                 <Input value={form.city} onChange={set("city")} className="h-9" />
@@ -204,7 +213,7 @@ export default function Grievance() {
           </div>
           <Divider />
           <div>
-            <SectionTitle num="4" label="Gender / Email" />
+            <SectionTitle num="3" label="Gender / Email" />
             <Row className="mt-2">
               <Field label="Gender" flex="1">
                 <SheetSelect
@@ -226,7 +235,7 @@ export default function Grievance() {
           </div>
           <Divider />
           <div>
-            <SectionTitle num="5" label="Job Title / Department / SUITS ID" />
+            <SectionTitle num="4" label="Job Title / Department / SUITS ID" />
             <Row className="mt-2">
               <Field label="Job Title" flex="2">
                 <Input value={form.job_title} onChange={set("job_title")} className="h-9" />
@@ -241,7 +250,7 @@ export default function Grievance() {
           </div>
           <Divider />
           <div>
-            <SectionTitle num="6" label="Work Location / 1st Level Mgr." />
+            <SectionTitle num="5" label="Work Location / 1st Level Mgr." />
             <Row className="mt-2">
               <Field label="Work Location" flex="2">
                 <Input value={form.work_location} onChange={set("work_location")} className="h-9" />
@@ -253,9 +262,9 @@ export default function Grievance() {
           </div>
         </div>
 
-        {/* Field 7 */}
+        {/* Field 6 */}
         <div className="rounded-2xl bg-white p-5 shadow-[0_1px_2px_rgba(11,37,69,0.06),0_8px_24px_-12px_rgba(11,37,69,0.2)] space-y-4">
-          <SectionTitle num="7" label="Date of Incident & Type" />
+          <SectionTitle num="6" label="Date of Incident & Type" />
           <Row className="mt-2">
             <Field label="Date of Incident" flex="1">
               <Input value={form.date_of_incident} onChange={set("date_of_incident")} type="date" className="h-9" />
@@ -292,14 +301,19 @@ export default function Grievance() {
               className="resize-none" />
             
           </Field>
-          <Field label="Signature Date">
-            <Input value={form.signature_date} onChange={set("signature_date")} type="date" className="h-9" />
-          </Field>
+          <Row>
+            <Field label="Signature (Initials)" flex="1">
+              <Input value={form.signature_initials} onChange={set("signature_initials")} maxLength={4} className="h-9" placeholder="Enter your initials" />
+            </Field>
+            <Field label="Signature Date" flex="1">
+              <Input value={form.signature_date} onChange={set("signature_date")} type="date" className="h-9" />
+            </Field>
+          </Row>
         </div>
 
-        {/* Field 8 */}
+        {/* Field 7 */}
         <div className="rounded-2xl bg-white p-5 shadow-[0_1px_2px_rgba(11,37,69,0.06),0_8px_24px_-12px_rgba(11,37,69,0.2)] space-y-3">
-          <SectionTitle num="8" label="What settlement is expected?" />
+          <SectionTitle num="7" label="What settlement is expected?" />
           <Textarea
             value={form.settlement_expected}
             onChange={set("settlement_expected")}
@@ -309,9 +323,9 @@ export default function Grievance() {
           
         </div>
 
-        {/* Field 9 */}
+        {/* Field 8 */}
         <div className="rounded-2xl bg-white p-5 shadow-[0_1px_2px_rgba(11,37,69,0.06),0_8px_24px_-12px_rgba(11,37,69,0.2)] space-y-3">
-          <SectionTitle num="9" label="Violation of Article(s) or Past Practice" />
+          <SectionTitle num="8" label="Violation of Article(s) or Past Practice" />
           <Textarea
             value={form.violation_of_articles}
             onChange={set("violation_of_articles")}
@@ -372,5 +386,4 @@ export default function Grievance() {
         </Button>
       </form>
     </div>);
-
 }
