@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
 import { ArrowLeft, Shield, ChevronDown, FileText, Inbox, CheckCircle2, Clock } from 'lucide-react';
+import SheetSelect from '@/components/mobile/SheetSelect';
 
 const STATUS_OPTIONS = [
   { value: 'submitted', label: 'Submitted', color: 'bg-blue-100 text-blue-700', dot: 'bg-blue-500' },
@@ -202,16 +203,13 @@ export default function GrievanceDashboard() {
                       </td>
                       <td className="px-4 py-3"><StatusBadge status={g.status} /></td>
                       <td className="px-4 py-3">
-                        <select
+                        <SheetSelect
                           value={g.status}
+                          onValueChange={(val) => updateStatus(g.id, val)}
                           disabled={updatingId === g.id}
-                          onChange={(e) => updateStatus(g.id, e.target.value)}
-                          className="h-8 rounded-md border border-slate-200 bg-white px-2 text-xs font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#c8102e]/30 disabled:opacity-50"
-                        >
-                          {STATUS_OPTIONS.map((s) => (
-                            <option key={s.value} value={s.value}>{s.label}</option>
-                          ))}
-                        </select>
+                          options={STATUS_OPTIONS}
+                          label="Update Status"
+                        />
                       </td>
                     </tr>
                   ))}

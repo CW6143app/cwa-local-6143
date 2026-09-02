@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { MapPin, Globe, ArrowUpRight } from "lucide-react";
 import PageHeader from "@/components/mobile/PageHeader";
 import { SITE, SOCIALS } from "@/lib/siteData";
+import AccountSettings from "@/components/mobile/AccountSettings";
 
 export default function About() {
   return (
@@ -47,6 +48,8 @@ export default function About() {
             ))}
           </div>
         </div>
+
+        <AccountSettings />
 
         <Link
           to="/grievance"

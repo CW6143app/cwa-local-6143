@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Loader2, CheckCircle2, FileText } from "lucide-react";
+import SheetSelect from "@/components/mobile/SheetSelect";
 
 const INCIDENT_TYPES = ["PN", "WR", "DML", "Susp/Term", "Other"];
 
@@ -203,22 +204,18 @@ export default function Grievance() {
           <div>
             <SectionTitle num="4" label="Gender / Email" />
             <Row className="mt-2">
-              <Field label="Gender" flex="0 0 auto">
-                <div className="flex gap-3 h-9 items-center">
-                  {["M", "F", "Other"].map((g) =>
-                  <label key={g} className="flex items-center gap-1.5 text-sm cursor-pointer">
-                      <input
-                      type="radio"
-                      name="gender"
-                      value={g}
-                      checked={form.gender === g}
-                      onChange={() => setForm((f) => ({ ...f, gender: g }))}
-                      className="accent-[#c8102e]" />
-                    
-                      {g}
-                    </label>
-                  )}
-                </div>
+              <Field label="Gender" flex="1">
+                <SheetSelect
+                  value={form.gender}
+                  onValueChange={(val) => setForm((f) => ({ ...f, gender: val }))}
+                  placeholder="Select gender"
+                  label="Select Gender"
+                  options={[
+                    { value: "M", label: "Male" },
+                    { value: "F", label: "Female" },
+                    { value: "Other", label: "Other" }
+                  ]}
+                />
               </Field>
               <Field label="Email" flex="2" required>
                 <Input value={form.email} onChange={set("email")} type="email" required className="h-9" />

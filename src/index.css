@@ -82,11 +82,28 @@
 
 
 @layer base {
+  html {
+    overscroll-behavior: none;
+  }
+
   * {
     @apply border-border outline-ring/50;
   }
 
   body {
     @apply bg-background text-foreground font-body;
+    overscroll-behavior: none;
+  }
+
+  button,
+  a,
+  nav,
+  [role="tab"],
+  [role="button"],
+  input[type="checkbox"],
+  input[type="radio"] {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
   }
 }
