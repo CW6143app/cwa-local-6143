@@ -138,7 +138,7 @@ export const RESOURCE_GROUPS = [
     links: [
       { label: "Grievance Form", url: "https://cwa6143.org/grievance", internal: "/grievance" },
       { label: "PMEI Submission Form", url: "https://cwa6143.org/contracts/pmei-submisson-form", internal: "/pmei" },
-      { label: "Committee Sign Up", url: "https://cwa6143.org/participate" },
+      { label: "Committee Sign Up", url: "https://cwa6143.org/participate", internal: "/committee-signup" },
       { label: "Contracts", url: "https://cwa6143.org/contracts/contracts" },
       { label: "6143 Bylaws", url: "https://cwa6143.org/contracts/bylaws-2023-0" },
       { label: "CWA Constitution", url: "https://cwa-union.org/for-locals/cwa-constitution" },
@@ -155,7 +155,6 @@ export const RESOURCE_GROUPS = [
   {
     group: "Take Action",
     links: [
-      { label: "Get Involved", url: "https://cwa6143.org/participate" },
       { label: "Legislative", url: "https://cwa6143.org/legislative" },
       { label: "CWA's e-Newsletter", url: "http://www.cwa-union.org/pages/sign_up_for_email" },
     ],
