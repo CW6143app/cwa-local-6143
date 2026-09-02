@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Loader2, CheckCircle2, FileText } from "lucide-react";
 import SheetSelect from "@/components/mobile/SheetSelect";
+import { useAuth } from "@/lib/AuthContext";
 
 const INCIDENT_TYPES = ["PN", "WR", "DML", "Susp/Term", "Other"];
 
@@ -69,20 +70,21 @@ function Divider() {
 
 export default function Grievance() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [form, setForm] = useState(EMPTY);
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    base44.auth.me().then((u) => {
+    if (user) {
       setForm((f) => ({
         ...f,
-        name_of_grievant: u.full_name || "",
-        email: u.email || ""
+        name_of_grievant: user.full_name || "",
+        email: user.email || ""
       }));
-    }).catch(() => {});
-  }, []);
+    }
+  }, [user]);
 
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
 
