@@ -47,7 +47,7 @@ export default function Home() {
             <button
               key={t.id}
               onClick={() => setTab(t.id)}
-              className={`flex-1 h-10 rounded-full text-sm font-semibold transition-colors ${
+              className={`flex-1 h-10 rounded-full text-xs font-semibold transition-colors ${
                 tab === t.id
                   ? "bg-[#c8102e] text-white"
                   : "text-[#0b2545] bg-transparent hover:bg-black/5"
@@ -56,6 +56,12 @@ export default function Home() {
               {t.label}
             </button>
           ))}
+          <Link
+            to="/grievance"
+            className="flex-1 h-10 rounded-full text-xs font-semibold transition-colors bg-[#0b2545] text-white hover:bg-[#0b2545]/90 flex items-center justify-center"
+          >
+            File a Grievance
+          </Link>
         </div>
       </div>
 
@@ -90,27 +96,10 @@ export default function Home() {
               View all events <ArrowRight className="w-4 h-4" />
             </Link>
           </section>
-
-          <section className="px-6 pt-8 pb-6">
-            <Link
-              to="/grievance"
-              className="block rounded-2xl bg-[#c8102e] py-4 text-center text-xs font-semibold uppercase tracking-[0.2em] text-white"
-            >
-              File a grievance
-            </Link>
-          </section>
         </>
       ) : (
         <section className="px-6 pt-6 pb-8">
           <UpdateInfoForm />
-          <div className="mt-6">
-            <Link
-              to="/grievance"
-              className="block rounded-2xl bg-[#c8102e] py-4 text-center text-xs font-semibold uppercase tracking-[0.2em] text-white"
-            >
-              File a grievance
-            </Link>
-          </div>
         </section>
       )}
 
