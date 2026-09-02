@@ -14,6 +14,8 @@ import Resources from '@/pages/Resources';
 import About from '@/pages/About';
 import Grievance from '@/pages/Grievance';
 import GrievanceDashboard from '@/pages/GrievanceDashboard';
+import PmeiForm from '@/pages/PmeiForm';
+import PmeiDashboard from '@/pages/PmeiDashboard';
 import AdminRoute from '@/components/AdminRoute';
 
 const AuthenticatedApp = () => {
@@ -42,9 +44,11 @@ const AuthenticatedApp = () => {
         <Route path="/resources" element={<Resources />} />
         <Route path="/about" element={<About />} />
         <Route path="/grievance" element={<Grievance />} />
+        <Route path="/pmei" element={<PmeiForm />} />
       </Route>
       <Route element={<AdminRoute />}>
         <Route path="/admin/grievances" element={<GrievanceDashboard />} />
+        <Route path="/admin/pmei" element={<PmeiDashboard />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
