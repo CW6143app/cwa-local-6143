@@ -1,0 +1,35 @@
+{
+  "name": "PushToken",
+  "type": "object",
+  "properties": {
+    "token": {
+      "type": "string",
+      "title": "FCM Device Token"
+    },
+    "user_agent": {
+      "type": "string",
+      "title": "User Agent"
+    }
+  },
+  "required": [
+    "token"
+  ],
+  "rls": {
+    "create": null,
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
