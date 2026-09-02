@@ -90,21 +90,29 @@ export default function Home() {
               View all events <ArrowRight className="w-4 h-4" />
             </Link>
           </section>
+
+          <section className="px-6 pt-8 pb-6">
+            <Link
+              to="/grievance"
+              className="block rounded-2xl bg-[#c8102e] py-4 text-center text-xs font-semibold uppercase tracking-[0.2em] text-white"
+            >
+              File a grievance
+            </Link>
+          </section>
         </>
       ) : (
         <section className="px-6 pt-6 pb-8">
           <UpdateInfoForm />
+          <div className="mt-6">
+            <Link
+              to="/grievance"
+              className="block rounded-2xl bg-[#c8102e] py-4 text-center text-xs font-semibold uppercase tracking-[0.2em] text-white"
+            >
+              File a grievance
+            </Link>
+          </div>
         </section>
       )}
-
-      <section className="px-6 pt-2 pb-6">
-        <Link
-          to="/grievance"
-          className="block rounded-2xl bg-[#c8102e] py-4 text-center text-xs font-semibold uppercase tracking-[0.2em] text-white"
-        >
-          File a grievance
-        </Link>
-      </section>
 
       <FollowLocal />
     </div>
