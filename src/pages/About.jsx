@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { MapPin, Globe, ArrowUpRight } from "lucide-react";
+import { MapPin, Globe, ArrowUpRight, Phone } from "lucide-react";
 import PageHeader from "@/components/mobile/PageHeader";
 import { SITE } from "@/lib/siteData";
 import AccountSettings from "@/components/mobile/AccountSettings";
@@ -19,6 +19,10 @@ export default function About() {
           <p className="flex items-start gap-2 text-sm text-slate-600">
             <MapPin className="mt-0.5 w-4 h-4 shrink-0 text-[#c8102e]" />
             {SITE.address}
+          </p>
+          <p className="mt-2 flex items-center gap-2 text-sm text-slate-600">
+            <Phone className="w-4 h-4 shrink-0 text-[#c8102e]" />
+            <a href="tel:2102246143" className="hover:text-[#0b2545]">210-224-6143</a>
           </p>
           <a
             href={`${SITE.site}/about-us`}
