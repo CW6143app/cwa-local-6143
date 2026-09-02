@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getMessaging, getToken, onMessage } from "firebase/messaging";
+import { getMessaging, isSupported } from "firebase/messaging";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAbohXIGgKzjszGJysVV73DNhyvhha9dIY",
@@ -11,31 +11,13 @@ const firebaseConfig = {
   measurementId: "G-2R6W5CFWBJ",
 };
 
-// Web push VAPID key — generate in Firebase Console:
-// Project Settings → Cloud Messaging → Web configuration → Generate key pair
-export const VAPID_KEY = "PASTE_VAPID_KEY_HERE";
+export const VAPID_KEY = "BLQKqLyrnfQe65T_N9owI4XrJiwFit9GKAoDXWZavviWjFzCwulRJ1SWQEa_NiVJg4-wUd4fbeSzA7V-WvZ95aM";
 
 const app = initializeApp(firebaseConfig);
+
 let messaging = null;
-try {
-  messaging = getMessaging(app);
-} catch (e) {
-  // Messaging unsupported in this browser/environment
-  console.warn("Firebase messaging unavailable:", e);
-}
+isSupported().then((ok) => {
+  if (ok) messaging = getMessaging(app);
+}).catch(() => {});
 
 export { messaging };
-
-export async function requestNotificationPermission() {
-  if (!messaging) throw new Error("Messaging not supported in this browser.");
-  if (!("Notification" in window)) throw new Error("Notifications not supported.");
-  const permission = await Notification.requestPermission();
-  if (permission !== "granted") throw new Error("Notification permission denied.");
-  const token = await getToken(messaging, { vapidKey: VAPID_KEY });
-  return token;
-}
-
-export function onMessageListener(callback) {
-  if (!messaging) return () => {};
-  return onMessage(messaging, callback);
-}

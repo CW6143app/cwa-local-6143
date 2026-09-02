@@ -1,4 +1,3 @@
-// Firebase Cloud Messaging background handler service worker
 importScripts("https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js");
 importScripts("https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js");
 
@@ -18,6 +17,6 @@ messaging.onBackgroundMessage((payload) => {
   const { title, body } = payload.notification || {};
   self.registration.showNotification(title || "CWA Local 6143", {
     body: body || "",
-    icon: "/icon-192.png",
+    icon: "/icons/icon-192.png",
   });
 });

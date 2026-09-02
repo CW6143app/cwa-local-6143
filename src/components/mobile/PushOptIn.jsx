@@ -1,36 +1,38 @@
 import React, { useState } from "react";
 import { Bell, BellRing, Loader2, CheckCircle2 } from "lucide-react";
-import { requestNotificationPermission } from "@/lib/firebase";
-import { base44 } from "@/api/base44Client";
+import { messaging, VAPID_KEY } from "@/lib/firebase";
+import { getToken } from "firebase/messaging";
 
 export default function PushOptIn() {
-  const [status, setStatus] = useState("idle"); // idle | loading | done | error
-  const [message, setMessage] = useState("");
+  const [status, setStatus] = useState("idle"); // idle | loading | granted | denied | unsupported
+  const [token, setToken] = useState(null);
 
-  const handleOptIn = async () => {
+  const enable = async () => {
+    if (!("Notification" in window)) {
+      setStatus("unsupported");
+      return;
+    }
     setStatus("loading");
-    setMessage("");
     try {
-      const token = await requestNotificationPermission();
-      // Register the service worker for background messages
-      if ("serviceWorker" in navigator) {
-        try {
-          await navigator.serviceWorker.register("/firebase-messaging-sw.js");
-        } catch (e) {
-          console.warn("SW registration failed:", e);
-        }
+      const permission = await Notification.requestPermission();
+      if (permission !== "granted") {
+        setStatus("denied");
+        return;
       }
-      // Store the token so admins can send to subscribers
-      await base44.entities.PushToken.create({
-        token,
-        user_agent: navigator.userAgent,
+      if (!messaging) {
+        setStatus("unsupported");
+        return;
+      }
+      const swReg = await navigator.serviceWorker.register("/firebase-messaging-sw.js");
+      const tok = await getToken(messaging, {
+        vapidKey: VAPID_KEY,
+        serviceWorkerRegistration: swReg,
       });
-      setStatus("done");
-      setMessage("You're subscribed — thanks for enabling alerts.");
+      setToken(tok);
+      setStatus("granted");
     } catch (err) {
       console.error("Push opt-in failed:", err);
-      setStatus("error");
-      setMessage(err.message || "Couldn't enable notifications. Try again later.");
+      setStatus("denied");
     }
   };
 
@@ -40,38 +42,40 @@ export default function PushOptIn() {
         Local Alerts
       </h2>
       <p className="mt-2 text-sm text-slate-600">
-        Get push notifications for urgent updates, meeting reminders, and action alerts from CWA Local 6143.
+        Get notified on this device when the Local posts urgent updates, meeting changes, or mobilization alerts.
       </p>
 
-      {status === "done" ? (
-        <div className="mt-4 flex items-center gap-2 rounded-2xl bg-green-50 p-3 text-sm text-green-700">
-          <CheckCircle2 className="w-4 h-4" />
-          {message}
-        </div>
-      ) : (
-        <button
-          onClick={handleOptIn}
-          disabled={status === "loading"}
-          className="mt-4 inline-flex items-center gap-2 rounded-full bg-[#c8102e] px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#a30d24] disabled:opacity-60"
-        >
-          {status === "loading" ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
-          ) : status === "error" ? (
+      <div className="mt-4">
+        {status === "granted" ? (
+          <div className="flex items-center gap-2 rounded-xl bg-green-50 px-4 py-3 text-sm font-medium text-green-700">
+            <CheckCircle2 className="w-4 h-4" />
+            Notifications enabled for this device
+          </div>
+        ) : status === "denied" ? (
+          <div className="flex items-center gap-2 rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
             <Bell className="w-4 h-4" />
-          ) : (
-            <BellRing className="w-4 h-4" />
-          )}
-          {status === "loading"
-            ? "Enabling…"
-            : status === "error"
-            ? "Try again"
-            : "Enable alerts"}
-        </button>
-      )}
-
-      {status === "error" && (
-        <p className="mt-2 text-xs text-red-600">{message}</p>
-      )}
+            Notifications blocked — enable them in your browser settings.
+          </div>
+        ) : status === "unsupported" ? (
+          <div className="flex items-center gap-2 rounded-xl bg-slate-100 px-4 py-3 text-sm font-medium text-slate-600">
+            <Bell className="w-4 h-4" />
+            Push notifications aren't supported on this browser.
+          </div>
+        ) : (
+          <button
+            onClick={enable}
+            disabled={status === "loading"}
+            className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#c8102e] px-4 py-3 text-sm font-semibold text-white hover:bg-[#a50d24] disabled:opacity-60 transition-colors"
+          >
+            {status === "loading" ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <BellRing className="w-4 h-4" />
+            )}
+            Enable notifications
+          </button>
+        )}
+      </div>
     </div>
   );
 }
