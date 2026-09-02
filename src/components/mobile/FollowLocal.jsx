@@ -11,11 +11,11 @@ const ICONS = {
 
 export default function FollowLocal() {
   return (
-    <section className="px-6 pt-6">
-      <h2 className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#0b2545] dark:text-slate-200">
+    <section className="px-6 pt-6 flex items-center gap-4">
+      <h2 className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#0b2545] dark:text-slate-200 shrink-0">
         Follow the Local
       </h2>
-      <div className="mt-3 flex gap-3">
+      <div className="flex gap-3">
         {SOCIALS.map((s) => {
           const Icon = ICONS[s.label];
           return (
