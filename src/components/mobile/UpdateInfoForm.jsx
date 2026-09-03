@@ -12,6 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Loader2, CheckCircle2, UserCog } from "lucide-react";
+import AddressAutocomplete from "@/components/mobile/AddressAutocomplete";
 
 const EMPLOYERS = ["AT&T", "AT&T Mobility", "TCE"];
 
@@ -121,7 +122,15 @@ export default function UpdateInfoForm() {
 
         <div className="space-y-1">
           <Label className="text-xs font-medium text-[#0b2545]">Address</Label>
-          <Input value={form.address} onChange={set("address")} className="h-9" placeholder="Street, City, State, Zip" />
+          <AddressAutocomplete
+            value={form.address}
+            onChange={set("address")}
+            placeholder="Start typing your address"
+            className="h-9"
+            onSelectAddress={(data) =>
+              setForm((f) => ({ ...f, address: data.formatted || f.address }))
+            }
+          />
         </div>
 
         <div className="space-y-1">

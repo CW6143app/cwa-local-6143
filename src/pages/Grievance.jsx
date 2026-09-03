@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Loader2, CheckCircle2, FileText } from "lucide-react";
 import SheetSelect from "@/components/mobile/SheetSelect";
+import AddressAutocomplete from "@/components/mobile/AddressAutocomplete";
 import { useAuth } from "@/lib/AuthContext";
 
 const INCIDENT_TYPES = ["PN", "WR", "DML", "Susp/Term", "Other"];
@@ -193,7 +194,20 @@ export default function Grievance() {
             <SectionTitle num="2" label="Home Address" />
             <Row className="mt-2">
               <Field label="Address" flex="2">
-                <Input value={form.home_address} onChange={set("home_address")} className="h-9" />
+                <AddressAutocomplete
+                  value={form.home_address}
+                  onChange={set("home_address")}
+                  placeholder="Start typing your address"
+                  className="h-9"
+                  onSelectAddress={(data) =>
+                    setForm((f) => ({
+                      ...f,
+                      home_address: data.street || data.formatted || f.home_address,
+                      city: data.city || f.city,
+                      zip: data.zip || f.zip,
+                    }))
+                  }
+                />
               </Field>
               <Field label="Cell #" flex="1">
                 <Input value={form.cell} onChange={set("cell")} type="tel" className="h-9" />
