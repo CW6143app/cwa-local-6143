@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import PageHeader from "@/components/mobile/PageHeader";
 import EventCard from "@/components/mobile/EventCard";
-import AddToCalendar from "@/components/mobile/AddToCalendar";
+import CalendarInteraction from "@/components/mobile/CalendarInteraction";
 import { base44 } from "@/api/base44Client";
 import { EVENTS } from "@/lib/siteData";
 
@@ -22,54 +22,26 @@ export default function Events() {
 
   const events = synced.length ? synced : EVENTS;
 
-  /**
-   * Helper function to convert your event object into 
-   * formatted date and time strings required by the button.
-   */
-  const formatEventForCalendar = (e) => {
-    // Falls back to year 2026 or current year if e.year is undefined
-    const year = e.year || new Date().getFullYear();
-    
-    // Construct ISO date string (YYYY-MM-DD)
-    // Note: Ensure e.month and e.day are formatted appropriately (e.g. '05', '12')
-    const startDate = e.dateIso || `${year}-${e.month.padStart(2, '0')}-${e.day.padStart(2, '0')}`;
-    
-    return {
-      name: e.title || e.name || "CWA Local 6143 Meeting",
-      description: e.description || e.subtitle || "Monthly membership meeting — join in person or via Zoom.",
-      location: e.location || "Local 6143 Union Hall / Zoom",
-      startDate: startDate,
-      startTime: e.startTime || "18:00",
-      endTime: e.endTime || "19:30",
-      timeZone: "America/Chicago", // Adjust to your local timezone
-    };
-  };
-
-return (
+  return (
     <div>
       <PageHeader
         eyebrow="Local 6143"
         title="Meetings & Events"
-        subtitle="Monthly membership meetings are hybrid — join us in person or by Zoom." 
+        subtitle="Monthly membership meetings are hybrid — join us in person or by Zoom."
       />
-      
+
       <div className="space-y-4 px-6">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
           {events.length} upcoming {events.length === 1 ? "event" : "events"}
         </p>
-        {events.map((e, i) => {
-          const calData = formatEventForCalendar(e);
-
-          return (
-            <div key={`${e.month}-${e.day}-${i}`} className="space-y-2">
-              <EventCard event={e} index={i} />
-              
-              <div className="flex justify-end">
-                <AddToCalendar event={calData} />
-              </div>
+        {events.map((e, i) => (
+          <div key={`${e.month}-${e.day}-${i}`} className="space-y-2">
+            <EventCard event={e} index={i} />
+            <div className="flex justify-end">
+              <CalendarInteraction event={e} />
             </div>
-          );
-        })}
+          </div>
+        ))}
       </div>
 
       <div className="px-6 pt-8 space-y-3">
