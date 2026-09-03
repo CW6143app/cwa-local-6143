@@ -102,43 +102,46 @@ export default function AddToCalendar({ event }) {
   };
 
   return (
-    <div ref={ref} className="relative">
+    <div ref={ref} className="relative inline-flex overflow-hidden rounded-full bg-[#c8102e]">
       <button
         type="button"
-        onClick={() => setOpen((o) => !o)}
-        className="inline-flex items-center gap-1.5 rounded-full bg-[#c8102e] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#a50d24] transition-colors"
+        onClick={downloadIcs}
+        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#a50d24] transition-colors"
       >
         <CalendarPlus className="h-3.5 w-3.5" />
         Add to Calendar
+      </button>
+      <button
+        type="button"
+        aria-label="More calendar options"
+        onClick={() => setOpen((o) => !o)}
+        className="inline-flex items-center border-l border-white/20 px-2 py-1.5 text-white hover:bg-[#a50d24] transition-colors"
+      >
         <ChevronDown className="h-3 w-3" />
       </button>
       {open && (
-        <div className="absolute right-0 z-20 mt-1 w-48 overflow-hidden rounded-xl border border-black/10 bg-white shadow-lg">
-          {OPTIONS.map((opt) =>
-            opt.download ? (
-              <button
-                key={opt.key}
-                type="button"
-                onClick={downloadIcs}
-                className="flex w-full items-center gap-2 px-3 py-2.5 text-sm text-[#0b2545] hover:bg-black/5"
-              >
-                <span className="h-2 w-2 rounded-full bg-[#c8102e]" />
-                {opt.label}
-              </button>
-            ) : (
-              <a
-                key={opt.key}
-                href={opt.href(event)}
-                target="_blank"
-                rel="noreferrer"
-                onClick={() => setOpen(false)}
-                className="flex w-full items-center gap-2 px-3 py-2.5 text-sm text-[#0b2545] hover:bg-black/5"
-              >
-                <span className="h-2 w-2 rounded-full bg-[#c8102e]" />
-                {opt.label}
-              </a>
-            )
-          )}
+        <div className="absolute right-0 top-full z-20 mt-1 w-52 overflow-hidden rounded-xl border border-black/10 bg-white shadow-lg">
+          <button
+            type="button"
+            onClick={downloadIcs}
+            className="flex w-full items-center gap-2 px-3 py-2.5 text-sm text-[#0b2545] hover:bg-black/5"
+          >
+            <span className="h-2 w-2 rounded-full bg-[#c8102e]" />
+            Device calendar (.ics)
+          </button>
+          {OPTIONS.filter((o) => !o.download).map((opt) => (
+            <a
+              key={opt.key}
+              href={opt.href(event)}
+              target="_blank"
+              rel="noreferrer"
+              onClick={() => setOpen(false)}
+              className="flex w-full items-center gap-2 px-3 py-2.5 text-sm text-[#0b2545] hover:bg-black/5"
+            >
+              <span className="h-2 w-2 rounded-full bg-[#c8102e]" />
+              {opt.label}
+            </a>
+          ))}
         </div>
       )}
     </div>
