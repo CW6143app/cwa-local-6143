@@ -46,14 +46,9 @@ export default async function (req: Request): Promise<Response> {
       headers: {
         "Content-Type": "application/json",
         "X-Goog-Api-Key": apiKey,
-        "X-Goog-FieldMask": "placePrediction.placeId,placePrediction.text",
+        "X-Goog-FieldMask": "suggestions.placePrediction.placeId,suggestions.placePrediction.text",
       },
-      body: JSON.stringify({
-        input,
-        includedPrimaryTypes: ["street_address", "premise", "subpremise"],
-        includedRegionCodes: ["us"],
-        language: "en",
-      }),
+      body: JSON.stringify({ input }),
     });
     const data: any = await res.json();
     if (!res.ok) return Response.json({ error: data.error?.message || "Autocomplete failed" }, { status: 502 });
