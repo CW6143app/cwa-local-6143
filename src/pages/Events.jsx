@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import PageHeader from "@/components/mobile/PageHeader";
 import EventCard from "@/components/mobile/EventCard";
+import AddToCalendar from "@/components/mobile/AddToCalendar";
 import { base44 } from "@/api/base44Client";
 import { EVENTS } from "@/lib/siteData";
 
@@ -12,8 +13,6 @@ export default function Events() {
       .then((data) => setSynced(Array.isArray(data) ? data : []))
       .catch(() => setSynced([]));
   }, []);
-
-  const events = synced.length ? synced : EVENTS;
 
   const events = synced.length ? synced : EVENTS;
 
@@ -56,21 +55,8 @@ return (
             <div key={`${e.month}-${e.day}-${i}`} className="space-y-2">
               <EventCard event={e} index={i} />
               
-              {/* Add to Calendar Button per Event */}
               <div className="flex justify-end">
-                <AddToCalendarButton
-                  name={calData.name}
-                  description={calData.description}
-                  location={calData.location}
-                  startDate={calData.startDate}
-                  startTime={calData.startTime}
-                  endTime={calData.endTime}
-                  timeZone={calData.timeZone}
-                  options={['Google', 'Apple', 'Outlook.com', 'iCal']}
-                  buttonStyle="round"
-                  size="1"
-                  lightMode="bodyScheme"
-                />
+                <AddToCalendar event={calData} />
               </div>
             </div>
           );
