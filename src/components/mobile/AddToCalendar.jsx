@@ -1,25 +1,18 @@
 import React, { useState, useRef, useEffect } from "react";
-import { CalendarPlus, ChevronDown, Calendar } from "lucide-react";
+import { CalendarPlus, ChevronDown } from "lucide-react";
 
-const MONTHS = [
-  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
-];
-
-function toIsoDate(dateStr) {
-  // dateStr like "2026-09-10"
-  return dateStr;
+function fmtDateTime(dateStr, timeStr) {
+  // returns YYYYMMDDTHHMMSS (local, no Z)
+  return `${dateStr.replace(/-/g, "")}T${timeStr.replace(":", "")}00`;
 }
 
 function buildGoogleUrl(e) {
-  const start = `${e.startDate}T${e.startTime}:00`;
-  const [sh, sm] = e.startTime.split(":").map(Number);
-  const [eh, em] = e.endTime.split(":").map(Number);
-  const end = `${e.startDate}T${String(eh).padStart(2, "0")}:${String(em).padStart(2, "0")}:00`;
+  const start = fmtDateTime(e.startDate, e.startTime);
+  const end = fmtDateTime(e.startDate, e.endTime);
   const params = new URLSearchParams({
     action: "TEMPLATE",
     text: e.name,
-    dates: `${start.replace(/[-:]/g, "")}/${end.replace(/[-:]/g, "")}`,
+    dates: `${start}/${end}`,
     details: e.description,
     location: e.location,
     ctz: e.timeZone,
@@ -27,19 +20,49 @@ function buildGoogleUrl(e) {
   return `https://calendar.google.com/calendar/render?${params.toString()}`;
 }
 
-function buildIcs(e) {
+function buildOutlookUrl(e) {
   const start = `${e.startDate}T${e.startTime}:00`;
-  const [eh, em] = e.endTime.split(":").map(Number);
-  const end = `${e.startDate}T${String(eh).padStart(2, "0")}:${String(em).padStart(2, "0")}:00`;
+  const end = `${e.startDate}T${e.endTime}:00`;
+  const params = new URLSearchParams({
+    path: "/calendar/action/compose",
+    rru: "addevent",
+    startdt: start,
+    enddt: end,
+    subject: e.name,
+    body: e.description,
+    location: e.location,
+  });
+  return `https://outlook.live.com/calendar/0/deeplink/compose?${params.toString()}`;
+}
+
+function buildYahooUrl(e) {
+  const start = fmtDateTime(e.startDate, e.startTime);
+  const end = fmtDateTime(e.startDate, e.endTime);
+  const params = new URLSearchParams({
+    v: "60",
+    view: "d",
+    type: "20",
+    title: e.name,
+    st: start,
+    et: end,
+    desc: e.description,
+    in_loc: e.location,
+  });
+  return `https://calendar.yahoo.com/?${params.toString()}`;
+}
+
+function buildIcs(e) {
+  const start = fmtDateTime(e.startDate, e.startTime);
+  const end = fmtDateTime(e.startDate, e.endTime);
   return [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
     "PRODID:-//CWA Local 6143//EN",
     "BEGIN:VEVENT",
     `UID:${Date.now()}@cwa6143`,
-    `DTSTAMP:${start.replace(/[-:]/g, "")}Z`,
-    `DTSTART:${start.replace(/[-:]/g, "")}`,
-    `DTEND:${end.replace(/[-:]/g, "")}`,
+    `DTSTAMP:${start}Z`,
+    `DTSTART:${start}`,
+    `DTEND:${end}`,
     `SUMMARY:${e.name}`,
     `DESCRIPTION:${e.description}`,
     `LOCATION:${e.location}`,
@@ -48,13 +71,20 @@ function buildIcs(e) {
   ].join("\r\n");
 }
 
+const OPTIONS = [
+  { key: "google", label: "Google Calendar", href: buildGoogleUrl, external: true },
+  { key: "outlook", label: "Outlook", href: buildOutlookUrl, external: true },
+  { key: "yahoo", label: "Yahoo Calendar", href: buildYahooUrl, external: true },
+  { key: "ical", label: "Apple / iCal (.ics)", href: null, download: true },
+];
+
 export default function AddToCalendar({ event }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
 
   useEffect(() => {
-    const onClick = (e) => {
-      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+    const onClick = (ev) => {
+      if (ref.current && !ref.current.contains(ev.target)) setOpen(false);
     };
     document.addEventListener("mousedown", onClick);
     return () => document.removeEventListener("mousedown", onClick);
@@ -83,23 +113,32 @@ export default function AddToCalendar({ event }) {
         <ChevronDown className="h-3 w-3" />
       </button>
       {open && (
-        <div className="absolute right-0 z-20 mt-1 w-44 overflow-hidden rounded-xl border border-black/10 bg-white shadow-lg">
-          <a
-            href={buildGoogleUrl(event)}
-            target="_blank"
-            rel="noreferrer"
-            onClick={() => setOpen(false)}
-            className="flex items-center gap-2 px-3 py-2.5 text-sm text-[#0b2545] hover:bg-black/5"
-          >
-            <Calendar className="h-4 w-4 text-[#c8102e]" /> Google
-          </a>
-          <button
-            type="button"
-            onClick={downloadIcs}
-            className="flex w-full items-center gap-2 px-3 py-2.5 text-sm text-[#0b2545] hover:bg-black/5"
-          >
-            <Calendar className="h-4 w-4 text-[#c8102e]" /> Apple / Outlook / iCal
-          </button>
+        <div className="absolute right-0 z-20 mt-1 w-48 overflow-hidden rounded-xl border border-black/10 bg-white shadow-lg">
+          {OPTIONS.map((opt) =>
+            opt.download ? (
+              <button
+                key={opt.key}
+                type="button"
+                onClick={downloadIcs}
+                className="flex w-full items-center gap-2 px-3 py-2.5 text-sm text-[#0b2545] hover:bg-black/5"
+              >
+                <span className="h-2 w-2 rounded-full bg-[#c8102e]" />
+                {opt.label}
+              </button>
+            ) : (
+              <a
+                key={opt.key}
+                href={opt.href(event)}
+                target="_blank"
+                rel="noreferrer"
+                onClick={() => setOpen(false)}
+                className="flex w-full items-center gap-2 px-3 py-2.5 text-sm text-[#0b2545] hover:bg-black/5"
+              >
+                <span className="h-2 w-2 rounded-full bg-[#c8102e]" />
+                {opt.label}
+              </a>
+            )
+          )}
         </div>
       )}
     </div>

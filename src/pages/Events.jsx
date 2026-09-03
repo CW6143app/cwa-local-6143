@@ -8,10 +8,16 @@ import { EVENTS } from "@/lib/siteData";
 export default function Events() {
   const [synced, setSynced] = useState([]);
 
-  useEffect(() => {
-    base44.entities.SyncedEvent.list("sort_order", 20)
+  const loadEvents = () => {
+    base44.entities.SyncedEvent.list("sort_order", 100)
       .then((data) => setSynced(Array.isArray(data) ? data : []))
       .catch(() => setSynced([]));
+  };
+
+  useEffect(() => {
+    loadEvents();
+    const unsubscribe = base44.entities.SyncedEvent.subscribe(() => loadEvents());
+    return unsubscribe;
   }, []);
 
   const events = synced.length ? synced : EVENTS;
@@ -48,6 +54,9 @@ return (
       />
       
       <div className="space-y-4 px-6">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+          {events.length} upcoming {events.length === 1 ? "event" : "events"}
+        </p>
         {events.map((e, i) => {
           const calData = formatEventForCalendar(e);
 
