@@ -147,7 +147,6 @@ export const RESOURCE_GROUPS = [
   {
     group: "Benefits",
     links: [
-      { label: "CWA Optavise Supersite", url: "https://www.mybensite.com/cwa6143/" },
       { label: "NettWorth Financial Group", url: "http://www.nettworth.net/ourTeam/austinsanantonio" },
       { label: "Union Plus Member Benefits", url: "https://www.unionplus.org/union-member-benefits?union_code=CWA" },
     ],
