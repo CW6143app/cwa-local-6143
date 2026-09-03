@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from "react";
 import { CalendarPlus, ChevronDown } from "lucide-react";
 
 function fmtDateTime(dateStr, timeStr) {
-  // returns YYYYMMDDTHHMMSS (local, no Z)
   return `${dateStr.replace(/-/g, "")}T${timeStr.replace(":", "")}00`;
 }
 
@@ -51,10 +50,10 @@ function buildYahooUrl(e) {
   return `https://calendar.yahoo.com/?${params.toString()}`;
 }
 
-function buildIcs(e) {
+function buildIcsDataUri(e) {
   const start = fmtDateTime(e.startDate, e.startTime);
   const end = fmtDateTime(e.startDate, e.endTime);
-  return [
+  const ics = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
     "PRODID:-//CWA Local 6143//EN",
@@ -69,13 +68,14 @@ function buildIcs(e) {
     "END:VEVENT",
     "END:VCALENDAR",
   ].join("\r\n");
+  return `data:text/calendar;charset=utf8,${encodeURIComponent(ics)}`;
 }
 
 const OPTIONS = [
+  { key: "device", label: "Device / Apple Calendar", href: buildIcsDataUri, external: false },
   { key: "google", label: "Google Calendar", href: buildGoogleUrl, external: true },
   { key: "outlook", label: "Outlook", href: buildOutlookUrl, external: true },
   { key: "yahoo", label: "Yahoo Calendar", href: buildYahooUrl, external: true },
-  { key: "ical", label: "Apple / iCal (.ics)", href: null, download: true },
 ];
 
 export default function AddToCalendar({ event }) {
@@ -90,51 +90,24 @@ export default function AddToCalendar({ event }) {
     return () => document.removeEventListener("mousedown", onClick);
   }, []);
 
-  const downloadIcs = () => {
-    const blob = new Blob([buildIcs(event)], { type: "text/calendar" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "cwa6143-event.ics";
-    a.click();
-    URL.revokeObjectURL(url);
-    setOpen(false);
-  };
-
   return (
-    <div ref={ref} className="relative inline-flex overflow-hidden rounded-full bg-[#c8102e]">
+    <div ref={ref} className="relative">
       <button
         type="button"
-        onClick={downloadIcs}
-        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#a50d24] transition-colors"
+        onClick={() => setOpen((o) => !o)}
+        className="inline-flex items-center gap-1.5 rounded-full bg-[#c8102e] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#a50d24] transition-colors"
       >
         <CalendarPlus className="h-3.5 w-3.5" />
         Add to Calendar
-      </button>
-      <button
-        type="button"
-        aria-label="More calendar options"
-        onClick={() => setOpen((o) => !o)}
-        className="inline-flex items-center border-l border-white/20 px-2 py-1.5 text-white hover:bg-[#a50d24] transition-colors"
-      >
         <ChevronDown className="h-3 w-3" />
       </button>
       {open && (
         <div className="absolute right-0 top-full z-20 mt-1 w-52 overflow-hidden rounded-xl border border-black/10 bg-white shadow-lg">
-          <button
-            type="button"
-            onClick={downloadIcs}
-            className="flex w-full items-center gap-2 px-3 py-2.5 text-sm text-[#0b2545] hover:bg-black/5"
-          >
-            <span className="h-2 w-2 rounded-full bg-[#c8102e]" />
-            Device calendar (.ics)
-          </button>
-          {OPTIONS.filter((o) => !o.download).map((opt) => (
+          {OPTIONS.map((opt) => (
             <a
               key={opt.key}
               href={opt.href(event)}
-              target="_blank"
-              rel="noreferrer"
+              {...(opt.external ? { target: "_blank", rel: "noreferrer" } : {})}
               onClick={() => setOpen(false)}
               className="flex w-full items-center gap-2 px-3 py-2.5 text-sm text-[#0b2545] hover:bg-black/5"
             >
