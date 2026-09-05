@@ -113,13 +113,13 @@ export const EXEC_BOARD = [
   },
   {
     name: "Jeremy Garcia",
-    title: "Vice-President 1",
+    title: "Vice President 1",
     email: "jeremygarcia@cwa6143.org",
     phone: "409-504-9809",
   },
   {
     name: "Jo Angela Barroso",
-    title: "Vice-President 2",
+    title: "Vice President 2",
     email: "joangelaherrera@cwa6143.org",
     phone: "210-289-7441",
     image: "https://cwa6143.org/sites/default/files/styles/featured_image_small/public/2023-07/joangelas_pic_1.jpg.webp?h=8d5e1f87&itok=U557XpSB",
