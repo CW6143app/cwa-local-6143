@@ -1,6 +1,8 @@
 import { secrets } from "base44:runtime";
 
-const COMMITTEE_EMAIL = "cwaelectioncommittee@gmail.com";
+// Sandbox sender (onboarding@resend.dev) can only deliver to the Resend account owner.
+// Until a sending domain is verified, route submissions to the account owner.
+const COMMITTEE_EMAIL = "appcwa6143@gmail.com";
 
 function escapeHtml(str) {
   return String(str || "")
