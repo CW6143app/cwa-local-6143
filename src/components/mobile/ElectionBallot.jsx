@@ -1,14 +1,28 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { CheckCircle2, Mail, Phone, MapPin, User, Loader2, Vote } from "lucide-react";
+import { CheckCircle2, Mail, Phone, MapPin, User, Loader2, Vote, ChevronRight } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 
+const NOMINATIONS = [
+  { office: "President", nominees: [] },
+  { office: "Executive Vice President", nominees: [] },
+  { office: "Secretary/Treasurer", nominees: [] },
+  { office: "Vice President 1", nominees: [] },
+  { office: "Core Chief Steward", nominees: [] },
+  { office: "App. J Chief Steward", nominees: [] },
+  { office: "Vice President 2", nominees: [] },
+  { office: "Chief Steward", nominees: [] },
+  { office: "Vice President 3", nominees: [] },
+  { office: "Retail Chief Steward", nominees: [] },
+  { office: "Call Center Chief Steward", nominees: [] },
+];
+
 export default function ElectionBallot() {
   const [open, setOpen] = useState(false);
-  const [step, setStep] = useState("question"); // question | form | yes | done
+  const [step, setStep] = useState("nominations"); // nominations | form | done
   const [form, setForm] = useState({ name: "", email: "", phone: "", address: "" });
   const [submitting, setSubmitting] = useState(false);
   const { toast } = useToast();
@@ -35,7 +49,7 @@ export default function ElectionBallot() {
 
   const reset = () => {
     setOpen(false);
-    setStep("question");
+    setStep("nominations");
     setForm({ name: "", email: "", phone: "", address: "" });
   };
 
@@ -66,65 +80,58 @@ export default function ElectionBallot() {
               exit={{ y: 40, opacity: 0 }}
               transition={{ type: "spring", damping: 28, stiffness: 320 }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl"
+              className="w-full max-w-md max-h-[85vh] overflow-y-auto rounded-3xl bg-white p-6 shadow-2xl"
             >
               <AnimatePresence mode="wait">
-                {/* Step: Question */}
-                {step === "question" && (
+                {/* Step: Nominations */}
+                {step === "nominations" && (
                   <motion.div
-                    key="question"
+                    key="nominations"
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -20 }}
-                    className="text-center"
                   >
-                    <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#c8102e]/10">
-                      <Vote className="h-7 w-7 text-[#c8102e]" />
+                    <div className="text-center">
+                      <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#c8102e]/10">
+                        <Vote className="h-6 w-6 text-[#c8102e]" />
+                      </div>
+                      <h3 className="mt-3 text-lg font-bold text-[#0b2545]">
+                        Local Election 2026 — Nominations
+                      </h3>
                     </div>
-                    <h3 className="mt-4 text-lg font-bold text-[#0b2545]">
-                      Have you received your election ballot?
-                    </h3>
-                    <p className="mt-2 text-sm text-slate-500">
-                      Local Election 2026 — let us know so we can make sure your vote counts.
-                    </p>
-                    <div className="mt-6 grid grid-cols-2 gap-3">
-                      <button
-                        onClick={() => setStep("yes")}
-                        className="rounded-xl bg-[#c8102e] py-3 text-sm font-semibold text-white"
-                      >
-                        Yes
-                      </button>
-                      <button
-                        onClick={() => setStep("form")}
-                        className="rounded-xl bg-[#c8102e] py-3 text-sm font-semibold text-white"
-                      >
-                        No
-                      </button>
-                    </div>
-                  </motion.div>
-                )}
 
-                {/* Step: Yes confirmation */}
-                {step === "yes" && (
-                  <motion.div
-                    key="yes"
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
-                    className="text-center"
-                  >
-                    <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#13653f]/10">
-                      <CheckCircle2 className="h-7 w-7 text-[#13653f]" />
-                    </div>
-                    <h3 className="mt-4 text-lg font-bold text-[#0b2545]">Great news!</h3>
-                    <p className="mt-2 text-sm text-slate-500">
-                      Thank you for confirming. Please return your ballot promptly so your voice is heard.
-                    </p>
+                    <ul className="mt-5 space-y-3">
+                      {NOMINATIONS.map((n) => (
+                        <li key={n.office} className="rounded-xl border border-slate-200 bg-slate-50/60 px-4 py-3">
+                          <p className="text-sm font-bold text-[#0b2545]">{n.office}</p>
+                          {n.nominees.length > 0 ? (
+                            <ul className="mt-1 space-y-0.5">
+                              {n.nominees.map((name) => (
+                                <li key={name} className="text-sm text-slate-700 leading-relaxed">
+                                  {name}
+                                </li>
+                              ))}
+                            </ul>
+                          ) : (
+                            <p className="mt-1 text-xs italic text-slate-400">—</p>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+
                     <button
-                      onClick={reset}
-                      className="mt-6 w-full rounded-xl bg-[#c8102e] py-3 text-sm font-semibold text-white"
+                      onClick={() => setStep("form")}
+                      className="mt-6 w-full flex items-center justify-center gap-2 rounded-xl bg-[#c8102e] py-3 text-sm font-semibold text-white"
                     >
-                      Done
+                      Click Here If You Have Not Received Your Ballot
+                      <ChevronRight className="h-4 w-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={reset}
+                      className="mt-2 w-full text-xs text-slate-400 hover:text-slate-600"
+                    >
+                      Close
                     </button>
                   </motion.div>
                 )}
@@ -191,7 +198,7 @@ export default function ElectionBallot() {
                     </button>
                     <button
                       type="button"
-                      onClick={() => setStep("question")}
+                      onClick={() => setStep("nominations")}
                       className="w-full text-xs text-slate-400 hover:text-slate-600"
                     >
                       Back
