@@ -34,6 +34,7 @@ export default function Home() {
 
   const stories = syncedStories.length ? syncedStories : STORIES;
   const events = syncedEvents.length ? syncedEvents : EVENTS;
+  const joinUrl = events.find((e) => e.join_meeting_url)?.join_meeting_url;
 
   return (
     <div>
@@ -81,6 +82,19 @@ export default function Home() {
 
       {tab === "news" ?
       <>
+          {joinUrl && (
+            <section className="px-6 pt-6">
+              <a
+                href={joinUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center justify-center gap-2 rounded-2xl bg-[#c8102e] px-4 py-4 text-sm font-semibold text-white hover:bg-[#a50d24] transition-colors shadow-sm"
+              >
+                Join Meeting
+              </a>
+            </section>
+          )}
+
           <section className="px-6 pt-6">
             <PushOptIn />
           </section>
@@ -108,19 +122,7 @@ export default function Home() {
             </h2>
             <div className="mt-5 space-y-4">
               {events.slice(0, 2).map((e, i) => (
-                <div key={(e.month || "") + (e.day || "")} className="space-y-2">
-                  <EventCard event={e} index={i} />
-                  {e.join_meeting_url && (
-                    <a
-                      href={e.join_meeting_url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="flex items-center justify-center gap-2 rounded-xl bg-[#c8102e] px-4 py-3 text-sm font-semibold text-white hover:bg-[#a50d24] transition-colors"
-                    >
-                      Join Meeting
-                    </a>
-                  )}
-                </div>
+                <EventCard key={(e.month || "") + (e.day || "")} event={e} index={i} />
               ))}
             </div>
             <Link
