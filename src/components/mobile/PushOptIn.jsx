@@ -3,10 +3,12 @@ import { Bell, BellRing, Loader2, CheckCircle2 } from "lucide-react";
 import { messaging, VAPID_KEY } from "@/lib/firebase";
 import { getToken, onMessage } from "firebase/messaging";
 import { base44 } from "@/api/base44Client";
+import { useToast } from "@/components/ui/use-toast";
 
 export default function PushOptIn() {
   const [status, setStatus] = useState("idle"); // idle | loading | granted | denied | unsupported
   const [token, setToken] = useState(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     let unsub;
@@ -15,9 +17,7 @@ export default function PushOptIn() {
     const ensureRegistered = async () => {
       if (!("Notification" in window) || Notification.permission !== "granted" || !messaging) return;
       try {
-        const swReg = await navigator.serviceWorker.register("/firebase-messaging-sw.js", {
-          type: "module",
-        });
+        const swReg = await navigator.serviceWorker.register("/firebase-messaging-sw.js");
         const tok = await getToken(messaging, {
           vapidKey: VAPID_KEY,
           serviceWorkerRegistration: swReg,
@@ -39,23 +39,10 @@ export default function PushOptIn() {
     // Show notifications while the app is open (foreground)
     if (messaging) {
       unsub = onMessage(messaging, (payload) => {
-        const n = payload.notification || {};
-        const title = n.title || "CWA Local 6143";
-        const body = n.body || "";
-        try {
-          if ("Notification" in window && Notification.permission === "granted") {
-            navigator.serviceWorker
-              .getRegistration("/firebase-messaging-sw.js")
-              .then((reg) =>
-                reg
-                  ? reg.showNotification(title, { body, icon: "https://media.base44.com/images/public/6a96f9a8ac8dfadbcb9d319b/be7f61f04_CWA6143a.jpg" })
-                  : new Notification(title, { body })
-              )
-              .catch(() => new Notification(title, { body }));
-          }
-        } catch (e) {
-          // ignore display errors
-        }
+        const d = payload.data || {};
+        const title = d.title || "CWA Local 6143";
+        const body = d.body || "";
+        toast({ title, description: body });
       });
     }
     return () => {
@@ -79,9 +66,7 @@ export default function PushOptIn() {
         setStatus("unsupported");
         return;
       }
-      const swReg = await navigator.serviceWorker.register("/firebase-messaging-sw.js", {
-        type: "module",
-      });
+      const swReg = await navigator.serviceWorker.register("/firebase-messaging-sw.js");
       const tok = await getToken(messaging, {
         vapidKey: VAPID_KEY,
         serviceWorkerRegistration: swReg,

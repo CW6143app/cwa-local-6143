@@ -80,14 +80,10 @@ async function sendToToken(accessToken, token) {
     body: JSON.stringify({
       message: {
         token,
-        notification: { title: NOTIFICATION_TITLE, body: NOTIFICATION_BODY },
-        webpush: {
-          notification: {
-            title: NOTIFICATION_TITLE,
-            body: NOTIFICATION_BODY,
-            requireInteraction: true,
-          },
-          fcm_options: { link: 'https://cwa6143.base44.app/events' },
+        data: {
+          title: NOTIFICATION_TITLE,
+          body: NOTIFICATION_BODY,
+          url: 'https://cwa6143.base44.app/events',
         },
       },
     }),
