@@ -49,7 +49,7 @@ export default function SyncDashboard() {
       await load();
       setPushMsg(
         turningOn
-          ? "Meeting link enabled — members will be notified automatically."
+          ? "Meeting link enabled — members can now join from the home and events screens."
           : ""
       );
     } catch {
