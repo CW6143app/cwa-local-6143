@@ -54,6 +54,11 @@ export default function CommitteeSignup() {
     setSubmitting(true);
     try {
       await base44.entities.CommitteeSignup.create(form);
+      try {
+        await base44.functions.invoke("notifyCommitteeSignup", form);
+      } catch (e) {
+        // submission saved; email notification failure should not block the user
+      }
       setDone(true);
     } catch (err) {
       setError("Something went wrong. Please try again.");
