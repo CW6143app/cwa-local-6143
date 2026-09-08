@@ -84,6 +84,7 @@ export const EVENTS = [
     note: "Hybrid meeting — in person or via Zoom invitation. Members only.",
     location: "1027 N. Saint Mary's St, San Antonio, TX 78215",
     url: "https://cwa6143.org/meetings-events/cwa-local-6143-membership-meeting",
+    join_meeting_url: "https://us02web.zoom.us/j/86358644306?pwd=VVRinTQCDLhCTM4SS3oXbXR93lgCva.1",
   },
   {
     day: "08",
@@ -93,6 +94,7 @@ export const EVENTS = [
     note: "Hybrid meeting — in person or via Zoom invitation. Members only.",
     location: "1027 N. Saint Mary's St, San Antonio, TX 78215",
     url: "https://cwa6143.org/meetings-events/cwa-local-6143-membership-meeting",
+    join_meeting_url: "https://us02web.zoom.us/j/86358644306?pwd=VVRinTQCDLhCTM4SS3oXbXR93lgCva.1",
   },
 ];
 

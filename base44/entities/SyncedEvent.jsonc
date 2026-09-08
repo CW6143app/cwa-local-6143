@@ -31,6 +31,11 @@
       "title": "Link URL",
       "format": "uri"
     },
+    "join_meeting_url": {
+      "type": "string",
+      "title": "Join Meeting URL",
+      "format": "uri"
+    },
     "sort_order": {
       "type": "number",
       "title": "Sort Order",

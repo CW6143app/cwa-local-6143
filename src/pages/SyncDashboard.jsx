@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
-import { ArrowLeft, Shield, RefreshCw, CheckCircle2, AlertTriangle, FileText, CalendarDays } from "lucide-react";
+import { ArrowLeft, Shield, RefreshCw, CheckCircle2, AlertTriangle, FileText, CalendarDays, Video } from "lucide-react";
+
+const ZOOM_URL = "https://us02web.zoom.us/j/86358644306?pwd=VVRinTQCDLhCTM4SS3oXbXR93lgCva.1";
 
 export default function SyncDashboard() {
   const [stories, setStories] = useState([]);
@@ -32,6 +34,17 @@ export default function SyncDashboard() {
   }, [load]);
 
   const lastSync = stories[0]?.updated_date || events[0]?.updated_date;
+
+  const toggleJoin = async (e) => {
+    try {
+      await base44.entities.SyncedEvent.update(e.id, {
+        join_meeting_url: e.join_meeting_url ? "" : ZOOM_URL,
+      });
+      await load();
+    } catch {
+      // ignore — list refresh keeps stale state
+    }
+  };
 
   const handleSync = async () => {
     setError("");
@@ -158,7 +171,18 @@ export default function SyncDashboard() {
                   <span className="w-12 shrink-0 text-center rounded-md bg-slate-100 py-1 text-xs font-bold text-slate-700">
                     {e.month} {e.day}
                   </span>
-                  <span className="text-slate-700 truncate">{e.title}</span>
+                  <span className="text-slate-700 truncate flex-1">{e.title}</span>
+                  <button
+                    onClick={() => toggleJoin(e)}
+                    className={`shrink-0 flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-semibold transition-colors ${
+                      e.join_meeting_url
+                        ? "bg-[#c8102e] text-white hover:bg-[#a50d24]"
+                        : "bg-slate-100 text-slate-500 hover:bg-slate-200"
+                    }`}
+                  >
+                    <Video className="w-3.5 h-3.5" />
+                    {e.join_meeting_url ? "Join ON" : "Join OFF"}
+                  </button>
                 </li>
               ))}
             </ul>
