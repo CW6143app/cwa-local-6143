@@ -35,12 +35,33 @@ export default function SyncDashboard() {
 
   const lastSync = stories[0]?.updated_date || events[0]?.updated_date;
 
+  const [pushing, setPushing] = useState(false);
+  const [pushMsg, setPushMsg] = useState("");
+
   const toggleJoin = async (e) => {
+    const turningOn = !e.join_meeting_url;
     try {
       await base44.entities.SyncedEvent.update(e.id, {
-        join_meeting_url: e.join_meeting_url ? "" : ZOOM_URL,
+        join_meeting_url: turningOn ? ZOOM_URL : "",
       });
       await load();
+      if (turningOn) {
+        setPushing(true);
+        setPushMsg("");
+        try {
+          const res = await base44.functions.invoke("sendMeetingPush", {});
+          const d = res.data || {};
+          setPushMsg(
+            `Push sent to ${d.sent ?? 0} device${d.sent === 1 ? "" : "s"}${
+              d.failed ? ` (${d.failed} failed)` : ""
+            }.`
+          );
+        } catch (err) {
+          setPushMsg(err?.response?.data?.error || "Push failed to send.");
+        } finally {
+          setPushing(false);
+        }
+      }
     } catch {
       // ignore — list refresh keeps stale state
     }
@@ -89,8 +110,18 @@ export default function SyncDashboard() {
             <h3 className="text-sm font-bold text-slate-900">Join Meeting Button</h3>
           </div>
           <p className="mt-1 text-xs text-slate-500 leading-relaxed">
-            Toggle the "Join Meeting" button on or off for each event. When on, members see the button on the home and events screens.
+            Toggle the "Join Meeting" button on or off for each event. When on, members see the button on the home and events screens, and a push notification is sent to all opted-in devices.
           </p>
+          {(pushing || pushMsg) && (
+            <div className={`mt-3 flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium ${
+              pushMsg && !pushMsg.startsWith("Push failed") && !pushMsg.startsWith("No devices")
+                ? "bg-green-50 text-green-700"
+                : "bg-amber-50 text-amber-700"
+            }`}>
+              {pushing && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}
+              {pushing ? "Sending push notification…" : pushMsg}
+            </div>
+          )}
           {loading ? (
             <p className="mt-4 text-xs text-slate-400">Loading events…</p>
           ) : events.length === 0 ? (
