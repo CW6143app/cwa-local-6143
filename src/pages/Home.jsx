@@ -65,8 +65,8 @@ export default function Home() {
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
-            className={`flex-1 h-10 rounded-full text-xs font-semibold transition-colors bg-[#c8102e] text-white ${
-            tab === t.id ? "" : "opacity-80 hover:opacity-100"}`
+            className={`flex-1 h-10 rounded-full text-xs font-semibold transition-colors text-white ${
+            tab === t.id ? "bg-[#a50d24]" : "bg-[#c8102e] hover:bg-[#a50d24]"}`
             }>
             
               {t.label}
