@@ -1,0 +1,47 @@
+{
+  "name": "Enable Meeting Button",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "recurring",
+      "cron_expression": "25 19 * * 4",
+      "one_time_date": null,
+      "timezone": "America/Chicago",
+      "interval_value": null,
+      "interval_unit": null,
+      "interval_anchor": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "enable_meeting_button",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "enable": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "toggleMeetingButton",
+            "args": {
+              "action": "on"
+            }
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Enable Join Meeting button",
+            "description": "Second Thursday, 7:25 PM CT"
+          }
+        }
+      }
+    ]
+  },
+  "description": "Turns on the Join Meeting button on the second Thursday of each month at 7:25 PM CT"
+}
