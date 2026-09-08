@@ -107,12 +107,11 @@ export default function Grievance() {
     setLoading(true);
     try {
       const { first_name, last_name, ...rest } = form;
-      await base44.entities.Grievance.create({
-        ...rest,
-        name_of_grievant: `${first_name} ${last_name}`.trim(),
-        status: "submitted"
-      });
+      const name = `${first_name} ${last_name}`.trim();
+      const payload = { ...rest, name, name_of_grievant: name, status: "submitted" };
+      await base44.entities.Grievance.create(payload);
       setDone(true);
+      base44.functions.invoke("notifyGrievance", payload).catch(() => {});
     } catch (err) {
       setError(err.message || "Could not submit. Please try again.");
     } finally {

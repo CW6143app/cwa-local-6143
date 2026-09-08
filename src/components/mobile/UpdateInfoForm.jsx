@@ -53,6 +53,7 @@ export default function UpdateInfoForm() {
     try {
       await base44.entities.MemberInfo.create(form);
       setDone(true);
+      base44.functions.invoke("notifyMemberInfo", form).catch(() => {});
     } catch (err) {
       setError(err.message || "Could not save. Please try again.");
     } finally {

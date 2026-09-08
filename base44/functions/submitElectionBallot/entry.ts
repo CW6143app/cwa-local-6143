@@ -1,15 +1,7 @@
 import { secrets } from "base44:runtime";
+import { escapeHtml, sendEmail, isValidEmail, nowCentral } from "../../shared/email.ts";
 
 const COMMITTEE_EMAIL = "cwaelectioncommittee@gmail.com";
-
-function escapeHtml(str) {
-  return String(str || "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
 
 export default async function (req: Request): Promise<Response> {
   try {
@@ -22,7 +14,7 @@ export default async function (req: Request): Promise<Response> {
     if (!name || !email) {
       return Response.json({ error: "Name and email are required." }, { status: 400 });
     }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    if (!isValidEmail(email)) {
       return Response.json({ error: "A valid email is required." }, { status: 400 });
     }
 
@@ -30,7 +22,7 @@ export default async function (req: Request): Promise<Response> {
     if (!apiKey) return Response.json({ error: "Email service not configured." }, { status: 500 });
 
     const subject = "Local Election 2026 — Ballot Not Received";
-    const submittedAt = new Date().toLocaleString("en-US", { timeZone: "America/Chicago" });
+    const submittedAt = nowCentral();
 
     const html = `
 <!DOCTYPE html>
@@ -79,22 +71,6 @@ Submitted: ${submittedAt} (CT)
 
 This message was sent automatically from the CWA Local 6143 mobile app.`;
 
-    const FROM = "CWA Local 6143 <noreply@appcwa6143.org>";
-
-    const sendEmail = async (payload: any) => {
-      const r = await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ from: FROM, ...payload }),
-      });
-      const d: any = await r.json().catch(() => ({} as any));
-      return { ok: r.ok, data: d };
-    };
-
-    // 1. Notification to the Election Committee
-    const committeePayload = { to: COMMITTEE_EMAIL, reply_to: email, subject, html, text };
-
-    // 2. Confirmation to the voter
     const voterHtml = `
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"></head>
@@ -122,16 +98,9 @@ This message was sent automatically from the CWA Local 6143 mobile app.`;
 
     const voterText = `Hello ${name},\n\nThank you for updating your information with the CWA Election Committee. We have received your updated details and will use them to ensure your records are up to date regarding your election ballot.\n\nBest regards,\nCWA Election Committee`;
 
-    const voterPayload = {
-      to: email,
-      subject: "Confirmation: Your contact information update has been received",
-      html: voterHtml,
-      text: voterText,
-    };
-
     const [committeeRes, voterRes] = await Promise.all([
-      sendEmail(committeePayload),
-      sendEmail(voterPayload),
+      sendEmail(apiKey, { to: COMMITTEE_EMAIL, reply_to: email, subject, html, text }),
+      sendEmail(apiKey, { to: email, subject: "Confirmation: Your contact information update has been received", html: voterHtml, text: voterText }),
     ]);
 
     if (!committeeRes.ok) {
