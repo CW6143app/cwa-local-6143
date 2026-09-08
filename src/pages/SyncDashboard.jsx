@@ -82,6 +82,46 @@ export default function SyncDashboard() {
       </header>
 
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-5">
+        {/* Join Meeting toggle */}
+        <div className="rounded-2xl border-2 border-[#c8102e]/30 bg-white p-5">
+          <div className="flex items-center gap-2">
+            <Video className="w-4 h-4 text-[#c8102e]" />
+            <h3 className="text-sm font-bold text-slate-900">Join Meeting Button</h3>
+          </div>
+          <p className="mt-1 text-xs text-slate-500 leading-relaxed">
+            Toggle the "Join Meeting" button on or off for each event. When on, members see the button on the home and events screens.
+          </p>
+          {loading ? (
+            <p className="mt-4 text-xs text-slate-400">Loading events…</p>
+          ) : events.length === 0 ? (
+            <p className="mt-4 text-xs text-slate-400">
+              No events yet. Use "Sync now" below to pull events from cwa6143.org, then toggle the button here.
+            </p>
+          ) : (
+            <ul className="mt-4 space-y-2">
+              {events.map((e) => (
+                <li key={e.id} className="flex items-center gap-3 text-sm">
+                  <span className="w-12 shrink-0 text-center rounded-md bg-slate-100 py-1 text-xs font-bold text-slate-700">
+                    {e.month} {e.day}
+                  </span>
+                  <span className="text-slate-700 truncate flex-1">{e.title}</span>
+                  <button
+                    onClick={() => toggleJoin(e)}
+                    className={`shrink-0 flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
+                      e.join_meeting_url
+                        ? "bg-[#c8102e] text-white hover:bg-[#a50d24]"
+                        : "bg-slate-100 text-slate-500 hover:bg-slate-200"
+                    }`}
+                  >
+                    <Video className="w-3.5 h-3.5" />
+                    {e.join_meeting_url ? "On" : "Off"}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
         {/* Sync card */}
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
           <div className="flex items-start gap-4">
@@ -161,33 +201,6 @@ export default function SyncDashboard() {
           </div>
         </div>
 
-        {/* Preview of synced events */}
-        {!loading && events.length > 0 && (
-          <div className="rounded-2xl border border-slate-200 bg-white p-5">
-            <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-400">Current synced events</h3>
-            <ul className="mt-3 space-y-2">
-              {events.map((e) => (
-                <li key={e.id} className="flex items-center gap-3 text-sm">
-                  <span className="w-12 shrink-0 text-center rounded-md bg-slate-100 py-1 text-xs font-bold text-slate-700">
-                    {e.month} {e.day}
-                  </span>
-                  <span className="text-slate-700 truncate flex-1">{e.title}</span>
-                  <button
-                    onClick={() => toggleJoin(e)}
-                    className={`shrink-0 flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-semibold transition-colors ${
-                      e.join_meeting_url
-                        ? "bg-[#c8102e] text-white hover:bg-[#a50d24]"
-                        : "bg-slate-100 text-slate-500 hover:bg-slate-200"
-                    }`}
-                  >
-                    <Video className="w-3.5 h-3.5" />
-                    {e.join_meeting_url ? "Join ON" : "Join OFF"}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
       </div>
     </div>
   );
