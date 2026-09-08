@@ -49,7 +49,7 @@ export default function Events() {
           href="https://cwa6143.org/meetings-events"
           target="_blank"
           rel="noreferrer"
-          className="block rounded-2xl py-4 text-center text-xs font-semibold uppercase tracking-[0.2em] text-white bg-gray-950"
+          className="block rounded-2xl py-4 text-center text-xs font-semibold uppercase tracking-[0.2em] text-white bg-[#c8102e] hover:bg-[#c8102e]/90 transition-colors"
         >
           See full calendar
         </a>

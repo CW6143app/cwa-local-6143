@@ -65,7 +65,7 @@ export default function PmeiForm() {
           <p className="mt-2 text-sm text-slate-500 leading-relaxed">
             Your PMEI suggestion has been submitted to Local 6143. Thank you for your input.
           </p>
-          <Button onClick={() => navigate("/resources")} className="mt-6 h-11 w-full bg-[#0b2545] text-white hover:bg-[#0b2545]/90">
+          <Button onClick={() => navigate("/resources")} className="mt-6 h-11 w-full bg-[#c8102e] text-white hover:bg-[#c8102e]/90">
             Back to Resources
           </Button>
         </motion.div>

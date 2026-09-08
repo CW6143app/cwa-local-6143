@@ -78,7 +78,7 @@ export default function UpdateInfoForm() {
             setDone(false);
             setForm(EMPTY);
           }}
-          className="mt-6 h-11 w-full bg-[#0b2545] text-white hover:bg-[#0b2545]/90"
+          className="mt-6 h-11 w-full bg-[#c8102e] text-white hover:bg-[#c8102e]/90"
         >
           Update again
         </Button>

@@ -61,7 +61,7 @@ export default function AccountSettings() {
               <p className="mt-2 text-sm text-slate-500">
                 Your account deletion request has been submitted. You will be contacted within 30 days.
               </p>
-              <Button onClick={reset} className="mt-6 w-full bg-[#0b2545] text-white hover:bg-[#0b2545]/90">
+              <Button onClick={reset} className="mt-6 w-full bg-[#c8102e] text-white hover:bg-[#c8102e]/90">
                 Close
               </Button>
             </div>

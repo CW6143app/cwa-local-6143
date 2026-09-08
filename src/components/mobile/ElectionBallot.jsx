@@ -90,7 +90,7 @@ export default function ElectionBallot() {
                     <div className="mt-6 grid grid-cols-2 gap-3">
                       <button
                         onClick={() => setStep("yes")}
-                        className="rounded-xl bg-[#13653f] py-3 text-sm font-semibold text-white"
+                        className="rounded-xl bg-[#c8102e] py-3 text-sm font-semibold text-white"
                       >
                         Yes
                       </button>
@@ -122,7 +122,7 @@ export default function ElectionBallot() {
                     </p>
                     <button
                       onClick={reset}
-                      className="mt-6 w-full rounded-xl bg-[#0b2545] py-3 text-sm font-semibold text-white"
+                      className="mt-6 w-full rounded-xl bg-[#c8102e] py-3 text-sm font-semibold text-white"
                     >
                       Done
                     </button>
@@ -217,7 +217,7 @@ export default function ElectionBallot() {
                     </p>
                     <button
                       onClick={reset}
-                      className="mt-6 w-full rounded-xl bg-[#0b2545] py-3 text-sm font-semibold text-white"
+                      className="mt-6 w-full rounded-xl bg-[#c8102e] py-3 text-sm font-semibold text-white"
                     >
                       Close
                     </button>
