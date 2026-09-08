@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Bell, BellRing, Loader2, CheckCircle2 } from "lucide-react";
 import { messaging, VAPID_KEY } from "@/lib/firebase";
 import { getToken } from "firebase/messaging";
+import { base44 } from "@/api/base44Client";
 
 export default function PushOptIn() {
   const [status, setStatus] = useState("idle"); // idle | loading | granted | denied | unsupported
@@ -36,6 +37,14 @@ export default function PushOptIn() {
       });
       setToken(tok);
       setStatus("granted");
+      try {
+        await base44.entities.PushToken.create({
+          token: tok,
+          user_agent: navigator.userAgent || "",
+        });
+      } catch (e) {
+        // token may already exist — ignore duplicate
+      }
     } catch (err) {
       console.error("Push opt-in failed:", err);
       setStatus("denied");
