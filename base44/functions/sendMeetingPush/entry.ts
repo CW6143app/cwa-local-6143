@@ -103,8 +103,21 @@ export default async function(req) {
       return Response.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const clientEmail = secrets.get('FCM_CLIENT_EMAIL');
-    let privateKey = secrets.get('FCM_PRIVATE_KEY');
+    let clientEmail;
+    let privateKey;
+    const sa = secrets.get('FIREBASE_SERVICE_ACCOUNT');
+    if (sa) {
+      try {
+        const parsed = JSON.parse(sa);
+        clientEmail = parsed.client_email;
+        privateKey = parsed.private_key;
+      } catch {
+        return Response.json({ error: 'FIREBASE_SERVICE_ACCOUNT is not valid JSON' }, { status: 500 });
+      }
+    } else {
+      clientEmail = secrets.get('FCM_CLIENT_EMAIL');
+      privateKey = secrets.get('FCM_PRIVATE_KEY');
+    }
     if (!clientEmail || !privateKey) {
       return Response.json({ error: 'FCM credentials not configured' }, { status: 500 });
     }
