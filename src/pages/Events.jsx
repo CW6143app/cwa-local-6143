@@ -34,14 +34,27 @@ export default function Events() {
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
           {events.length} upcoming {events.length === 1 ? "event" : "events"}
         </p>
-        {events.map((e, i) => (
-          <div key={`${e.month}-${e.day}-${i}`} className="space-y-2">
-            <EventCard event={e} index={i} />
-            <div className="flex justify-end">
-              <CalendarInteraction event={e} />
+        {events.map((e, i) => {
+          const isMembershipMeeting = (e.title || "").toLowerCase().includes("membership meeting");
+          return (
+            <div key={`${e.month}-${e.day}-${i}`} className="space-y-2">
+              <EventCard event={e} index={i} />
+              {isMembershipMeeting && (
+                <a
+                  href="https://us02web.zoom.us/j/86358644306?pwd=VVRinTQCDLhCTM4SS3oXbXR93lgCva.1"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center justify-center gap-2 rounded-xl bg-[#c8102e] px-4 py-3 text-sm font-semibold text-white hover:bg-[#a50d24] transition-colors"
+                >
+                  Join Meeting
+                </a>
+              )}
+              <div className="flex justify-end">
+                <CalendarInteraction event={e} />
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       <div className="px-6 pt-8 space-y-3">
