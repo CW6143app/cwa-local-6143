@@ -1,8 +1,6 @@
 import { secrets } from "base44:runtime";
 
-// Sandbox sender (onboarding@resend.dev) can only deliver to the Resend account owner.
-// Until a sending domain is verified, route submissions to the account owner.
-const COMMITTEE_EMAIL = "appcwa6143@gmail.com";
+const COMMITTEE_EMAIL = "cwaelectioncommittee@gmail.com";
 
 function escapeHtml(str) {
   return String(str || "")
@@ -81,7 +79,7 @@ Submitted: ${submittedAt} (CT)
 
 This message was sent automatically from the CWA Local 6143 mobile app.`;
 
-    const FROM = "CWA Local 6143 <onboarding@resend.dev>";
+    const FROM = "CWA Local 6143 <noreply@appcwa6143.org>";
 
     const sendEmail = async (payload: any) => {
       const r = await fetch("https://api.resend.com/emails", {
@@ -131,20 +129,16 @@ This message was sent automatically from the CWA Local 6143 mobile app.`;
       text: voterText,
     };
 
-    // Sandbox sender can only deliver to the account owner, so a voter-email send
-    // may fail until a sending domain is verified — don't let it break the committee notice.
-    const [committeeRes, voterRes] = await Promise.allSettled([
+    const [committeeRes, voterRes] = await Promise.all([
       sendEmail(committeePayload),
       sendEmail(voterPayload),
     ]);
 
-    if (committeeRes.status === "fulfilled" && committeeRes.value.ok) {
-      const voterNotified = voterRes.status === "fulfilled" && voterRes.value.ok;
-      return Response.json({ ok: true, id: committeeRes.value.data.id, voterNotified });
+    if (!committeeRes.ok) {
+      return Response.json({ error: committeeRes.data?.error?.message || "Email delivery failed." }, { status: 502 });
     }
 
-    const errMsg = committeeRes.status === "fulfilled" ? committeeRes.value.data?.error?.message : committeeRes.reason?.message;
-    return Response.json({ error: errMsg || "Email delivery failed." }, { status: 502 });
+    return Response.json({ ok: true, id: committeeRes.data.id, voterNotified: voterRes.ok });
   } catch (error: any) {
     return Response.json({ error: error.message }, { status: 500 });
   }
