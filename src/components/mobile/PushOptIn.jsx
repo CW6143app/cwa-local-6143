@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Bell, BellRing, Loader2, CheckCircle2 } from "lucide-react";
 import { messaging, VAPID_KEY } from "@/lib/firebase";
-import { getToken } from "firebase/messaging";
+import { getToken, onMessage } from "firebase/messaging";
 import { base44 } from "@/api/base44Client";
 
 export default function PushOptIn() {
@@ -9,9 +9,58 @@ export default function PushOptIn() {
   const [token, setToken] = useState(null);
 
   useEffect(() => {
+    let unsub;
+    // If permission was already granted, make sure the SW + token are set up
+    // (covers users who opted in before the service worker existed).
+    const ensureRegistered = async () => {
+      if (!("Notification" in window) || Notification.permission !== "granted" || !messaging) return;
+      try {
+        const swReg = await navigator.serviceWorker.register("/firebase-messaging-sw.js", {
+          type: "module",
+        });
+        const tok = await getToken(messaging, {
+          vapidKey: VAPID_KEY,
+          serviceWorkerRegistration: swReg,
+        });
+        setToken(tok);
+        await base44.entities.PushToken
+          .create({ token: tok, user_agent: navigator.userAgent || "" })
+          .catch(() => {});
+      } catch (e) {
+        // ignore — token may already exist or SW unavailable
+      }
+    };
+
     if ("Notification" in window && Notification.permission === "granted") {
       setStatus("granted");
+      ensureRegistered();
     }
+
+    // Show notifications while the app is open (foreground)
+    if (messaging) {
+      unsub = onMessage(messaging, (payload) => {
+        const n = payload.notification || {};
+        const title = n.title || "CWA Local 6143";
+        const body = n.body || "";
+        try {
+          if ("Notification" in window && Notification.permission === "granted") {
+            navigator.serviceWorker
+              .getRegistration("/firebase-messaging-sw.js")
+              .then((reg) =>
+                reg
+                  ? reg.showNotification(title, { body, icon: "https://media.base44.com/images/public/6a96f9a8ac8dfadbcb9d319b/be7f61f04_CWA6143a.jpg" })
+                  : new Notification(title, { body })
+              )
+              .catch(() => new Notification(title, { body }));
+          }
+        } catch (e) {
+          // ignore display errors
+        }
+      });
+    }
+    return () => {
+      if (unsub) unsub();
+    };
   }, []);
 
   const enable = async () => {
@@ -30,7 +79,9 @@ export default function PushOptIn() {
         setStatus("unsupported");
         return;
       }
-      const swReg = await navigator.serviceWorker.register("/firebase-messaging-sw.js");
+      const swReg = await navigator.serviceWorker.register("/firebase-messaging-sw.js", {
+        type: "module",
+      });
       const tok = await getToken(messaging, {
         vapidKey: VAPID_KEY,
         serviceWorkerRegistration: swReg,
