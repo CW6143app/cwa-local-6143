@@ -95,54 +95,78 @@ async function sendToToken(accessToken, token) {
   return res.ok;
 }
 
+function resolveCredentials() {
+  let clientEmail;
+  let privateKey;
+  const sa = secrets.get('FIREBASE_SERVICE_ACCOUNT');
+  if (sa) {
+    try {
+      const parsed = JSON.parse(sa);
+      clientEmail = parsed.client_email;
+      privateKey = parsed.private_key;
+    } catch {
+      throw new Error('FIREBASE_SERVICE_ACCOUNT is not valid JSON');
+    }
+  } else {
+    clientEmail = secrets.get('FCM_CLIENT_EMAIL');
+    privateKey = secrets.get('FCM_PRIVATE_KEY');
+  }
+  if (!clientEmail || !privateKey) {
+    throw new Error('FCM credentials not configured');
+  }
+  privateKey = privateKey.replace(/\\n/g, '\n').trim();
+  return { clientEmail, privateKey };
+}
+
+async function broadcastPush(base44, clientEmail, privateKey) {
+  const tokens = await base44.asServiceRole.entities.PushToken.list('-created_date', 1000);
+  const list = Array.isArray(tokens) ? tokens : [];
+  if (list.length === 0) {
+    return { sent: 0, failed: 0, total: 0, message: 'No devices registered for push.' };
+  }
+  const accessToken = await getAccessToken(clientEmail, privateKey);
+  let sent = 0;
+  let failed = 0;
+  for (const t of list) {
+    try {
+      const ok = await sendToToken(accessToken, t.token);
+      if (ok) sent++; else failed++;
+    } catch {
+      failed++;
+    }
+  }
+  return { sent, failed, total: list.length };
+}
+
 export default async function(req) {
   try {
     const base44 = createClientFromRequest(req);
+    let body = {};
+    try { body = await req.json(); } catch {}
+    const { clientEmail, privateKey } = resolveCredentials();
+
+    // Workflow path: dedup per event so each meeting notifies at most once.
+    if (body.event_id) {
+      const event = await base44.asServiceRole.entities.SyncedEvent.get(body.event_id);
+      if (!event) return Response.json({ error: 'Event not found' }, { status: 404 });
+      if (event.meeting_notified) {
+        return Response.json({ sent: 0, skipped: true, message: 'Already notified for this meeting.' });
+      }
+      if (!event.join_meeting_url) {
+        return Response.json({ sent: 0, skipped: true, message: 'Join meeting not enabled.' });
+      }
+      const result = await broadcastPush(base44, clientEmail, privateKey);
+      await base44.asServiceRole.entities.SyncedEvent.update(body.event_id, { meeting_notified: true });
+      return Response.json(result);
+    }
+
+    // Manual admin path (dashboard test)
     const user = await base44.auth.me();
     if (!user || user.role !== 'admin') {
       return Response.json({ error: 'Forbidden' }, { status: 403 });
     }
-
-    let clientEmail;
-    let privateKey;
-    const sa = secrets.get('FIREBASE_SERVICE_ACCOUNT');
-    if (sa) {
-      try {
-        const parsed = JSON.parse(sa);
-        clientEmail = parsed.client_email;
-        privateKey = parsed.private_key;
-      } catch {
-        return Response.json({ error: 'FIREBASE_SERVICE_ACCOUNT is not valid JSON' }, { status: 500 });
-      }
-    } else {
-      clientEmail = secrets.get('FCM_CLIENT_EMAIL');
-      privateKey = secrets.get('FCM_PRIVATE_KEY');
-    }
-    if (!clientEmail || !privateKey) {
-      return Response.json({ error: 'FCM credentials not configured' }, { status: 500 });
-    }
-    privateKey = privateKey.replace(/\\n/g, '\n').trim();
-
-    const tokens = await base44.asServiceRole.entities.PushToken.list('-created_date', 1000);
-    const list = Array.isArray(tokens) ? tokens : [];
-    if (list.length === 0) {
-      return Response.json({ sent: 0, message: 'No devices registered for push.' });
-    }
-
-    const accessToken = await getAccessToken(clientEmail, privateKey);
-
-    let sent = 0;
-    let failed = 0;
-    for (const t of list) {
-      try {
-        const ok = await sendToToken(accessToken, t.token);
-        if (ok) sent++; else failed++;
-      } catch {
-        failed++;
-      }
-    }
-
-    return Response.json({ sent, failed, total: list.length });
+    const result = await broadcastPush(base44, clientEmail, privateKey);
+    return Response.json(result);
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });
   }

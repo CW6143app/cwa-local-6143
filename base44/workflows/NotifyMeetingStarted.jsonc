@@ -1,6 +1,6 @@
 {
   "name": "Notify Meeting Started",
-  "description": "When a SyncedEvent's Join Meeting link is toggled on, broadcast an FCM push notification to all opted-in members.",
+  "description": "When a SyncedEvent's Join Meeting link is toggled on, broadcast an FCM push notification to all opted-in members (once per meeting).",
   "trigger": {
     "config": {
       "trigger_type": "entity",
@@ -9,7 +9,7 @@
         "update"
       ]
     },
-    "condition": "${ (.trigger.data.join_meeting_url // \"\") != \"\" and (.trigger.old_data.join_meeting_url // \"\") == \"\" }"
+    "condition": "${ (.trigger.data.join_meeting_url // \"\") != \"\" and (.trigger.old_data.join_meeting_url // \"\") == \"\" and (.trigger.data.meeting_notified // false) != true }"
   },
   "definition": {
     "document": {
@@ -24,12 +24,14 @@
           "call": "invoke_backend_function",
           "with": {
             "function_name": "sendMeetingPush",
-            "args": {}
+            "args": {
+              "event_id": "${.trigger.data.id}"
+            }
           },
           "then": "end",
           "x-base44": {
             "title": "Send meeting push",
-            "description": "Broadcast to all devices"
+            "description": "Broadcast to all devices once"
           }
         }
       }
