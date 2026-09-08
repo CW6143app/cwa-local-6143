@@ -107,9 +107,21 @@ export default function Home() {
               Upcoming Events
             </h2>
             <div className="mt-5 space-y-4">
-              {events.slice(0, 2).map((e, i) =>
-            <EventCard key={(e.month || "") + (e.day || "")} event={e} index={i} />
-            )}
+              {events.slice(0, 2).map((e, i) => (
+                <div key={(e.month || "") + (e.day || "")} className="space-y-2">
+                  <EventCard event={e} index={i} />
+                  {e.join_meeting_url && (
+                    <a
+                      href={e.join_meeting_url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex items-center justify-center gap-2 rounded-xl bg-[#c8102e] px-4 py-3 text-sm font-semibold text-white hover:bg-[#a50d24] transition-colors"
+                    >
+                      Join Meeting
+                    </a>
+                  )}
+                </div>
+              ))}
             </div>
             <Link
             to="/events"
