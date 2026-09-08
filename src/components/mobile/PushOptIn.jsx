@@ -42,6 +42,18 @@ export default function PushOptIn() {
         const d = payload.data || {};
         const title = d.title || "CWA Local 6143";
         const body = d.body || "";
+        // Show the in-app alert in only one tab, even if the app is open in
+        // multiple tabs of the same browser. The service worker handles the
+        // single system notification when all tabs are closed.
+        const key = `${title}|${body}`;
+        const now = Date.now();
+        try {
+          const stored = JSON.parse(localStorage.getItem("cwa_last_push") || "{}");
+          if (stored.key === key && now - stored.time < 5000) return;
+          localStorage.setItem("cwa_last_push", JSON.stringify({ key, time: now }));
+        } catch (e) {
+          // ignore storage errors
+        }
         toast({ title, description: body });
       });
     }
