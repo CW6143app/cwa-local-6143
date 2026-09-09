@@ -1,0 +1,45 @@
+{
+  "name": "Daily Website Sync",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "recurring",
+      "cron_expression": "0 17 * * *",
+      "one_time_date": null,
+      "timezone": "America/Chicago",
+      "interval_value": null,
+      "interval_unit": null,
+      "interval_anchor": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "daily_website_sync",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "sync": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "syncFromWebsite",
+            "args": {}
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Sync from cwa6143.org",
+            "description": "Daily, 5:00 PM CT"
+          }
+        }
+      }
+    ]
+  },
+  "description": "Pulls the latest stories and events from cwa6143.org into the app every day at 5:00 PM CT"
+}
