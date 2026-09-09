@@ -10,6 +10,7 @@ import EventCard from "@/components/mobile/EventCard";
 import UpdateInfoForm from "@/components/mobile/UpdateInfoForm";
 import FollowLocal from "@/components/mobile/FollowLocal";
 import PushOptIn from "@/components/mobile/PushOptIn";
+import InstallPrompt from "@/components/mobile/InstallPrompt";
 import ElectionBallot from "@/components/mobile/ElectionBallot";
 
 const TABS = [
@@ -82,6 +83,10 @@ export default function Home() {
 
       {tab === "news" ?
       <>
+          <section className="px-6 pt-6">
+            <InstallPrompt />
+          </section>
+
           {joinUrl && (
             <section className="px-6 pt-6">
               <a
