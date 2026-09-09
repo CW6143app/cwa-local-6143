@@ -41,6 +41,7 @@ export default function SyncDashboard() {
   const [pushMsg, setPushMsg] = useState("");
 
   const toggleJoin = async (e) => {
+    if (!(e.title || "").includes("Membership Meeting")) return;
     const turningOn = !e.join_meeting_url;
     try {
       await base44.entities.SyncedEvent.update(e.id, {
@@ -110,13 +111,13 @@ export default function SyncDashboard() {
           )}
           {loading ? (
             <p className="mt-4 text-xs text-slate-400">Loading events…</p>
-          ) : events.length === 0 ? (
+          ) : events.filter((e) => (e.title || "").includes("Membership Meeting")).length === 0 ? (
             <p className="mt-4 text-xs text-slate-400">
-              No events yet. Use "Sync now" below to pull events from cwa6143.org, then toggle the button here.
+              No Membership Meeting events yet. Use "Sync now" below to pull events from cwa6143.org, then toggle the button here.
             </p>
           ) : (
             <ul className="mt-4 space-y-2">
-              {events.map((e) => (
+              {events.filter((e) => (e.title || "").includes("Membership Meeting")).map((e) => (
                 <li key={e.id} className="flex items-center gap-3 text-sm">
                   <span className="w-12 shrink-0 text-center rounded-md bg-slate-100 py-1 text-xs font-bold text-slate-700">
                     {e.month} {e.day}
