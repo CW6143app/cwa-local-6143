@@ -154,7 +154,7 @@ export default function SyncDashboard() {
               </p>
               {lastSync && (
                 <p className="mt-2 text-xs text-slate-400">
-                  Last synced {new Date(lastSync).toLocaleString()}
+                  Last synced {new Date(lastSync).toLocaleString("en-US", { timeZone: "America/Chicago", timeZoneName: "short" })}
                 </p>
               )}
             </div>
