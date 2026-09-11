@@ -128,8 +128,7 @@ export default function PushOptIn() {
       if (unsubWeb) unsubWeb();
       if (unlistenNative) unlistenNative();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [native]);
 
   const enableNative = async () => {
     setStatus("loading");
