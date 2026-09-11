@@ -13,6 +13,9 @@
   },
   "dependencies": {
     "@base44/sdk": "^0.8.48",
+    "@capacitor/core": "^6.2.0",
+    "@capacitor-firebase/messaging": "^6.3.0",
+    "@capacitor/local-notifications": "^6.1.0",
     "@base44/vite-plugin": "^1.0.36",
     "@hello-pangea/dnd": "^17.0.0",
     "@hookform/resolvers": "^4.1.2",
