@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
+import { useAuth } from "@/lib/AuthContext";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { Settings, Trash2, AlertTriangle, Loader2, CheckCircle2 } from "lucide-react";
@@ -10,6 +11,7 @@ export default function AccountSettings() {
   const [confirmText, setConfirmText] = useState("");
   const [deleting, setDeleting] = useState(false);
   const [done, setDone] = useState(false);
+  const { logout } = useAuth();
 
   useEffect(() => {
     base44.auth.me().then(setUser).catch(() => {});
@@ -19,10 +21,16 @@ export default function AccountSettings() {
 
   const handleDelete = async () => {
     setDeleting(true);
-    // Mock API deletion request
-    await new Promise((r) => setTimeout(r, 1500));
+    try {
+      await base44.functions.invoke("deleteUserAccount", { email: user.email });
+    } catch (e) {
+      // proceed to sign out even if the deletion call fails
+    }
     setDeleting(false);
     setDone(true);
+    try {
+      await logout();
+    } catch (e) {}
   };
 
   const reset = () => {

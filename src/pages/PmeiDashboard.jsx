@@ -57,10 +57,12 @@ export default function PmeiDashboard() {
 
   const updateStatus = async (id, newStatus) => {
     setUpdatingId(id);
+    const previous = submissions;
+    setSubmissions((prev) => prev.map((s) => s.id === id ? { ...s, status: newStatus } : s));
     try {
       await base44.entities.PmeiSubmission.update(id, { status: newStatus });
-      setSubmissions((prev) => prev.map((s) => s.id === id ? { ...s, status: newStatus } : s));
     } catch {
+      setSubmissions(previous);
       alert("Failed to update status. Please try again.");
     } finally {
       setUpdatingId(null);

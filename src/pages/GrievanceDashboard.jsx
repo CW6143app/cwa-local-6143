@@ -65,13 +65,15 @@ export default function GrievanceDashboard() {
 
   const updateStatus = async (id, newStatus) => {
     setUpdatingId(id);
+    const previous = grievances;
+    setGrievances((prev) =>
+      prev.map((g) => (g.id === id ? { ...g, status: newStatus } : g))
+    );
     try {
       await base44.entities.Grievance.update(id, { status: newStatus });
-      setGrievances((prev) =>
-        prev.map((g) => (g.id === id ? { ...g, status: newStatus } : g))
-      );
     } catch (err) {
       console.error('Failed to update status:', err);
+      setGrievances(previous);
       alert('Failed to update status. Please try again.');
     } finally {
       setUpdatingId(null);

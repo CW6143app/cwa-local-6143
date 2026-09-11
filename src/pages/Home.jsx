@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Image } from "@/components/ui/image";
@@ -20,7 +20,8 @@ const TABS = [
 
 
 export default function Home() {
-  const [tab, setTab] = useState("news");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tab = searchParams.get("tab") === "update" ? "update" : "news";
   const [syncedStories, setSyncedStories] = useState([]);
   const [syncedEvents, setSyncedEvents] = useState([]);
 
@@ -71,7 +72,7 @@ export default function Home() {
           {TABS.map((t) =>
           <button
             key={t.id}
-            onClick={() => setTab(t.id)}
+            onClick={() => setSearchParams({ tab: t.id })}
             className="flex-1 h-11 rounded-full text-xs font-semibold transition-colors bg-[#c8102e] text-white hover:bg-[#a50d24]">
             
               {t.label}

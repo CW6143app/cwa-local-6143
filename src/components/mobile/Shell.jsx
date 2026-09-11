@@ -35,6 +35,12 @@ export default function Shell() {
                 <Link
                   key={to}
                   to={to}
+                  onClick={(e) => {
+                    if (pathname === to) {
+                      e.preventDefault();
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }
+                  }}
                   className="flex flex-col items-center gap-1 py-3 transition-colors"
                 >
                   <Icon
