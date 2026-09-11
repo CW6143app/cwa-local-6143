@@ -111,3 +111,23 @@ export function downloadIcs(e) {
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
+
+// Hands the event straight to whichever calendar app the phone's OS has
+// registered as the default .ics handler — no provider picker. On iOS this
+// opens the native "New Event" sheet in the user's default calendar app.
+// On Android it triggers the OS "Open with" resolution (or opens directly if
+// a single calendar app is registered), and on desktop browsers with no
+// registered handler it falls back to a normal file download.
+export function addToNativeCalendar(e) {
+  const ics = buildIcsForEvent(e, `${Date.now()}`);
+  const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+
+  // Navigating directly (rather than an <a download> click) is what lets
+  // mobile Safari/Chrome hand the file to the registered calendar app
+  // instead of always forcing a download.
+  window.location.href = url;
+
+  // Give the OS a moment to pick up the blob before releasing it.
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+}
