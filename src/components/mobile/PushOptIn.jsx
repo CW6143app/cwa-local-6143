@@ -36,15 +36,19 @@ export default function PushOptIn() {
       ensureRegistered();
     }
 
-    // Show notifications while the app is open (foreground)
+    // Route foreground pushes through the OS's native notification system —
+    // the same showNotification() call the service worker uses in the
+    // background — so an alert looks and behaves identically whether the app
+    // is open or closed, instead of a custom in-app toast.
     if (messaging) {
-      unsub = onMessage(messaging, (payload) => {
+      unsub = onMessage(messaging, async (payload) => {
         const d = payload.data || {};
         const title = d.title || "CWA Local 6143";
         const body = d.body || "";
-        // Show the in-app alert in only one tab, even if the app is open in
-        // multiple tabs of the same browser. The service worker handles the
-        // single system notification when all tabs are closed.
+        const url = d.url || "https://cwa6143.base44.app/events";
+
+        // Fire only one native notification, even if the app is open in
+        // multiple tabs of the same browser.
         const key = `${title}|${body}`;
         const now = Date.now();
         try {
@@ -54,7 +58,19 @@ export default function PushOptIn() {
         } catch (e) {
           // ignore storage errors
         }
-        toast({ title, description: body });
+
+        try {
+          const reg = await navigator.serviceWorker.ready;
+          await reg.showNotification(title, {
+            body,
+            icon: "https://media.base44.com/images/public/6a96f9a8ac8dfadbcb9d319b/be7f61f04_CWA6143a.jpg",
+            data: { url },
+          });
+        } catch (e) {
+          // No active service worker registration — fall back to an in-app
+          // toast so the alert still reaches the user.
+          toast({ title, description: body });
+        }
       });
     }
     return () => {
