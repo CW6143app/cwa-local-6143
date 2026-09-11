@@ -94,6 +94,7 @@ export default function CommitteeSignup() {
   return (
     <div>
       <PageHeader
+        showBack
         eyebrow="Get Involved"
         title="Committee Sign Up"
         subtitle="Volunteer for a Local 6143 committee and help build a stronger union."

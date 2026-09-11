@@ -1,5 +1,6 @@
 import React from "react";
-import { Link, useLocation, Outlet } from "react-router-dom";
+import { Link, useLocation, useOutlet } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
 import { Home, CalendarDays, BookOpen, Info } from "lucide-react";
 
 const TABS = [
@@ -11,10 +12,21 @@ const TABS = [
 
 export default function Shell() {
   const { pathname } = useLocation();
+  const outlet = useOutlet();
   return (
     <div className="min-h-screen bg-[#f6f5f2] flex justify-center">
-      <div className="w-full max-w-[480px] bg-[#f6f5f2] pb-24 shadow-sm relative dark:bg-[#0a1420]" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
-        <Outlet />
+      <div className="w-full max-w-[480px] bg-[#f6f5f2] pb-24 shadow-sm relative dark:bg-[#0a1420] no-scrollbar" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={pathname}
+            initial={{ opacity: 0, x: 16 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -16 }}
+            transition={{ duration: 0.22, ease: "easeOut" }}
+          >
+            {outlet}
+          </motion.div>
+        </AnimatePresence>
         <nav className="fixed bottom-0 w-full max-w-[480px] border-t border-black/10 bg-white/90 backdrop-blur-xl dark:border-white/10 dark:bg-[#0a1420]/90" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
           <div className="grid grid-cols-4">
             {TABS.map(({ to, label, icon: Icon }) => {

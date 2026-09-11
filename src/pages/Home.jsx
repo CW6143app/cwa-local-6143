@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
@@ -11,6 +11,7 @@ import UpdateInfoForm from "@/components/mobile/UpdateInfoForm";
 import FollowLocal from "@/components/mobile/FollowLocal";
 import PushOptIn from "@/components/mobile/PushOptIn";
 import InstallPrompt from "@/components/mobile/InstallPrompt";
+import PullToRefresh from "@/components/mobile/PullToRefresh";
 import ElectionBallot from "@/components/mobile/ElectionBallot";
 
 const TABS = [
@@ -23,21 +24,25 @@ export default function Home() {
   const [syncedStories, setSyncedStories] = useState([]);
   const [syncedEvents, setSyncedEvents] = useState([]);
 
-  useEffect(() => {
-    Promise.all([
+  const load = useCallback(async () => {
+    const [s, e] = await Promise.all([
       base44.entities.SyncedStory.list("sort_order", 8).catch(() => []),
       base44.entities.SyncedEvent.list("sort_order", 4).catch(() => []),
-    ]).then(([s, e]) => {
-      setSyncedStories(Array.isArray(s) ? s : []);
-      setSyncedEvents(Array.isArray(e) ? e : []);
-    });
+    ]);
+    setSyncedStories(Array.isArray(s) ? s : []);
+    setSyncedEvents(Array.isArray(e) ? e : []);
   }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
 
   const stories = syncedStories.length ? syncedStories : STORIES;
   const events = syncedEvents.length ? syncedEvents : EVENTS;
   const joinUrl = events.find((e) => e.join_meeting_url)?.join_meeting_url;
 
   return (
+    <PullToRefresh onRefresh={load}>
     <div>
       <section className="relative h-[300px] w-full overflow-hidden">
         <Image src={SITE.hero} alt="CWA Local 6143" className="h-full w-full" />
@@ -67,14 +72,14 @@ export default function Home() {
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
-            className="flex-1 h-10 rounded-full text-xs font-semibold transition-colors bg-[#c8102e] text-white hover:bg-[#a50d24]">
+            className="flex-1 h-11 rounded-full text-xs font-semibold transition-colors bg-[#c8102e] text-white hover:bg-[#a50d24]">
             
               {t.label}
             </button>
           )}
           <Link
             to="/grievance"
-            className="flex-1 h-10 rounded-full text-xs font-semibold transition-colors text-white hover:bg-[#a50d24] flex items-center justify-center bg-[#c8102e]">
+            className="flex-1 h-11 rounded-full text-xs font-semibold transition-colors text-white hover:bg-[#a50d24] flex items-center justify-center bg-[#c8102e]">
             
             File a Grievance
           </Link>
@@ -145,6 +150,8 @@ export default function Home() {
       }
 
       <FollowLocal />
-    </div>);
+    </div>
+    </PullToRefresh>
+  );
 
 }

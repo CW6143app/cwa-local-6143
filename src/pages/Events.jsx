@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import PageHeader from "@/components/mobile/PageHeader";
 import EventCard from "@/components/mobile/EventCard";
 import CalendarInteraction from "@/components/mobile/CalendarInteraction";
+import PullToRefresh from "@/components/mobile/PullToRefresh";
 import { base44 } from "@/api/base44Client";
 import { EVENTS } from "@/lib/siteData";
 
@@ -23,6 +24,7 @@ export default function Events() {
   const events = synced.length ? synced : EVENTS;
 
   return (
+    <PullToRefresh onRefresh={loadEvents}>
     <div>
       <PageHeader
         eyebrow="Local 6143"
@@ -65,5 +67,6 @@ export default function Events() {
         </a>
       </div>
     </div>
+    </PullToRefresh>
   );
 }

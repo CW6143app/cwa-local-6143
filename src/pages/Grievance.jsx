@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Loader2, CheckCircle2, FileText } from "lucide-react";
+import { Loader2, CheckCircle2, FileText, ArrowLeft } from "lucide-react";
 import SheetSelect from "@/components/mobile/SheetSelect";
 import AddressAutocomplete from "@/components/mobile/AddressAutocomplete";
 import { useAuth } from "@/lib/AuthContext";
@@ -144,6 +144,14 @@ export default function Grievance() {
       {/* Header */}
       <div className="px-6 pt-10 pb-6 opacity-100 bg-[#b31414]">
         <div className="flex items-center gap-4">
+          <button
+            type="button"
+            onClick={() => navigate(-1)}
+            aria-label="Go back"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/25 transition-colors"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </button>
           <img
             src="https://cwa6143.org/sites/default/files/styles/logo/public/logos/cwa-logo-80x38_5.png.webp?itok=wTtU3j7j"
             alt="CWA"

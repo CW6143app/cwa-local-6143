@@ -4,17 +4,15 @@ import { base44 } from "@/api/base44Client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import SheetSelect from "@/components/mobile/SheetSelect";
 import { Loader2, CheckCircle2, UserCog } from "lucide-react";
 import AddressAutocomplete from "@/components/mobile/AddressAutocomplete";
 
-const EMPLOYERS = ["AT&T", "AT&T Mobility", "TCE"];
+const EMPLOYERS = [
+  { value: "AT&T", label: "AT&T" },
+  { value: "AT&T Mobility", label: "AT&T Mobility" },
+  { value: "TCE", label: "TCE" },
+];
 
 const EMPTY = {
   first_name: "",
@@ -141,19 +139,14 @@ export default function UpdateInfoForm() {
 
         <div className="space-y-1">
           <Label className="text-xs font-medium text-[#0b2545]">Employer</Label>
-          <Select
+          <SheetSelect
             value={form.employer}
             onValueChange={(val) => setForm((f) => ({ ...f, employer: val }))}
-          >
-            <SelectTrigger className="h-9">
-              <SelectValue placeholder="Select employer" />
-            </SelectTrigger>
-            <SelectContent>
-              {EMPLOYERS.map((e) => (
-                <SelectItem key={e} value={e}>{e}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            options={EMPLOYERS}
+            placeholder="Select employer"
+            label="Select Employer"
+            className="h-11"
+          />
         </div>
 
         {error && (
