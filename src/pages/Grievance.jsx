@@ -23,7 +23,6 @@ const EMPTY = {
   cell: "",
   city: "",
   zip: "",
-  last4_ssn: "",
   gender: "",
   email: "",
   job_title: "",
