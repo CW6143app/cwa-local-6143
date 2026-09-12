@@ -35,10 +35,6 @@
       "type": "string",
       "title": "Zip"
     },
-    "last4_ssn": {
-      "type": "string",
-      "title": "Last 4 of Soc. Sec. #"
-    },
     "gender": {
       "type": "string",
       "enum": [
