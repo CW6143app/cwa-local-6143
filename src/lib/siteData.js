@@ -115,9 +115,14 @@ export const EXEC_BOARD = [
   },
   {
     name: "Jeremy Garcia",
-    title: "Vice President 1",
+    title: "Executive Vice President",
     email: "jeremygarcia@cwa6143.org",
     phone: "409-504-9809",
+  },
+  {
+    name: "Reynaldo Puente",
+    title: "Vice President 1",
+    phone: "210-712-3747",
   },
   {
     name: "Jo Angela Barroso",
