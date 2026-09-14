@@ -15,6 +15,11 @@ import { useAuth } from "@/lib/AuthContext";
 const INCIDENT_TYPES = ["PN", "WR", "DML", "Susp/Term", "Other"];
 
 const EMPTY = {
+  grievance_number: null,
+  year: new Date().getFullYear(),
+  vp_group: "",
+  reason_for_grievance: "",
+  status_update: "",
   local_grievance_num: "",
   date_of_submission: "",
   first_name: "",
@@ -91,6 +96,19 @@ export default function Grievance() {
     }
   }, [user]);
 
+  useEffect(() => {
+    (async () => {
+      try {
+        const existing = await base44.entities.Grievance.list("-grievance_number", 200);
+        const nums = (existing || []).map((g) => Number(g.grievance_number)).filter((n) => !Number.isNaN(n));
+        const nextNum = nums.length ? Math.max(...nums) + 1 : 1;
+        setForm((f) => ({ ...f, grievance_number: nextNum, year: new Date().getFullYear() }));
+      } catch (err) {
+        setForm((f) => ({ ...f, grievance_number: 1, year: new Date().getFullYear() }));
+      }
+    })();
+  }, []);
+
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
 
   const toggleIncidentType = (type) => {
@@ -109,7 +127,13 @@ export default function Grievance() {
     try {
       const { first_name, last_name, ...rest } = form;
       const name = `${first_name} ${last_name}`.trim();
-      const payload = { ...rest, name, name_of_grievant: name, status: "submitted" };
+      const payload = {
+        ...rest,
+        name,
+        name_of_grievant: name,
+        reason_for_grievance: form.explain_grievance || form.reason_for_grievance || "",
+        status: "submitted"
+      };
 
       const sigDataUrl = sigPadRef.current?.toDataURL();
       if (sigDataUrl) {
@@ -180,15 +204,25 @@ export default function Grievance() {
 
         {/* Grievance # & Date of Submission */}
         <div className="rounded-2xl bg-white p-5 shadow-[0_1px_2px_rgba(11,37,69,0.06),0_8px_24px_-12px_rgba(11,37,69,0.2)] space-y-4">
-          <Field label="Local Grievance #">
+          <Field label="Grievance #">
             <div className="flex items-center gap-2">
-              <span className="text-sm font-semibold text-[#0b2545]">20</span>
-              <span className="text-sm text-slate-400">-</span>
-              <span className="text-sm text-slate-400 italic">Assigned by Local</span>
+              <span className="text-sm font-semibold text-[#0b2545]">
+                {form.grievance_number ? `${form.year}-${form.grievance_number}` : "Assigning…"}
+              </span>
+              <span className="text-sm text-slate-400 italic">Auto-assigned</span>
             </div>
           </Field>
           <Field label="Date of Submission">
             <Input value={form.date_of_submission} onChange={set("date_of_submission")} type="date" className="h-9" />
+          </Field>
+          <Field label="VP Group">
+            <Input
+              value={form.vp_group}
+              onChange={(e) => setForm((f) => ({ ...f, vp_group: e.target.value ? Number(e.target.value) : "" }))}
+              type="number"
+              min="1"
+              className="h-9"
+            />
           </Field>
         </div>
 

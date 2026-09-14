@@ -6,6 +6,7 @@ import { ArrowLeft, Shield, ChevronDown, FileText, Inbox, CheckCircle2, Clock } 
 import SheetSelect from '@/components/mobile/SheetSelect';
 
 const STATUS_OPTIONS = [
+  { value: 'open', label: 'Open', color: 'bg-slate-100 text-slate-700', dot: 'bg-slate-500' },
   { value: 'submitted', label: 'Submitted', color: 'bg-blue-100 text-blue-700', dot: 'bg-blue-500' },
   { value: 'in_review', label: 'In Review', color: 'bg-amber-100 text-amber-700', dot: 'bg-amber-500' },
   { value: 'resolved', label: 'Resolved', color: 'bg-green-100 text-green-700', dot: 'bg-green-500' }
@@ -82,6 +83,7 @@ export default function GrievanceDashboard() {
 
   const counts = {
     total: grievances.length,
+    open: grievances.filter((g) => g.status === 'open').length,
     submitted: grievances.filter((g) => g.status === 'submitted').length,
     in_review: grievances.filter((g) => g.status === 'in_review').length,
     resolved: grievances.filter((g) => g.status === 'resolved').length
@@ -116,7 +118,7 @@ export default function GrievanceDashboard() {
         {/* Stats */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <StatCard icon={Inbox} label="Total" count={counts.total} tint="bg-slate-100 text-slate-600" />
-          <StatCard icon={FileText} label="Submitted" count={counts.submitted} tint="bg-blue-100 text-blue-600" />
+          <StatCard icon={FileText} label="Open" count={counts.open} tint="bg-slate-100 text-slate-600" />
           <StatCard icon={Clock} label="In Review" count={counts.in_review} tint="bg-amber-100 text-amber-600" />
           <StatCard icon={CheckCircle2} label="Resolved" count={counts.resolved} tint="bg-green-100 text-green-600" />
         </div>
@@ -125,6 +127,7 @@ export default function GrievanceDashboard() {
         <div className="mt-6 flex gap-2 overflow-x-auto pb-1">
           {[
             { key: 'all', label: 'All' },
+            { key: 'open', label: 'Open' },
             { key: 'submitted', label: 'Submitted' },
             { key: 'in_review', label: 'In Review' },
             { key: 'resolved', label: 'Resolved' }
@@ -179,10 +182,11 @@ export default function GrievanceDashboard() {
               <table className="w-full text-sm">
                 <thead className="bg-slate-50 border-b border-slate-200">
                   <tr className="text-left text-[11px] uppercase tracking-wide text-slate-400">
+                    <th className="px-4 py-3 font-semibold">Grievance #</th>
                     <th className="px-4 py-3 font-semibold">Grievant</th>
-                    <th className="px-4 py-3 font-semibold">Incident Date</th>
-                    <th className="px-4 py-3 font-semibold">Type</th>
-                    <th className="px-4 py-3 font-semibold">Filed</th>
+                    <th className="px-4 py-3 font-semibold">Date</th>
+                    <th className="px-4 py-3 font-semibold">VP</th>
+                    <th className="px-4 py-3 font-semibold">Reason</th>
                     <th className="px-4 py-3 font-semibold">Status</th>
                     <th className="px-4 py-3 font-semibold">Update</th>
                   </tr>
@@ -191,18 +195,17 @@ export default function GrievanceDashboard() {
                   {filtered.map((g) => (
                     <tr key={g.id} className="hover:bg-slate-50 transition-colors">
                       <td className="px-4 py-3">
+                        <p className="font-semibold text-slate-900">
+                          {g.grievance_number ? `${g.year || ''}-${g.grievance_number}` : (g.local_grievance_num || '—')}
+                        </p>
+                      </td>
+                      <td className="px-4 py-3">
                         <p className="font-semibold text-slate-900">{g.name_of_grievant || '—'}</p>
-                        <p className="text-xs text-slate-400">{g.local_grievance_num || 'No grievance #'}</p>
+                        <p className="text-xs text-slate-400">{g.job_title || ''}</p>
                       </td>
-                      <td className="px-4 py-3 text-slate-600">{g.date_of_incident || '—'}</td>
-                      <td className="px-4 py-3 text-slate-600">
-                        {Array.isArray(g.incident_type) && g.incident_type.length > 0
-                          ? g.incident_type.join(', ')
-                          : '—'}
-                      </td>
-                      <td className="px-4 py-3 text-slate-600">
-                        {g.created_date ? new Date(g.created_date).toLocaleDateString() : '—'}
-                      </td>
+                      <td className="px-4 py-3 text-slate-600">{g.date_of_submission || (g.date_of_incident || '—')}</td>
+                      <td className="px-4 py-3 text-slate-600">{g.vp_group || '—'}</td>
+                      <td className="px-4 py-3 text-slate-600 max-w-[220px] truncate">{g.reason_for_grievance || g.explain_grievance || '—'}</td>
                       <td className="px-4 py-3"><StatusBadge status={g.status} /></td>
                       <td className="px-4 py-3">
                         <SheetSelect
@@ -235,7 +238,7 @@ export default function GrievanceDashboard() {
                     <div className="min-w-0">
                       <p className="font-semibold text-slate-900 truncate">{g.name_of_grievant || '—'}</p>
                       <p className="text-xs text-slate-400 mt-0.5">
-                        {g.date_of_incident || 'No incident date'} · {g.local_grievance_num || 'No #'}
+                        {g.grievance_number ? `${g.year || ''}-${g.grievance_number}` : (g.local_grievance_num || 'No #')} · {g.date_of_submission || g.date_of_incident || 'No date'}
                       </p>
                     </div>
                     <div className="flex items-center gap-2 flex-shrink-0">
@@ -246,6 +249,9 @@ export default function GrievanceDashboard() {
 
                   {expandedId === g.id && (
                     <div className="px-4 pb-4 space-y-3 border-t border-slate-100 pt-3">
+                      <DetailRow label="Grievance #" value={g.grievance_number ? `${g.year || ''}-${g.grievance_number}` : (g.local_grievance_num || '—')} />
+                      <DetailRow label="VP Group" value={g.vp_group ? String(g.vp_group) : '—'} />
+                      <DetailRow label="Reason for Grievance" value={g.reason_for_grievance || g.explain_grievance || '—'} />
                       <DetailRow label="Incident Type" value={Array.isArray(g.incident_type) && g.incident_type.length > 0 ? g.incident_type.join(', ') : '—'} />
                       <DetailRow label="Job Title" value={g.job_title || '—'} />
                       <DetailRow label="Department" value={g.department || '—'} />
@@ -253,6 +259,7 @@ export default function GrievanceDashboard() {
                       <DetailRow label="Manager" value={g.first_level_mgr || '—'} />
                       <DetailRow label="Grievance" value={g.explain_grievance || '—'} />
                       <DetailRow label="Settlement Expected" value={g.settlement_expected || '—'} />
+                      <DetailRow label="Status Update" value={g.status_update || '—'} />
                       <DetailRow label="Filed" value={g.created_date ? new Date(g.created_date).toLocaleString() : '—'} />
 
                       <div className="pt-2">
