@@ -87,7 +87,7 @@ export default async function (req: Request): Promise<Response> {
 </body>
 </html>`;
 
-    const confirmText = `Hello ${name},\n\nThank you for updating your contact information with CWA Local 6143. We have received your updated details and will use them to keep your membership records current.\n\nBest regards,\nCWA Local 6143`;
+    const confirmText = `Hello ${name},\n\nThank you for updating your contact information with CWA Local 6143. We’ve received your updated details and updated our membership records accordingly..\n\nIn Solidarity,\nCWA Local 6143`;
 
     const [notifyRes, confirmRes] = await Promise.all([
       sendEmail(apiKey, { to: NOTIFY_EMAIL, reply_to: email, subject, html: notifyHtml, text: notifyText }),
