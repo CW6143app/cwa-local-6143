@@ -82,6 +82,7 @@ export default function Grievance() {
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState("");
+  const [vpLoading, setVpLoading] = useState(false);
   const sigPadRef = useRef(null);
 
   useEffect(() => {
@@ -108,6 +109,31 @@ export default function Grievance() {
       }
     })();
   }, []);
+
+  useEffect(() => {
+    if (!form.job_title || !form.department) {
+      setForm((f) => ({ ...f, vp_group: "" }));
+      return;
+    }
+    let cancelled = false;
+    const timer = setTimeout(async () => {
+      setVpLoading(true);
+      try {
+        const res = await base44.functions.invoke("lookupVpGroup", {
+          job_title: form.job_title,
+          department: form.department,
+          first_name: form.first_name,
+          last_name: form.last_name
+        });
+        if (!cancelled) setForm((f) => ({ ...f, vp_group: res.data?.vp_group || "" }));
+      } catch (err) {
+        // ignore — VP group stays empty
+      } finally {
+        if (!cancelled) setVpLoading(false);
+      }
+    }, 500);
+    return () => { cancelled = true; clearTimeout(timer); };
+  }, [form.job_title, form.department, form.first_name, form.last_name]);
 
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
 
@@ -216,13 +242,18 @@ export default function Grievance() {
             <Input value={form.date_of_submission} onChange={set("date_of_submission")} type="date" className="h-9" />
           </Field>
           <Field label="VP Group">
-            <Input
-              value={form.vp_group}
-              onChange={(e) => setForm((f) => ({ ...f, vp_group: e.target.value ? Number(e.target.value) : "" }))}
-              type="number"
-              min="1"
-              className="h-9"
-            />
+            <div className="flex items-center gap-2 h-9">
+              {vpLoading ? (
+                <span className="text-sm text-slate-400 italic">Looking up…</span>
+              ) : (
+                <>
+                  <span className="text-sm font-semibold text-[#0b2545]">
+                    {form.vp_group ? `VP ${form.vp_group}` : "—"}
+                  </span>
+                  <span className="text-sm text-slate-400 italic">Auto-assigned</span>
+                </>
+              )}
+            </div>
           </Field>
         </div>
 
