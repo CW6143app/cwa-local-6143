@@ -226,9 +226,6 @@ export default function Grievance() {
               <Field label="Zip" flex="1">
                 <Input value={form.zip} onChange={set("zip")} className="h-9" />
               </Field>
-              <Field label="Last 4 SSN" flex="1">
-                <Input value={form.last4_ssn} onChange={set("last4_ssn")} maxLength={4} className="h-9" />
-              </Field>
             </Row>
           </div>
           <Divider />
