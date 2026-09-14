@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { base44 } from "@/api/base44Client";
@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2, CheckCircle2, FileText, ArrowLeft } from "lucide-react";
 import SheetSelect from "@/components/mobile/SheetSelect";
 import AddressAutocomplete from "@/components/mobile/AddressAutocomplete";
+import SignaturePad from "@/components/mobile/SignaturePad";
 import { useAuth } from "@/lib/AuthContext";
 
 const INCIDENT_TYPES = ["PN", "WR", "DML", "Susp/Term", "Other"];
@@ -76,6 +77,7 @@ export default function Grievance() {
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState("");
+  const sigPadRef = useRef(null);
 
   useEffect(() => {
     if (user) {
@@ -108,6 +110,17 @@ export default function Grievance() {
       const { first_name, last_name, ...rest } = form;
       const name = `${first_name} ${last_name}`.trim();
       const payload = { ...rest, name, name_of_grievant: name, status: "submitted" };
+
+      const sigDataUrl = sigPadRef.current?.toDataURL();
+      if (sigDataUrl) {
+        const blob = await (await fetch(sigDataUrl)).blob();
+        const file = new File([blob], "signature.png", { type: "image/png" });
+        const { file_url } = await base44.integrations.Core.UploadPublicFile({ file });
+        payload.signature_initials = file_url;
+      } else {
+        payload.signature_initials = "";
+      }
+
       await base44.entities.Grievance.create(payload);
       setDone(true);
       base44.functions.invoke("notifyGrievance", payload).catch(() => {});
@@ -318,14 +331,6 @@ export default function Grievance() {
               className="resize-none" />
             
           </Field>
-          <Row>
-            <Field label="Signature (Initials)" flex="1">
-              <Input value={form.signature_initials} onChange={set("signature_initials")} maxLength={4} className="h-9" placeholder="Enter your initials" />
-            </Field>
-            <Field label="Signature Date" flex="1">
-              <Input value={form.signature_date} onChange={set("signature_date")} type="date" className="h-9" />
-            </Field>
-          </Row>
         </div>
 
         {/* Field 7 */}
@@ -384,6 +389,16 @@ export default function Grievance() {
               Medical Records
             </label>
           </div>
+        </div>
+
+        {/* Signature */}
+        <div className="rounded-2xl bg-white p-5 shadow-[0_1px_2px_rgba(11,37,69,0.06),0_8px_24px_-12px_rgba(11,37,69,0.2)] space-y-3">
+          <h3 className="text-sm font-semibold text-[#0b2545]">Signature</h3>
+          <p className="text-xs text-slate-500">Sign your name below using your finger or stylus.</p>
+          <SignaturePad ref={sigPadRef} />
+          <Field label="Signature Date">
+            <Input value={form.signature_date} onChange={set("signature_date")} type="date" className="h-9" />
+          </Field>
         </div>
 
         {error &&
