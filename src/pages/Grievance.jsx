@@ -231,11 +231,8 @@ export default function Grievance() {
         {/* Grievance # & Date of Submission */}
         <div className="rounded-2xl bg-white p-5 shadow-[0_1px_2px_rgba(11,37,69,0.06),0_8px_24px_-12px_rgba(11,37,69,0.2)] space-y-4">
           <Field label="Grievance #">
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-semibold text-[#0b2545]">
-                {form.grievance_number ? `${form.year}-${form.grievance_number}` : "Assigning…"}
-              </span>
-              <span className="text-sm text-slate-400 italic">Auto-assigned</span>
+            <div className="flex items-center h-9">
+              <span className="text-sm text-slate-400 italic">Auto-Assigned</span>
             </div>
           </Field>
           <Field label="Date of Submission">
