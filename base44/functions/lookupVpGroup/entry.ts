@@ -13,9 +13,30 @@ export default async function(req: Request): Promise<Response> {
       return Response.json({ vp_group: null });
     }
 
+    // Expand common job-title abbreviations to their full forms for matching
+    const ABBREVIATIONS: Record<string, string> = {
+      // VP 1
+      "prem tech": "premises technician",
+      "splicer": "cable splicer",
+      "cst": "customer service technician",
+      "comm tech": "communications technician",
+      "combo tech": "combination technician",
+      "asct": "assistant customer service technician",
+      "sys tech": "systems technician",
+      // VP 2
+      "tier 2": "tech support",
+      "clerk": "senior general clerk",
+      // VP 3
+      "psc": "premier service consultant",
+      "rsc": "retail service consultant",
+      "ihx": "sr in home sales expert",
+      "wireless tech": "wireless technician"
+    };
+    const expandedTitle = ABBREVIATIONS[jobTitle.toLowerCase()] || jobTitle;
+
     // Try exact match on job_title + processing_unit (department)
     let matches = await base44.asServiceRole.entities.RosterMember.filter({
-      job_title: jobTitle,
+      job_title: expandedTitle,
       processing_unit: department
     }, null, 1);
 
@@ -27,9 +48,9 @@ export default async function(req: Request): Promise<Response> {
     const norm = (s: string) => (s || "").toLowerCase().trim().replace(/\s+/g, " ");
     const allMembers = await base44.asServiceRole.entities.RosterMember.list(null, 1200);
 
-    // Try job title + department (normalized)
+    // Try job title + department (normalized, with abbreviation expansion)
     let match = allMembers.find((m: any) =>
-      norm(m.job_title) === norm(jobTitle) && norm(m.processing_unit) === norm(department)
+      norm(m.job_title) === norm(expandedTitle) && norm(m.processing_unit) === norm(department)
     );
 
     // If still no match, try name match as a last resort
