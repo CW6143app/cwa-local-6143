@@ -44,6 +44,7 @@
     "first_name",
     "last_name"
   ],
+  "defaultSort": "ncs_date",
   "rls": {
     "create": {
       "user_condition": {
