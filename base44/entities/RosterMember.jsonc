@@ -1,0 +1,69 @@
+{
+  "name": "RosterMember",
+  "type": "object",
+  "properties": {
+    "first_name": {
+      "type": "string",
+      "title": "First Name"
+    },
+    "last_name": {
+      "type": "string",
+      "title": "Last Name"
+    },
+    "processing_unit": {
+      "type": "string",
+      "title": "Processing Unit (Department)"
+    },
+    "job_title": {
+      "type": "string",
+      "title": "Job Title"
+    },
+    "status": {
+      "type": "string",
+      "title": "Status"
+    },
+    "building_city": {
+      "type": "string",
+      "title": "Building City"
+    },
+    "ncs_date": {
+      "type": "string",
+      "format": "date",
+      "title": "NCS Date"
+    },
+    "vp_group": {
+      "type": "number",
+      "title": "VP Group"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Notes"
+    }
+  },
+  "required": [
+    "first_name",
+    "last_name"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
