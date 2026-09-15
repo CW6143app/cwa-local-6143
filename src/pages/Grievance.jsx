@@ -21,7 +21,6 @@ const EMPTY = {
   reason_for_grievance: "",
   status_update: "",
   local_grievance_num: "",
-  date_of_submission: "",
   first_name: "",
   last_name: "",
   ncs: "",
