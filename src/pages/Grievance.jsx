@@ -162,7 +162,7 @@ export default function Grievance() {
 
       // Remove empty-string values for non-string fields (number, date, enum)
       // to prevent API validation errors that would block submission
-      ["vp_group", "date_of_submission", "date_of_incident", "signature_date", "gender"].forEach((k) => {
+      ["vp_group", "date_of_incident", "signature_date", "gender"].forEach((k) => {
         if (payload[k] === "" || payload[k] === undefined) delete payload[k];
       });
 
@@ -233,15 +233,12 @@ export default function Grievance() {
 
       <form onSubmit={handleSubmit} className="px-5 pt-6 space-y-5">
 
-        {/* Grievance # & Date of Submission */}
+        {/* Grievance # & VP Group */}
         <div className="rounded-2xl bg-white p-5 shadow-[0_1px_2px_rgba(11,37,69,0.06),0_8px_24px_-12px_rgba(11,37,69,0.2)] space-y-4">
           <Field label="Grievance #">
             <div className="flex items-center h-9">
               <span className="text-sm text-slate-400 italic">Auto-Assigned</span>
             </div>
-          </Field>
-          <Field label="Date of Submission">
-            <Input value={form.date_of_submission} onChange={set("date_of_submission")} type="date" className="h-9" />
           </Field>
           <Field label="VP Group">
             <div className="flex items-center gap-2 h-9">
