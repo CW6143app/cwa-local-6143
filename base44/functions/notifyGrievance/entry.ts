@@ -49,7 +49,6 @@ export default async function (req: Request): Promise<Response> {
       ["Records permission", auth],
       ["Signature (Initials)", b.signature_initials],
       ["Signature Date", b.signature_date],
-      ["Date of Submission", b.date_of_submission],
       ["Submitted", `${submittedAt} (CT)`],
     ];
 
@@ -94,7 +93,10 @@ export default async function (req: Request): Promise<Response> {
         </td></tr>
         <tr><td style="padding:32px;">
           <p style="margin:0 0 16px;font-size:15px;color:#0b2545;">Hello <strong>${escapeHtml(name)}</strong>,</p>
-          <p style="margin:0 0 16px;font-size:14px;color:#52525b;line-height:1.6;">Your grievance has been filed with CWA Local 6143. A steward will follow up with you regarding this matter. Please keep this confirmation for your records.</p>
+          <p style="margin:0 0 16px;font-size:14px;color:#52525b;line-height:1.6;">Your grievance has been filed with CWA Local 6143. A steward will follow up with you regarding this matter. Below is a copy of your grievance for your records.</p>
+          <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin:0 0 20px;">
+            ${fields.map(([k, v]) => row(k, v)).join("\n            ")}
+          </table>
           <p style="margin:0;font-size:14px;color:#52525b;line-height:1.6;">In solidarity,<br><strong>CWA Local 6143</strong></p>
         </td></tr>
         <tr><td style="background-color:#f1f1f1;padding:16px 32px;">
@@ -106,7 +108,7 @@ export default async function (req: Request): Promise<Response> {
 </body>
 </html>`;
 
-    const confirmText = `Hello ${name},\n\nYour grievance has been filed with CWA Local 6143. A steward will follow up with you regarding this matter. Please keep this confirmation for your records.\n\nIn solidarity,\nCWA Local 6143`;
+    const confirmText = `Hello ${name},\n\nYour grievance has been filed with CWA Local 6143. A steward will follow up with you regarding this matter. Below is a copy of your grievance for your records.\n\n${fields.map(([k, v]) => `${k}: ${v || "—"}`).join("\n")}\n\nIn solidarity,\nCWA Local 6143`;
 
     const [notifyRes, confirmRes] = await Promise.all([
       sendEmail(apiKey, { to: NOTIFY_EMAIL, reply_to: email, subject, html: notifyHtml, text: notifyText }),
