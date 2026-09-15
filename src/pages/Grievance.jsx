@@ -161,6 +161,12 @@ export default function Grievance() {
         status: "submitted"
       };
 
+      // Remove empty-string values for non-string fields (number, date, enum)
+      // to prevent API validation errors that would block submission
+      ["vp_group", "date_of_submission", "date_of_incident", "signature_date", "gender"].forEach((k) => {
+        if (payload[k] === "" || payload[k] === undefined) delete payload[k];
+      });
+
       const sigDataUrl = sigPadRef.current?.toDataURL();
       if (sigDataUrl) {
         const blob = await (await fetch(sigDataUrl)).blob();
