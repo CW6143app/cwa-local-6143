@@ -7,7 +7,7 @@
       "title": "Grievance #"
     },
     "year": {
-      "type": "number",
+      "type": "string",
       "title": "Year"
     },
     "vp_group": {

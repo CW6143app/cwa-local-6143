@@ -17,7 +17,7 @@ const INCIDENT_TYPES = ["PN", "WR", "DML", "Susp/Term", "Other"];
 
 const EMPTY = {
   grievance_number: null,
-  year: new Date().getFullYear(),
+  year: String(new Date().getFullYear()),
   vp_group: "",
   reason_for_grievance: "",
   status_update: "",
@@ -104,9 +104,9 @@ export default function Grievance() {
         const existing = await base44.entities.Grievance.list("-grievance_number", 200);
         const nums = (existing || []).map((g) => Number(g.grievance_number)).filter((n) => !Number.isNaN(n));
         const nextNum = nums.length ? Math.max(...nums) + 1 : 1;
-        setForm((f) => ({ ...f, grievance_number: nextNum, year: new Date().getFullYear() }));
+        setForm((f) => ({ ...f, grievance_number: nextNum, year: String(new Date().getFullYear()) }));
       } catch (err) {
-        setForm((f) => ({ ...f, grievance_number: 1, year: new Date().getFullYear() }));
+        setForm((f) => ({ ...f, grievance_number: 1, year: String(new Date().getFullYear()) }));
       }
     })();
   }, []);
