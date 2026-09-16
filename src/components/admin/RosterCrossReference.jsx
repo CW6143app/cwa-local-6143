@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useRef } from "react";
-import { Upload, FileSpreadsheet, AlertTriangle, CheckCircle2, X } from "lucide-react";
+import { Upload, FileSpreadsheet, AlertTriangle, CheckCircle2, X, UserPlus, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { base44 } from "@/api/base44Client";
 
 // Parse CSV text into array of row objects keyed by header.
 function parseCsv(text) {
@@ -46,11 +47,44 @@ function findColumn(headers, patterns) {
   return headers.find((h) => patterns.some((p) => p.test(h)));
 }
 
-export default function RosterCrossReference({ members, onClose }) {
+// Map CSV columns to RosterMember entity fields (vp_group intentionally excluded — set manually).
+const FIELD_ALIASES = {
+  first_name: [/^first\s*name/i, /^first$/i, /^fname$/i, /^f_?name$/i],
+  last_name: [/^last\s*name/i, /^last$/i, /^lname$/i, /^l_?name$/i, /^surname$/i],
+  processing_unit: [/processing\s*unit/i, /department/i, /^dept$/i],
+  job_title: [/job\s*title/i, /^title$/i, /^position$/i],
+  status: [/^status$/i, /member\s*status/i],
+  building_city: [/building\s*city/i, /^city$/i, /^location$/i, /^office$/i],
+  ncs_date: [/^ncs/i, /^ncs\s*date$/i],
+  notes: [/^notes?$/i, /^comment/i]
+};
+
+function detectFieldMap(headers) {
+  const map = {};
+  Object.entries(FIELD_ALIASES).forEach(([field, patterns]) => {
+    map[field] = findColumn(headers, patterns) || "";
+  });
+  return map;
+}
+
+function buildMemberFromRow(row, fieldMap) {
+  const member = {};
+  Object.entries(fieldMap).forEach(([field, col]) => {
+    if (col && row[col] != null) member[field] = row[col].trim();
+  });
+  // Clean up empty strings for the date field
+  if (!member.ncs_date) delete member.ncs_date;
+  return member;
+}
+
+export default function RosterCrossReference({ members, onAdded, onClose }) {
   const [parsed, setParsed] = useState(null); // { headers, data }
   const [fileName, setFileName] = useState("");
   const [firstCol, setFirstCol] = useState("");
   const [lastCol, setLastCol] = useState("");
+  const [fieldMap, setFieldMap] = useState({});
+  const [addedKeys, setAddedKeys] = useState(new Set());
+  const [adding, setAdding] = useState(false);
   const [error, setError] = useState("");
   const inputRef = useRef(null);
 
@@ -68,6 +102,8 @@ export default function RosterCrossReference({ members, onClose }) {
       const lc = findColumn(headers, [/last\s*name/i, /^last$/i, /^lname$/i, /^l_?name$/i, /^surname$/i]) || headers[1] || headers[0];
       setFirstCol(fc);
       setLastCol(lc);
+      setFieldMap(detectFieldMap(headers));
+      setAddedKeys(new Set());
     } catch (e) {
       setError("Failed to read the file.");
     }
@@ -92,6 +128,39 @@ export default function RosterCrossReference({ members, onClose }) {
 
     return { missingFromRoster, extraInRoster, totalCsv: csvRows.length, totalRoster: members.length };
   }, [parsed, firstCol, lastCol, members]);
+
+  const addRow = async (row) => {
+    setError("");
+    setAdding(true);
+    try {
+      const payload = buildMemberFromRow(row, fieldMap);
+      await base44.entities.RosterMember.create(payload);
+      setAddedKeys((s) => new Set(s).add(row._key));
+      if (onAdded) onAdded();
+    } catch (e) {
+      setError(e.message || "Failed to add member.");
+    } finally {
+      setAdding(false);
+    }
+  };
+
+  const addAllMissing = async () => {
+    setError("");
+    setAdding(true);
+    try {
+      const toAdd = comparison.missingFromRoster.filter((r) => !addedKeys.has(r._key));
+      const payloads = toAdd.map((r) => buildMemberFromRow(r, fieldMap));
+      if (payloads.length) {
+        await base44.entities.RosterMember.bulkCreate(payloads);
+        setAddedKeys((s) => new Set([...s, ...toAdd.map((r) => r._key)]));
+        if (onAdded) onAdded();
+      }
+    } catch (e) {
+      setError(e.message || "Failed to add members.");
+    } finally {
+      setAdding(false);
+    }
+  };
 
   return (
     <div className="rounded-xl border border-slate-200 bg-white p-5 mb-5">
@@ -152,23 +221,45 @@ export default function RosterCrossReference({ members, onClose }) {
           <div className="flex flex-wrap gap-3 text-xs">
             <span className="px-2.5 py-1 rounded-full bg-slate-100 text-slate-600">CSV rows: {comparison.totalCsv}</span>
             <span className="px-2.5 py-1 rounded-full bg-slate-100 text-slate-600">App roster: {comparison.totalRoster}</span>
-            <span className="px-2.5 py-1 rounded-full bg-[#c8102e]/10 text-[#c8102e] font-semibold">Missing from app: {comparison.missingFromRoster.length}</span>
+            <span className="px-2.5 py-1 rounded-full bg-[#c8102e]/10 text-[#c8102e] font-semibold">Missing from app: {comparison.missingFromRoster.filter((r) => !addedKeys.has(r._key)).length}</span>
             <span className="px-2.5 py-1 rounded-full bg-amber-100 text-amber-700 font-semibold">Extra in app: {comparison.extraInRoster.length}</span>
           </div>
 
           {comparison.missingFromRoster.length > 0 && (
             <div className="rounded-lg border border-[#c8102e]/20 bg-[#c8102e]/5 p-3">
-              <div className="flex items-center gap-2 mb-2">
-                <AlertTriangle className="w-4 h-4 text-[#c8102e]" />
-                <h3 className="text-sm font-semibold text-[#c8102e]">In CSV but not in app roster ({comparison.missingFromRoster.length})</h3>
+              <div className="flex items-center justify-between gap-2 mb-2 flex-wrap">
+                <div className="flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4 text-[#c8102e]" />
+                  <h3 className="text-sm font-semibold text-[#c8102e]">
+                    In CSV but not in app roster ({comparison.missingFromRoster.filter((r) => !addedKeys.has(r._key)).length})
+                  </h3>
+                </div>
+                <button
+                  onClick={addAllMissing}
+                  disabled={adding}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#c8102e] text-white text-xs font-semibold hover:bg-[#c8102e]/90 disabled:opacity-50 transition-colors"
+                >
+                  {adding ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <UserPlus className="w-3.5 h-3.5" />}
+                  Add all to roster
+                </button>
               </div>
+              <p className="text-xs text-slate-500 mb-2">Added members are created without a VP Group — assign that manually.</p>
               <div className="max-h-64 overflow-y-auto">
                 <table className="w-full text-sm">
                   <tbody className="divide-y divide-[#c8102e]/10">
-                    {comparison.missingFromRoster.map((r, i) => (
+                    {comparison.missingFromRoster.filter((r) => !addedKeys.has(r._key)).map((r, i) => (
                       <tr key={i}>
                         <td className="py-1.5 pr-3 text-slate-800 font-medium">{r._name}</td>
                         <td className="py-1.5 text-slate-500 text-xs">{r.job_title || r["Job Title"] || r["Title"] || ""}</td>
+                        <td className="py-1.5 text-right">
+                          <button
+                            onClick={() => addRow(r)}
+                            disabled={adding}
+                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#c8102e]/10 text-[#c8102e] text-xs font-semibold hover:bg-[#c8102e]/20 disabled:opacity-50 transition-colors"
+                          >
+                            <UserPlus className="w-3 h-3" /> Add
+                          </button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>

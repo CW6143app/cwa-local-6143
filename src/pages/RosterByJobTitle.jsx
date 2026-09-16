@@ -67,21 +67,21 @@ export default function RosterByJobTitle() {
   const [editOpen, setEditOpen] = useState(false);
   const [selected, setSelected] = useState(new Set());
 
-  useEffect(() => {
-    (async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const data = await base44.entities.RosterMember.list("ncs_date", 1000);
-        setMembers(Array.isArray(data) ? data : []);
-      } catch (err) {
-        console.error("Failed to load roster:", err);
-        setError("Unable to load roster. Please try again.");
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, []);
+  const loadMembers = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await base44.entities.RosterMember.list("ncs_date", 1000);
+      setMembers(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error("Failed to load roster:", err);
+      setError("Unable to load roster. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { loadMembers(); }, []);
 
   // Top-level folders by VP Group; inside each, sub-folders by job_title
   const vpGroups = useMemo(() => {
@@ -247,7 +247,7 @@ export default function RosterByJobTitle() {
       </header>
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6" style={{ paddingBottom: selected.size > 0 ? "5rem" : "1.5rem" }}>
-        {showCompare && !loading && <RosterCrossReference members={members} onClose={() => setShowCompare(false)} />}
+        {showCompare && !loading && <RosterCrossReference members={members} onAdded={loadMembers} onClose={() => setShowCompare(false)} />}
         {loading && (
           <div className="flex items-center justify-center py-20">
             <Loader2 className="w-8 h-8 animate-spin text-[#c8102e]" />
