@@ -210,7 +210,7 @@ export default function RosterByJobTitle() {
             <div>
               <div className="flex items-center gap-2">
                 <Users className="w-4 h-4 text-[#ff8a9b]" />
-                <h1 className="text-base font-bold">Roster by Job Title</h1>
+                <h1 className="text-base font-bold">VP Group Roster</h1>
               </div>
               <p className="text-[11px] text-white/50 mt-0.5">CWA Local 6143 — Admin View</p>
             </div>
