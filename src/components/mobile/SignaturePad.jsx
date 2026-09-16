@@ -1,11 +1,12 @@
 import React, { useRef, useEffect, useImperativeHandle, forwardRef, useState } from "react";
-import { Eraser } from "lucide-react";
+import { Eraser, Maximize2, X } from "lucide-react";
 
 const SignaturePad = forwardRef((props, ref) => {
   const canvasRef = useRef(null);
   const drawingRef = useRef(false);
   const lastPoint = useRef(null);
   const [hasInk, setHasInk] = useState(false);
+  const [expanded, setExpanded] = useState(false);
   const inkBackupRef = useRef(null);
 
   useImperativeHandle(ref, () => ({
@@ -49,7 +50,7 @@ const SignaturePad = forwardRef((props, ref) => {
     }
   };
 
-  // Initial setup + observe resizes (works inside installed PWA/native webview)
+  // Setup + observe resizes; re-runs when expanded toggles so the new canvas sizes
   useEffect(() => {
     let raf;
     const setup = () => {
@@ -82,7 +83,7 @@ const SignaturePad = forwardRef((props, ref) => {
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [expanded]);
 
   const getPos = (e) => {
     const canvas = canvasRef.current;
@@ -140,7 +141,7 @@ const SignaturePad = forwardRef((props, ref) => {
       canvas.removeEventListener('touchcancel', tEnd);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hasInk]);
+  }, [expanded, hasInk]);
 
   const clearCanvas = () => {
     const canvas = canvasRef.current;
@@ -160,6 +161,47 @@ const SignaturePad = forwardRef((props, ref) => {
     onMouseLeave: end,
   };
 
+  if (expanded) {
+    return (
+      <div
+        className="fixed inset-0 z-50 bg-white flex flex-col"
+        style={{
+          paddingTop: "env(safe-area-inset-top)",
+          paddingBottom: "env(safe-area-inset-bottom)",
+          paddingLeft: "env(safe-area-inset-left)",
+          paddingRight: "env(safe-area-inset-right)",
+        }}
+      >
+        <div className="flex items-center justify-between px-4 py-3 border-b border-black/10 shrink-0">
+          <span className="text-sm font-semibold text-[#0b2545]">Sign your full signature below</span>
+          <div className="flex items-center gap-3">
+            {hasInk && (
+              <button type="button" onClick={clearCanvas} className="flex items-center gap-1 text-xs font-medium text-[#c8102e]">
+                <Eraser className="w-3.5 h-3.5" /> Clear
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => setExpanded(false)}
+              className="flex h-9 w-9 items-center justify-center rounded-full bg-black/5 text-[#0b2545] hover:bg-black/10 transition-colors"
+              aria-label="Close full screen"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+        <div className="flex-1 relative">
+          <canvas ref={canvasRef} {...canvasProps} className="w-full h-full block" />
+          {!hasInk && (
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <span className="text-base text-slate-300 italic">Sign here</span>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div>
       <div className="relative rounded-xl border-2 border-black/10 bg-white overflow-hidden">
@@ -170,11 +212,20 @@ const SignaturePad = forwardRef((props, ref) => {
           </div>
         )}
       </div>
-      {hasInk && (
-        <button type="button" onClick={clearCanvas} className="mt-2 flex items-center gap-1 text-xs font-medium text-[#c8102e]">
-          <Eraser className="w-3.5 h-3.5" /> Clear signature
+      <div className="mt-2 flex items-center gap-4">
+        {hasInk && (
+          <button type="button" onClick={clearCanvas} className="flex items-center gap-1 text-xs font-medium text-[#c8102e]">
+            <Eraser className="w-3.5 h-3.5" /> Clear signature
+          </button>
+        )}
+        <button
+          type="button"
+          onClick={() => setExpanded(true)}
+          className="flex items-center gap-1 text-xs font-medium text-[#0b2545]"
+        >
+          <Maximize2 className="w-3.5 h-3.5" /> Expand to sign bigger
         </button>
-      )}
+      </div>
     </div>
   );
 });
