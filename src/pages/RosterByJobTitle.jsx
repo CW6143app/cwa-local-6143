@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
-import { ArrowLeft, Download, Loader2, Users, ChevronDown, ChevronUp } from "lucide-react";
+import { ArrowLeft, Download, Loader2, Users, ChevronDown, ChevronUp, Pencil, Trash2, Plus } from "lucide-react";
+import EditRosterMember from "@/components/admin/EditRosterMember";
 
 const CSV_COLUMNS = [
   { key: "first_name", label: "First Name" },
@@ -53,6 +54,8 @@ export default function RosterByJobTitle() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [expanded, setExpanded] = useState({});
+  const [editing, setEditing] = useState(null);
+  const [editOpen, setEditOpen] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -92,6 +95,42 @@ export default function RosterByJobTitle() {
 
   const toggle = (title) => setExpanded((p) => ({ ...p, [title]: !p[title] }));
 
+  const openEdit = (member) => {
+    setEditing(member);
+    setEditOpen(true);
+  };
+
+  const openNew = () => {
+    setEditing(null);
+    setEditOpen(true);
+  };
+
+  const handleSave = async (id, payload) => {
+    if (id) {
+      const updated = await base44.entities.RosterMember.update(id, payload);
+      setMembers((prev) => prev.map((m) => (m.id === id ? { ...m, ...payload } : m)));
+      return updated;
+    } else {
+      const created = await base44.entities.RosterMember.create({
+        first_name: payload.first_name || "",
+        last_name: payload.last_name || "",
+        ...payload
+      });
+      setMembers((prev) => [...prev, created]);
+      return created;
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("Delete this roster member? This cannot be undone.")) return;
+    try {
+      await base44.entities.RosterMember.delete(id);
+      setMembers((prev) => prev.filter((m) => m.id !== id));
+    } catch (err) {
+      alert("Could not delete: " + (err.message || "unknown error"));
+    }
+  };
+
   const downloadAll = () => {
     groups.forEach((g) => downloadCsv(`roster_${safeJobTitleSlug(g.title)}.csv`, g.rows));
   };
@@ -115,14 +154,24 @@ export default function RosterByJobTitle() {
               <p className="text-[11px] text-white/50 mt-0.5">CWA Local 6143 — Admin View</p>
             </div>
           </div>
-          {!loading && groups.length > 0 && (
-            <button
-              onClick={downloadAll}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#c8102e] text-white text-xs font-semibold hover:bg-[#c8102e]/90 transition-colors"
-            >
-              <Download className="w-3.5 h-3.5" /> Download All
-            </button>
-          )}
+          <div className="flex items-center gap-2">
+            {!loading && groups.length > 0 && (
+              <button
+                onClick={downloadAll}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#c8102e] text-white text-xs font-semibold hover:bg-[#c8102e]/90 transition-colors"
+              >
+                <Download className="w-3.5 h-3.5" /> Download All
+              </button>
+            )}
+            {!loading && (
+              <button
+                onClick={openNew}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 text-white text-xs font-semibold hover:bg-white/20 transition-colors"
+              >
+                <Plus className="w-3.5 h-3.5" /> Add Member
+              </button>
+            )}
+          </div>
         </div>
       </header>
 
@@ -184,6 +233,7 @@ export default function RosterByJobTitle() {
                               <th className="px-4 py-2 font-semibold">VP</th>
                               <th className="px-4 py-2 font-semibold">Status</th>
                               <th className="px-4 py-2 font-semibold">City</th>
+                              <th className="px-4 py-2 font-semibold text-right">Actions</th>
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-slate-100">
@@ -195,6 +245,22 @@ export default function RosterByJobTitle() {
                                 <td className="px-4 py-2 text-slate-600">{m.vp_group || "—"}</td>
                                 <td className="px-4 py-2 text-slate-600">{m.status || "—"}</td>
                                 <td className="px-4 py-2 text-slate-600">{m.building_city || "—"}</td>
+                                <td className="px-4 py-2 text-right whitespace-nowrap">
+                                  <button
+                                    onClick={() => openEdit(m)}
+                                    className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-black/5 text-[#0b2545] hover:bg-black/10 transition-colors"
+                                    aria-label="Edit member"
+                                  >
+                                    <Pencil className="w-3.5 h-3.5" />
+                                  </button>
+                                  <button
+                                    onClick={() => handleDelete(m.id)}
+                                    className="ml-1 inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[#c8102e]/10 text-[#c8102e] hover:bg-[#c8102e]/20 transition-colors"
+                                    aria-label="Delete member"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
+                                </td>
                               </tr>
                             ))}
                           </tbody>
@@ -208,6 +274,13 @@ export default function RosterByJobTitle() {
           </>
         )}
       </div>
+
+      <EditRosterMember
+        open={editOpen}
+        member={editing}
+        onClose={() => setEditOpen(false)}
+        onSave={handleSave}
+      />
     </div>
   );
 }
