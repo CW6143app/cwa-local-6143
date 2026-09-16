@@ -2,12 +2,10 @@ import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { FileText, Download, Loader2, Eye } from "lucide-react";
 import PageHeader from "@/components/mobile/PageHeader";
-import PdfViewerModal from "@/components/mobile/PdfViewerModal";
 
 export default function Contracts() {
   const [contracts, setContracts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [viewing, setViewing] = useState(null);
 
   useEffect(() => {
     (async () => {
@@ -21,6 +19,10 @@ export default function Contracts() {
       }
     })();
   }, []);
+
+  const handleOpen = (c) => {
+    if (c.file_url) window.open(c.file_url, "_blank");
+  };
 
   return (
     <div className="pb-8">
@@ -58,7 +60,7 @@ export default function Contracts() {
                   <div className="flex items-center gap-2 shrink-0">
                     <button
                       type="button"
-                      onClick={() => setViewing(c)}
+                      onClick={() => handleOpen(c)}
                       className="flex h-9 w-9 items-center justify-center rounded-full bg-[#c8102e]/10 text-[#c8102e] hover:bg-[#c8102e]/20 transition-colors"
                       aria-label={`Open ${c.title}`}
                     >
@@ -79,13 +81,6 @@ export default function Contracts() {
           </div>
         )}
       </div>
-
-      <PdfViewerModal
-        open={!!viewing}
-        onClose={() => setViewing(null)}
-        title={viewing?.title}
-        fileUrl={viewing?.file_url}
-      />
     </div>
   );
 }
