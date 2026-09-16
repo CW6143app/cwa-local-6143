@@ -59,7 +59,8 @@ export default function RosterByJobTitle() {
   const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [expanded, setExpanded] = useState({});
+  const [expandedVp, setExpandedVp] = useState({});
+  const [expandedJt, setExpandedJt] = useState({});
   const [editing, setEditing] = useState(null);
   const [editOpen, setEditOpen] = useState(false);
   const [selected, setSelected] = useState(new Set());
@@ -80,27 +81,41 @@ export default function RosterByJobTitle() {
     })();
   }, []);
 
-  // Group by job_title, each group sorted by ncs_date ascending (oldest → newest)
-  const groups = useMemo(() => {
-    const map = new Map();
+  // Top-level folders by VP Group; inside each, sub-folders by job_title
+  const vpGroups = useMemo(() => {
+    const vpMap = new Map();
     for (const m of members) {
-      const key = m.job_title || "(No Job Title)";
-      if (!map.has(key)) map.set(key, []);
-      map.get(key).push(m);
+      const vpKey = m.vp_group ? `VP ${m.vp_group}` : "Unassigned";
+      if (!vpMap.has(vpKey)) vpMap.set(vpKey, []);
+      vpMap.get(vpKey).push(m);
     }
-    const arr = Array.from(map.entries()).map(([title, rows]) => ({
-      title,
-      rows: rows.slice().sort((a, b) => {
-        const da = a.ncs_date || "";
-        const db = b.ncs_date || "";
-        return da < db ? -1 : da > db ? 1 : 0;
-      })
-    }));
-    arr.sort((a, b) => a.title.localeCompare(b.title));
+    const arr = Array.from(vpMap.entries()).map(([vpTitle, rows]) => {
+      const jtMap = new Map();
+      for (const r of rows) {
+        const jt = r.job_title || "(No Job Title)";
+        if (!jtMap.has(jt)) jtMap.set(jt, []);
+        jtMap.get(jt).push(r);
+      }
+      const jobGroups = Array.from(jtMap.entries()).map(([title, jtRows]) => ({
+        title,
+        rows: jtRows.slice().sort((a, b) => {
+          const da = a.ncs_date || "";
+          const db = b.ncs_date || "";
+          return da < db ? -1 : da > db ? 1 : 0;
+        })
+      })).sort((a, b) => a.title.localeCompare(b.title));
+      return { vpTitle, rows, jobGroups };
+    });
+    arr.sort((a, b) => {
+      if (a.vpTitle === "Unassigned") return 1;
+      if (b.vpTitle === "Unassigned") return -1;
+      return a.vpTitle.localeCompare(b.vpTitle, undefined, { numeric: true });
+    });
     return arr;
   }, [members]);
 
-  const toggle = (title) => setExpanded((p) => ({ ...p, [title]: !p[title] }));
+  const toggleVp = (vpTitle) => setExpandedVp((p) => ({ ...p, [vpTitle]: !p[vpTitle] }));
+  const toggleJt = (key) => setExpandedJt((p) => ({ ...p, [key]: !p[key] }));
 
   const openEdit = (member) => {
     setEditing(member);
@@ -139,7 +154,7 @@ export default function RosterByJobTitle() {
   };
 
   const downloadAll = () => {
-    groups.forEach((g) => downloadCsv(`roster_${safeJobTitleSlug(g.title)}.csv`, g.rows));
+    vpGroups.forEach((g) => downloadCsv(`roster_${safeJobTitleSlug(g.vpTitle)}.csv`, g.rows));
   };
 
   const toggleSelected = (id) => {
@@ -201,7 +216,7 @@ export default function RosterByJobTitle() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            {!loading && groups.length > 0 && (
+            {!loading && vpGroups.length > 0 && (
               <button
                 onClick={downloadAll}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#c8102e] text-white text-xs font-semibold hover:bg-[#c8102e]/90 transition-colors"
@@ -234,101 +249,129 @@ export default function RosterByJobTitle() {
           </div>
         )}
 
-        {!loading && !error && groups.length === 0 && (
+        {!loading && !error && vpGroups.length === 0 && (
           <div className="rounded-xl border border-slate-200 bg-white p-10 text-center">
             <Users className="w-10 h-10 text-slate-300 mx-auto" />
             <p className="mt-3 text-sm font-medium text-slate-500">No roster members found.</p>
           </div>
         )}
 
-        {!loading && !error && groups.length > 0 && (
+        {!loading && !error && vpGroups.length > 0 && (
           <>
             <p className="text-xs text-slate-500 mb-4">
-              {groups.length} unique job title{groups.length === 1 ? "" : "s"} · {members.length} total members · sorted by NCS date (oldest → newest)
+              {vpGroups.length} VP group{vpGroups.length === 1 ? "" : "s"} · {members.length} total members · sorted by NCS date (oldest → newest)
             </p>
             <div className="space-y-3">
-              {groups.map((g) => {
-                const open = expanded[g.title] !== false;
+              {vpGroups.map((g) => {
+                const vpOpen = expandedVp[g.vpTitle] !== false;
                 return (
-                  <div key={g.title} className="rounded-xl border border-slate-200 bg-white overflow-hidden">
-                    <div className="flex items-center justify-between p-4">
+                  <div key={g.vpTitle} className="rounded-xl border border-slate-200 bg-white overflow-hidden">
+                    <div className="flex items-center justify-between p-4 bg-[#0b2545]/5">
                       <button
-                        onClick={() => toggle(g.title)}
+                        onClick={() => toggleVp(g.vpTitle)}
                         className="flex items-center gap-2 text-left min-w-0"
                       >
-                        {open ? <ChevronUp className="w-4 h-4 text-slate-400 shrink-0" /> : <ChevronDown className="w-4 h-4 text-slate-400 shrink-0" />}
-                        <span className="font-semibold text-slate-900 truncate">{g.title}</span>
+                        {vpOpen ? <ChevronUp className="w-4 h-4 text-slate-500 shrink-0" /> : <ChevronDown className="w-4 h-4 text-slate-500 shrink-0" />}
+                        <Users className="w-4 h-4 text-[#0b2545] shrink-0" />
+                        <span className="font-bold text-[#0b2545] truncate">{g.vpTitle}</span>
                         <span className="text-xs font-medium text-slate-400 shrink-0">({g.rows.length})</span>
                       </button>
                       <button
-                        onClick={() => downloadCsv(`roster_${safeJobTitleSlug(g.title)}.csv`, g.rows)}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-black/5 text-[#0b2545] text-xs font-semibold hover:bg-black/10 transition-colors shrink-0"
+                        onClick={() => downloadCsv(`roster_${safeJobTitleSlug(g.vpTitle)}.csv`, g.rows)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#c8102e] text-white text-xs font-semibold hover:bg-[#c8102e]/90 transition-colors shrink-0"
                       >
                         <Download className="w-3.5 h-3.5" /> CSV
                       </button>
                     </div>
 
-                    {open && (
-                      <div className="overflow-x-auto border-t border-slate-100">
-                        <table className="w-full text-sm">
-                          <thead className="bg-slate-50">
-                            <tr className="text-left text-[11px] uppercase tracking-wide text-slate-400">
-                              <th className="px-4 py-2 font-semibold w-10">
-                                <input
-                                  type="checkbox"
-                                  checked={g.rows.length > 0 && g.rows.every((r) => selected.has(r.id))}
-                                  onChange={() => toggleGroupSelected(g.rows)}
-                                  className="accent-[#c8102e] w-4 h-4"
-                                />
-                              </th>
-                              <th className="px-4 py-2 font-semibold">First Name</th>
-                              <th className="px-4 py-2 font-semibold">Last Name</th>
-                              <th className="px-4 py-2 font-semibold">NCS Date</th>
-                              <th className="px-4 py-2 font-semibold">VP</th>
-                              <th className="px-4 py-2 font-semibold">Status</th>
-                              <th className="px-4 py-2 font-semibold">Processing Unit</th>
-                              <th className="px-4 py-2 font-semibold">City</th>
-                              <th className="px-4 py-2 font-semibold text-right">Actions</th>
-                            </tr>
-                          </thead>
-                          <tbody className="divide-y divide-slate-100">
-                            {g.rows.map((m) => (
-                              <tr key={m.id} className={`transition-colors ${selected.has(m.id) ? "bg-[#c8102e]/5" : "hover:bg-slate-50"}`}>
-                                <td className="px-4 py-2">
-                                  <input
-                                    type="checkbox"
-                                    checked={selected.has(m.id)}
-                                    onChange={() => toggleSelected(m.id)}
-                                    className="accent-[#c8102e] w-4 h-4"
-                                  />
-                                </td>
-                                <td className="px-4 py-2 text-slate-900">{m.first_name || "—"}</td>
-                                <td className="px-4 py-2 text-slate-900">{m.last_name || "—"}</td>
-                                <td className="px-4 py-2 text-slate-600">{m.ncs_date || "—"}</td>
-                                <td className="px-4 py-2 text-slate-600">{m.vp_group || "—"}</td>
-                                <td className="px-4 py-2 text-slate-600">{m.status || "—"}</td>
-                                <td className="px-4 py-2 text-slate-600 truncate max-w-[220px]" title={stripProcessingUnitNumber(m.processing_unit)}>{stripProcessingUnitNumber(m.processing_unit) || "—"}</td>
-                                <td className="px-4 py-2 text-slate-600">{m.building_city || "—"}</td>
-                                <td className="px-4 py-2 text-right whitespace-nowrap">
-                                  <button
-                                    onClick={() => openEdit(m)}
-                                    className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-black/5 text-[#0b2545] hover:bg-black/10 transition-colors"
-                                    aria-label="Edit member"
-                                  >
-                                    <Pencil className="w-3.5 h-3.5" />
-                                  </button>
-                                  <button
-                                    onClick={() => handleDelete(m.id)}
-                                    className="ml-1 inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[#c8102e]/10 text-[#c8102e] hover:bg-[#c8102e]/20 transition-colors"
-                                    aria-label="Delete member"
-                                  >
-                                    <Trash2 className="w-3.5 h-3.5" />
-                                  </button>
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
+                    {vpOpen && (
+                      <div className="border-t border-slate-100 divide-y divide-slate-100">
+                        {g.jobGroups.map((jg) => {
+                          const jtKey = `${g.vpTitle}::${jg.title}`;
+                          const jtOpen = expandedJt[jtKey] !== false;
+                          return (
+                            <div key={jtKey} className="bg-white">
+                              <div className="flex items-center justify-between px-4 py-3 bg-slate-50/60">
+                                <button
+                                  onClick={() => toggleJt(jtKey)}
+                                  className="flex items-center gap-2 text-left min-w-0"
+                                >
+                                  {jtOpen ? <ChevronUp className="w-3.5 h-3.5 text-slate-400 shrink-0" /> : <ChevronDown className="w-3.5 h-3.5 text-slate-400 shrink-0" />}
+                                  <span className="font-semibold text-slate-800 truncate text-sm">{jg.title}</span>
+                                  <span className="text-xs font-medium text-slate-400 shrink-0">({jg.rows.length})</span>
+                                </button>
+                                <button
+                                  onClick={() => downloadCsv(`roster_${safeJobTitleSlug(g.vpTitle)}_${safeJobTitleSlug(jg.title)}.csv`, jg.rows)}
+                                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-black/5 text-[#0b2545] text-xs font-medium hover:bg-black/10 transition-colors shrink-0"
+                                >
+                                  <Download className="w-3 h-3" /> CSV
+                                </button>
+                              </div>
+
+                              {jtOpen && (
+                                <div className="overflow-x-auto">
+                                  <table className="w-full text-sm">
+                                    <thead className="bg-slate-50">
+                                      <tr className="text-left text-[11px] uppercase tracking-wide text-slate-400">
+                                        <th className="px-4 py-2 font-semibold w-10">
+                                          <input
+                                            type="checkbox"
+                                            checked={jg.rows.length > 0 && jg.rows.every((r) => selected.has(r.id))}
+                                            onChange={() => toggleGroupSelected(jg.rows)}
+                                            className="accent-[#c8102e] w-4 h-4"
+                                          />
+                                        </th>
+                                        <th className="px-4 py-2 font-semibold">First Name</th>
+                                        <th className="px-4 py-2 font-semibold">Last Name</th>
+                                        <th className="px-4 py-2 font-semibold">NCS Date</th>
+                                        <th className="px-4 py-2 font-semibold">Status</th>
+                                        <th className="px-4 py-2 font-semibold">Processing Unit</th>
+                                        <th className="px-4 py-2 font-semibold">City</th>
+                                        <th className="px-4 py-2 font-semibold text-right">Actions</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-100">
+                                      {jg.rows.map((m) => (
+                                        <tr key={m.id} className={`transition-colors ${selected.has(m.id) ? "bg-[#c8102e]/5" : "hover:bg-slate-50"}`}>
+                                          <td className="px-4 py-2">
+                                            <input
+                                              type="checkbox"
+                                              checked={selected.has(m.id)}
+                                              onChange={() => toggleSelected(m.id)}
+                                              className="accent-[#c8102e] w-4 h-4"
+                                            />
+                                          </td>
+                                          <td className="px-4 py-2 text-slate-900">{m.first_name || "—"}</td>
+                                          <td className="px-4 py-2 text-slate-900">{m.last_name || "—"}</td>
+                                          <td className="px-4 py-2 text-slate-600">{m.ncs_date || "—"}</td>
+                                          <td className="px-4 py-2 text-slate-600">{m.status || "—"}</td>
+                                          <td className="px-4 py-2 text-slate-600 truncate max-w-[220px]" title={stripProcessingUnitNumber(m.processing_unit)}>{stripProcessingUnitNumber(m.processing_unit) || "—"}</td>
+                                          <td className="px-4 py-2 text-slate-600">{m.building_city || "—"}</td>
+                                          <td className="px-4 py-2 text-right whitespace-nowrap">
+                                            <button
+                                              onClick={() => openEdit(m)}
+                                              className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-black/5 text-[#0b2545] hover:bg-black/10 transition-colors"
+                                              aria-label="Edit member"
+                                            >
+                                              <Pencil className="w-3.5 h-3.5" />
+                                            </button>
+                                            <button
+                                              onClick={() => handleDelete(m.id)}
+                                              className="ml-1 inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[#c8102e]/10 text-[#c8102e] hover:bg-[#c8102e]/20 transition-colors"
+                                              aria-label="Delete member"
+                                            >
+                                              <Trash2 className="w-3.5 h-3.5" />
+                                            </button>
+                                          </td>
+                                        </tr>
+                                      ))}
+                                    </tbody>
+                                  </table>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
                       </div>
                     )}
                   </div>
