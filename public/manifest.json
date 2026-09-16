@@ -1,18 +1,25 @@
 {
   "name": "CWA Local 6143",
   "short_name": "CWA 6143",
-  "description": "Union news, events, grievance filing, and member resources for CWA Local 6143.",
+  "description": "CWA Local 6143 — union news, events, grievance filing, and member resources.",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "orientation": "portrait",
+  "orientation": "any",
   "background_color": "#f6f5f2",
   "theme_color": "#c8102e",
   "icons": [
     {
       "src": "https://media.base44.com/images/public/6a96f9a8ac8dfadbcb9d319b/be7f61f04_CWA6143a.jpg",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "sizes": "192x192 512x512",
+      "type": "image/jpeg",
+      "purpose": "any"
+    },
+    {
+      "src": "https://media.base44.com/images/public/6a96f9a8ac8dfadbcb9d319b/be7f61f04_CWA6143a.jpg",
+      "sizes": "192x192 512x512",
+      "type": "image/jpeg",
+      "purpose": "maskable"
     }
   ]
 }
