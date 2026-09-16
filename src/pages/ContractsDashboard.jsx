@@ -1,15 +1,17 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
-import { ArrowLeft, Shield, FileText, Trash2, Upload, Loader2, Plus } from "lucide-react";
+import { ArrowLeft, Shield, FileText, Trash2, Upload, Loader2 } from "lucide-react";
 
 export default function ContractsDashboard() {
   const [contracts, setContracts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [uploadingId, setUploadingId] = useState(null);
   const [creating, setCreating] = useState(false);
-  const [newTitle, setNewTitle] = useState("");
   const fileInputRefs = useRef({});
+  const newFileRef = useRef(null);
+
+  const stripExt = (name) => name.replace(/\.[^.]+$/, "");
 
   const load = useCallback(async () => {
     try {
@@ -26,13 +28,21 @@ export default function ContractsDashboard() {
   useEffect(() => { load(); }, [load]);
 
   const handleCreate = async (e) => {
-    e.preventDefault();
-    if (!newTitle.trim()) return;
+    e?.preventDefault?.();
+    const file = newFileRef.current?.files?.[0];
+    if (!file) return;
     setCreating(true);
     try {
-      await base44.entities.Contract.create({ title: newTitle.trim(), sort_order: contracts.length });
-      setNewTitle("");
+      const { file_url } = await base44.integrations.Core.UploadPublicFile({ file });
+      await base44.entities.Contract.create({
+        title: stripExt(file.name),
+        file_url,
+        sort_order: contracts.length,
+      });
+      if (newFileRef.current) newFileRef.current.value = "";
       await load();
+    } catch {
+      alert("Upload failed. Please try again.");
     } finally {
       setCreating(false);
     }
@@ -80,20 +90,22 @@ export default function ContractsDashboard() {
       </header>
 
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-5">
-        <form onSubmit={handleCreate} className="rounded-2xl border border-slate-200 bg-white p-5 flex items-center gap-3">
+        <form onSubmit={handleCreate} className="rounded-2xl border border-slate-200 bg-white p-5">
           <input
-            value={newTitle}
-            onChange={(e) => setNewTitle(e.target.value)}
-            placeholder="New contract title (e.g. 2025 Southwest Core Contract)"
-            className="flex-1 h-10 rounded-lg border border-slate-200 px-3 text-sm outline-none focus:border-[#c8102e]"
+            type="file"
+            accept="application/pdf"
+            ref={newFileRef}
+            onChange={handleCreate}
+            className="hidden"
           />
           <button
-            type="submit"
-            disabled={creating || !newTitle.trim()}
-            className="h-10 shrink-0 flex items-center gap-1.5 rounded-lg bg-[#c8102e] px-4 text-sm font-semibold text-white disabled:opacity-50"
+            type="button"
+            onClick={() => newFileRef.current?.click()}
+            disabled={creating}
+            className="w-full h-11 flex items-center justify-center gap-2 rounded-lg bg-[#c8102e] px-4 text-sm font-semibold text-white disabled:opacity-50"
           >
-            {creating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
-            Add
+            {creating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+            {creating ? "Uploading…" : "Upload Contract"}
           </button>
         </form>
 
@@ -103,7 +115,7 @@ export default function ContractsDashboard() {
           </div>
         ) : contracts.length === 0 ? (
           <div className="rounded-xl border border-slate-200 bg-white p-10 text-center text-sm text-slate-500">
-            No contracts yet. Add one above.
+            No contracts yet. Upload one above.
           </div>
         ) : (
           <div className="rounded-2xl border border-slate-200 bg-white divide-y divide-slate-100">
