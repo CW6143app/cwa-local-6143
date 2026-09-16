@@ -237,7 +237,7 @@ export default function GrievanceDashboard() {
                     <div className="min-w-0">
                       <p className="font-semibold text-slate-900 truncate">{g.name_of_grievant || '—'}</p>
                       <p className="text-xs text-slate-400 mt-0.5">
-                        {g.grievance_number ? `${g.year || ''}-${g.grievance_number}` : (g.local_grievance_num || 'No #')} · {g.date_of_submission || g.date_of_incident || 'No date'}
+                        {g.grievance_number ? `${String(g.year || '').replace(/,/g, '')}-${g.grievance_number}` : (g.local_grievance_num || 'No #')} · {g.date_of_submission || g.date_of_incident || 'No date'}
                       </p>
                     </div>
                     <div className="flex items-center gap-2 flex-shrink-0">
