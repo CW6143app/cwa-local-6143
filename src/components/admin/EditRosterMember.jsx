@@ -13,6 +13,14 @@ import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import SheetSelect from "@/components/mobile/SheetSelect";
 
+const STATUS_OPTIONS = [
+  { value: "Pending", label: "Pending" },
+  { value: "Active", label: "Active" },
+  { value: "Member - Active - Active", label: "Member - Active - Active" },
+  { value: "Member - Active - Suspended", label: "Member - Active - Suspended" },
+  { value: "Retired", label: "Retired" }
+];
+
 const FIELDS = [
   { key: "first_name", label: "First Name", type: "text" },
   { key: "last_name", label: "Last Name", type: "text" },
@@ -24,7 +32,7 @@ const FIELDS = [
     type: "select",
     options: [1, 2, 3, 4, 5, 6].map((n) => ({ value: String(n), label: `VP ${n}` }))
   },
-  { key: "status", label: "Status", type: "text" },
+  { key: "status", label: "Status", type: "select", options: STATUS_OPTIONS },
   { key: "processing_unit", label: "Processing Unit", type: "text" },
   { key: "building_city", label: "Building City", type: "text" },
   { key: "notes", label: "Notes", type: "textarea" }
@@ -97,9 +105,13 @@ export default function EditRosterMember({ open, member, onClose, onSave }) {
                 <SheetSelect
                   value={form[f.key]}
                   onValueChange={(v) => setForm((p) => ({ ...p, [f.key]: v }))}
-                  options={f.options}
-                  placeholder="Select VP Group"
-                  label="Select VP Group"
+                  options={
+                    form[f.key] && !f.options.some((o) => o.value === form[f.key])
+                      ? [{ value: form[f.key], label: form[f.key] }, ...f.options]
+                      : f.options
+                  }
+                  placeholder={`Select ${f.label}`}
+                  label={`Select ${f.label}`}
                 />
               ) : (
                 <Input

@@ -12,6 +12,14 @@ const FIELD_OPTIONS = [
 
 const VP_OPTIONS = [1, 2, 3, 4, 5, 6].map((n) => ({ value: String(n), label: `VP ${n}` }));
 
+const STATUS_OPTIONS = [
+  { value: "Pending", label: "Pending" },
+  { value: "Active", label: "Active" },
+  { value: "Member - Active - Active", label: "Member - Active - Active" },
+  { value: "Member - Active - Suspended", label: "Member - Active - Suspended" },
+  { value: "Retired", label: "Retired" }
+];
+
 export default function BulkEditBar({ selectedCount, onApply, onClear, onSelectAll, total }) {
   const [field, setField] = useState("vp_group");
   const [value, setValue] = useState("");
@@ -70,11 +78,19 @@ export default function BulkEditBar({ selectedCount, onApply, onClear, onSelectA
               placeholder="Select VP"
               label="VP Group"
             />
+          ) : field === "status" ? (
+            <SheetSelect
+              value={value}
+              onValueChange={setValue}
+              options={STATUS_OPTIONS}
+              placeholder="Select status"
+              label="Member Status"
+            />
           ) : (
             <Input
               value={value}
               onChange={(e) => setValue(e.target.value)}
-              placeholder={field === "status" ? "e.g. Member - Active - Active" : "e.g. 0008001 ATT / SOUTH WESTERN BELL"}
+              placeholder="e.g. 0008001 ATT / SOUTH WESTERN BELL"
               className="h-9 w-56"
             />
           )}
