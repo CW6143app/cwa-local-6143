@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { FileText, Download, Loader2 } from "lucide-react";
+import { FileText, Download, Loader2, Eye } from "lucide-react";
 import PageHeader from "@/components/mobile/PageHeader";
 import PdfViewerModal from "@/components/mobile/PdfViewerModal";
 
@@ -50,24 +50,29 @@ export default function Contracts() {
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#c8102e]/10 text-[#c8102e]">
                   <FileText className="w-5 h-5" />
                 </div>
-                <button
-                  type="button"
-                  onClick={() => c.file_url && setViewing(c)}
-                  disabled={!c.file_url}
-                  className="flex-1 text-left text-sm font-medium text-[#0b2545] disabled:text-slate-400"
-                >
-                  {c.title}
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-[#0b2545] truncate">{c.title}</p>
                   {!c.file_url && <span className="block text-xs text-slate-400 font-normal">Coming soon</span>}
-                </button>
+                </div>
                 {c.file_url && (
-                  <a
-                    href={c.file_url}
-                    download
-                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-black/5 text-[#0b2545] hover:bg-black/10 transition-colors"
-                    aria-label={`Download ${c.title}`}
-                  >
-                    <Download className="w-4 h-4" />
-                  </a>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => setViewing(c)}
+                      className="flex h-9 w-9 items-center justify-center rounded-full bg-[#c8102e]/10 text-[#c8102e] hover:bg-[#c8102e]/20 transition-colors"
+                      aria-label={`Open ${c.title}`}
+                    >
+                      <Eye className="w-4 h-4" />
+                    </button>
+                    <a
+                      href={c.file_url}
+                      download
+                      className="flex h-9 w-9 items-center justify-center rounded-full bg-black/5 text-[#0b2545] hover:bg-black/10 transition-colors"
+                      aria-label={`Download ${c.title}`}
+                    >
+                      <Download className="w-4 h-4" />
+                    </a>
+                  </div>
                 )}
               </div>
             ))}
