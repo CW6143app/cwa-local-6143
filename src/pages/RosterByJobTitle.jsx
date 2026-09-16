@@ -71,8 +71,17 @@ export default function RosterByJobTitle() {
     try {
       setLoading(true);
       setError(null);
-      const data = await base44.entities.RosterMember.list("ncs_date", 1000);
-      setMembers(Array.isArray(data) ? data : []);
+      const PAGE = 1000;
+      const all = [];
+      let skip = 0;
+      while (true) {
+        const page = await base44.entities.RosterMember.list("ncs_date", PAGE, skip);
+        const arr = Array.isArray(page) ? page : [];
+        all.push(...arr);
+        if (arr.length < PAGE) break;
+        skip += PAGE;
+      }
+      setMembers(all);
     } catch (err) {
       console.error("Failed to load roster:", err);
       setError("Unable to load roster. Please try again.");

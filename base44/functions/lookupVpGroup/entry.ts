@@ -46,7 +46,15 @@ export default async function(req: Request): Promise<Response> {
 
     // Fallback: normalized case-insensitive match across all roster members
     const norm = (s: string) => (s || "").toLowerCase().trim().replace(/\s+/g, " ");
-    const allMembers = await base44.asServiceRole.entities.RosterMember.list(null, 1200);
+    const PAGE = 1000;
+    const allMembers: any[] = [];
+    let skip = 0;
+    while (true) {
+      const page: any[] = await base44.asServiceRole.entities.RosterMember.list(null, PAGE, skip);
+      allMembers.push(...(page || []));
+      if (!page || page.length < PAGE) break;
+      skip += PAGE;
+    }
 
     // Try job title + department (normalized, with abbreviation expansion)
     let match = allMembers.find((m: any) =>
