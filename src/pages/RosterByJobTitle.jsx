@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { ArrowLeft, Download, Loader2, Users, ChevronDown, ChevronUp, Pencil, Trash2, Plus } from "lucide-react";
 import EditRosterMember from "@/components/admin/EditRosterMember";
+import BulkEditBar from "@/components/admin/BulkEditBar";
 
 const CSV_COLUMNS = [
   { key: "first_name", label: "First Name" },
@@ -56,6 +57,7 @@ export default function RosterByJobTitle() {
   const [expanded, setExpanded] = useState({});
   const [editing, setEditing] = useState(null);
   const [editOpen, setEditOpen] = useState(false);
+  const [selected, setSelected] = useState(new Set());
 
   useEffect(() => {
     (async () => {
@@ -135,6 +137,45 @@ export default function RosterByJobTitle() {
     groups.forEach((g) => downloadCsv(`roster_${safeJobTitleSlug(g.title)}.csv`, g.rows));
   };
 
+  const toggleSelected = (id) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleGroupSelected = (rows) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      const allSelected = rows.every((r) => next.has(r.id));
+      if (allSelected) rows.forEach((r) => next.delete(r.id));
+      else rows.forEach((r) => next.add(r.id));
+      return next;
+    });
+  };
+
+  const clearSelected = () => setSelected(new Set());
+
+  const selectAll = () => {
+    if (selected.size === members.length) {
+      setSelected(new Set());
+    } else {
+      setSelected(new Set(members.map((m) => m.id)));
+    }
+  };
+
+  const handleBulkApply = async (field, value) => {
+    const ids = Array.from(selected);
+    const payload = ids.map((id) => ({ id, [field]: value }));
+    await base44.entities.RosterMember.bulkUpdate(payload);
+    setMembers((prev) =>
+      prev.map((m) => (selected.has(m.id) ? { ...m, [field]: value } : m))
+    );
+    setSelected(new Set());
+  };
+
   return (
     <div className="min-h-screen bg-slate-50">
       <header className="sticky top-0 z-20 bg-[#0b2545] text-white px-5 py-4 shadow-md">
@@ -175,7 +216,7 @@ export default function RosterByJobTitle() {
         </div>
       </header>
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6" style={{ paddingBottom: selected.size > 0 ? "5rem" : "1.5rem" }}>
         {loading && (
           <div className="flex items-center justify-center py-20">
             <Loader2 className="w-8 h-8 animate-spin text-[#c8102e]" />
@@ -227,6 +268,14 @@ export default function RosterByJobTitle() {
                         <table className="w-full text-sm">
                           <thead className="bg-slate-50">
                             <tr className="text-left text-[11px] uppercase tracking-wide text-slate-400">
+                              <th className="px-4 py-2 font-semibold w-10">
+                                <input
+                                  type="checkbox"
+                                  checked={g.rows.length > 0 && g.rows.every((r) => selected.has(r.id))}
+                                  onChange={() => toggleGroupSelected(g.rows)}
+                                  className="accent-[#c8102e] w-4 h-4"
+                                />
+                              </th>
                               <th className="px-4 py-2 font-semibold">First Name</th>
                               <th className="px-4 py-2 font-semibold">Last Name</th>
                               <th className="px-4 py-2 font-semibold">NCS Date</th>
@@ -238,7 +287,15 @@ export default function RosterByJobTitle() {
                           </thead>
                           <tbody className="divide-y divide-slate-100">
                             {g.rows.map((m) => (
-                              <tr key={m.id} className="hover:bg-slate-50 transition-colors">
+                              <tr key={m.id} className={`transition-colors ${selected.has(m.id) ? "bg-[#c8102e]/5" : "hover:bg-slate-50"}`}>
+                                <td className="px-4 py-2">
+                                  <input
+                                    type="checkbox"
+                                    checked={selected.has(m.id)}
+                                    onChange={() => toggleSelected(m.id)}
+                                    className="accent-[#c8102e] w-4 h-4"
+                                  />
+                                </td>
                                 <td className="px-4 py-2 text-slate-900">{m.first_name || "—"}</td>
                                 <td className="px-4 py-2 text-slate-900">{m.last_name || "—"}</td>
                                 <td className="px-4 py-2 text-slate-600">{m.ncs_date || "—"}</td>
@@ -280,6 +337,14 @@ export default function RosterByJobTitle() {
         member={editing}
         onClose={() => setEditOpen(false)}
         onSave={handleSave}
+      />
+
+      <BulkEditBar
+        selectedCount={selected.size}
+        total={members.length}
+        onApply={handleBulkApply}
+        onClear={clearSelected}
+        onSelectAll={selectAll}
       />
     </div>
   );
