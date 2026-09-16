@@ -146,7 +146,7 @@ export const RESOURCE_GROUPS = [
       { label: "Grievance Form", url: "https://cwa6143.org/grievance", internal: "/grievance" },
       { label: "PMEI Submission Form", url: "https://cwa6143.org/contracts/pmei-submisson-form", internal: "/pmei" },
       { label: "Committee Sign Up", url: "https://cwa6143.org/participate", internal: "/committee-signup" },
-      { label: "Contracts", url: "https://cwa6143.org/contracts/contracts" },
+      { label: "Contracts", url: "https://cwa6143.org/contracts/contracts", internal: "/contracts" },
       { label: "6143 Bylaws", url: "https://cwa6143.org/contracts/bylaws-2023-0" },
       { label: "CWA Constitution", url: "https://cwa-union.org/for-locals/cwa-constitution" },
     ],

@@ -18,6 +18,8 @@ import PmeiForm from '@/pages/PmeiForm';
 import CommitteeSignup from '@/pages/CommitteeSignup';
 import PmeiDashboard from '@/pages/PmeiDashboard';
 import SyncDashboard from '@/pages/SyncDashboard';
+import Contracts from '@/pages/Contracts';
+import ContractsDashboard from '@/pages/ContractsDashboard';
 import AdminRoute from '@/components/AdminRoute';
 
 const AuthenticatedApp = () => {
@@ -48,11 +50,13 @@ const AuthenticatedApp = () => {
         <Route path="/grievance" element={<Grievance />} />
         <Route path="/pmei" element={<PmeiForm />} />
         <Route path="/committee-signup" element={<CommitteeSignup />} />
+        <Route path="/contracts" element={<Contracts />} />
       </Route>
       <Route element={<AdminRoute />}>
         <Route path="/admin/grievances" element={<GrievanceDashboard />} />
         <Route path="/admin/pmei" element={<PmeiDashboard />} />
         <Route path="/admin/sync" element={<SyncDashboard />} />
+        <Route path="/admin/contracts" element={<ContractsDashboard />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
