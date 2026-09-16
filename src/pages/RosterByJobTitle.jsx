@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
-import { ArrowLeft, Download, Loader2, Users, ChevronDown, ChevronUp, Pencil, Trash2, Plus } from "lucide-react";
+import { ArrowLeft, Download, Loader2, Users, ChevronDown, ChevronUp, Pencil, Trash2, Plus, FileSpreadsheet } from "lucide-react";
 import EditRosterMember from "@/components/admin/EditRosterMember";
 import BulkEditBar from "@/components/admin/BulkEditBar";
+import RosterCrossReference from "@/components/admin/RosterCrossReference";
 
 const CSV_COLUMNS = [
   { key: "first_name", label: "First Name" },
@@ -61,6 +62,7 @@ export default function RosterByJobTitle() {
   const [error, setError] = useState(null);
   const [expandedVp, setExpandedVp] = useState({});
   const [expandedJt, setExpandedJt] = useState({});
+  const [showCompare, setShowCompare] = useState(false);
   const [editing, setEditing] = useState(null);
   const [editOpen, setEditOpen] = useState(false);
   const [selected, setSelected] = useState(new Set());
@@ -224,6 +226,14 @@ export default function RosterByJobTitle() {
                 <Download className="w-3.5 h-3.5" /> Download All
               </button>
             )}
+            {!loading && members.length > 0 && (
+              <button
+                onClick={() => setShowCompare((v) => !v)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${showCompare ? "bg-white/20 text-white" : "bg-white/10 text-white hover:bg-white/20"}`}
+              >
+                <FileSpreadsheet className="w-3.5 h-3.5" /> Compare CSV
+              </button>
+            )}
             {!loading && (
               <button
                 onClick={openNew}
@@ -237,6 +247,7 @@ export default function RosterByJobTitle() {
       </header>
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6" style={{ paddingBottom: selected.size > 0 ? "5rem" : "1.5rem" }}>
+        {showCompare && !loading && <RosterCrossReference members={members} onClose={() => setShowCompare(false)} />}
         {loading && (
           <div className="flex items-center justify-center py-20">
             <Loader2 className="w-8 h-8 animate-spin text-[#c8102e]" />
