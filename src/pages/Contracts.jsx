@@ -8,9 +8,6 @@ export default function Contracts() {
   const [contracts, setContracts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [viewing, setViewing] = useState(null);
-  const [blobUrl, setBlobUrl] = useState(null);
-  const [opening, setOpening] = useState(false);
-  const [openError, setOpenError] = useState("");
 
   useEffect(() => {
     (async () => {
@@ -24,36 +21,6 @@ export default function Contracts() {
       }
     })();
   }, []);
-
-  const handleOpen = async (c) => {
-    if (!c.file_url) return;
-    setOpening(true);
-    setOpenError("");
-    try {
-      const res = await fetch(c.file_url);
-      if (!res.ok) throw new Error("Could not load file");
-      const blob = await res.blob();
-      const typed = new Blob([blob], { type: "application/pdf" });
-      const url = URL.createObjectURL(typed);
-      setBlobUrl((prev) => {
-        if (prev) URL.revokeObjectURL(prev);
-        return url;
-      });
-      setViewing(c);
-    } catch (err) {
-      setOpenError("Could not open this contract. Try downloading instead.");
-    } finally {
-      setOpening(false);
-    }
-  };
-
-  const handleClose = () => {
-    setViewing(null);
-    setBlobUrl((prev) => {
-      if (prev) URL.revokeObjectURL(prev);
-      return null;
-    });
-  };
 
   return (
     <div className="pb-8">
@@ -91,12 +58,11 @@ export default function Contracts() {
                   <div className="flex items-center gap-2 shrink-0">
                     <button
                       type="button"
-                      onClick={() => handleOpen(c)}
-                      disabled={opening}
-                      className="flex h-9 w-9 items-center justify-center rounded-full bg-[#c8102e]/10 text-[#c8102e] hover:bg-[#c8102e]/20 transition-colors disabled:opacity-50"
+                      onClick={() => setViewing(c)}
+                      className="flex h-9 w-9 items-center justify-center rounded-full bg-[#c8102e]/10 text-[#c8102e] hover:bg-[#c8102e]/20 transition-colors"
                       aria-label={`Open ${c.title}`}
                     >
-                      {opening ? <Loader2 className="w-4 h-4 animate-spin" /> : <Eye className="w-4 h-4" />}
+                      <Eye className="w-4 h-4" />
                     </button>
                     <a
                       href={c.file_url}
@@ -112,17 +78,13 @@ export default function Contracts() {
             ))}
           </div>
         )}
-        {openError && (
-          <p className="mt-3 text-center text-xs text-[#c8102e]">{openError}</p>
-        )}
       </div>
 
       <PdfViewerModal
         open={!!viewing}
-        onClose={handleClose}
+        onClose={() => setViewing(null)}
         title={viewing?.title}
-        blobUrl={blobUrl}
-        downloadUrl={viewing?.file_url}
+        fileUrl={viewing?.file_url}
       />
     </div>
   );
