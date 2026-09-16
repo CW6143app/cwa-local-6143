@@ -25,7 +25,7 @@ function escapeCsv(value) {
 function buildCsv(rows) {
   const header = CSV_COLUMNS.map((c) => escapeCsv(c.label)).join(",");
   const body = rows
-    .map((r) => CSV_COLUMNS.map((c) => escapeCsv(r[c.key])).join(","))
+    .map((r) => CSV_COLUMNS.map((c) => escapeCsv(c.key === "processing_unit" ? stripProcessingUnitNumber(r[c.key]) : r[c.key])).join(","))
     .join("\n");
   return `${header}\n${body}`;
 }
@@ -41,6 +41,11 @@ function downloadCsv(filename, rows) {
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
+}
+
+function stripProcessingUnitNumber(value) {
+  if (!value) return "";
+  return String(value).replace(/^\s*\d+\s*/, "").trim();
 }
 
 function safeJobTitleSlug(title) {
@@ -302,7 +307,7 @@ export default function RosterByJobTitle() {
                                 <td className="px-4 py-2 text-slate-600">{m.ncs_date || "—"}</td>
                                 <td className="px-4 py-2 text-slate-600">{m.vp_group || "—"}</td>
                                 <td className="px-4 py-2 text-slate-600">{m.status || "—"}</td>
-                                <td className="px-4 py-2 text-slate-600 truncate max-w-[220px]" title={m.processing_unit || ""}>{m.processing_unit || "—"}</td>
+                                <td className="px-4 py-2 text-slate-600 truncate max-w-[220px]" title={stripProcessingUnitNumber(m.processing_unit)}>{stripProcessingUnitNumber(m.processing_unit) || "—"}</td>
                                 <td className="px-4 py-2 text-slate-600">{m.building_city || "—"}</td>
                                 <td className="px-4 py-2 text-right whitespace-nowrap">
                                   <button
