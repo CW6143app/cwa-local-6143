@@ -1,40 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Download, Loader2 } from "lucide-react";
+import { X, Download } from "lucide-react";
 
-export default function PdfViewerModal({ open, onClose, title, fileUrl }) {
-  const [blobUrl, setBlobUrl] = useState(null);
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    let revoked = false;
-    let createdUrl = null;
-    if (!open || !fileUrl) {
-      setBlobUrl(null);
-      return;
-    }
-    setLoading(true);
-    setBlobUrl(null);
-    fetch(fileUrl)
-      .then((res) => res.blob())
-      .then((blob) => {
-        const typed = new Blob([blob], { type: "application/pdf" });
-        createdUrl = URL.createObjectURL(typed);
-        if (!revoked) setBlobUrl(createdUrl);
-      })
-      .catch(() => {
-        // Fallback to direct URL if blob fetch fails
-        if (!revoked) setBlobUrl(fileUrl);
-      })
-      .finally(() => {
-        if (!revoked) setLoading(false);
-      });
-    return () => {
-      revoked = true;
-      if (createdUrl) URL.revokeObjectURL(createdUrl);
-    };
-  }, [open, fileUrl]);
-
+export default function PdfViewerModal({ open, onClose, title, blobUrl, downloadUrl }) {
   return (
     <AnimatePresence>
       {open && (
@@ -53,14 +21,16 @@ export default function PdfViewerModal({ open, onClose, title, fileUrl }) {
             <div className="flex items-center justify-between gap-3 border-b border-black/8 px-4 py-3 shrink-0">
               <h3 className="text-sm font-semibold text-[#0b2545] truncate">{title}</h3>
               <div className="flex items-center gap-2 shrink-0">
-                <a
-                  href={fileUrl}
-                  download
-                  className="flex h-9 w-9 items-center justify-center rounded-full bg-black/5 text-[#0b2545] hover:bg-black/10 transition-colors"
-                  aria-label="Download"
-                >
-                  <Download className="w-4 h-4" />
-                </a>
+                {downloadUrl && (
+                  <a
+                    href={downloadUrl}
+                    download
+                    className="flex h-9 w-9 items-center justify-center rounded-full bg-black/5 text-[#0b2545] hover:bg-black/10 transition-colors"
+                    aria-label="Download"
+                  >
+                    <Download className="w-4 h-4" />
+                  </a>
+                )}
                 <button
                   onClick={onClose}
                   className="flex h-9 w-9 items-center justify-center rounded-full bg-black/5 text-[#0b2545] hover:bg-black/10 transition-colors"
@@ -70,18 +40,9 @@ export default function PdfViewerModal({ open, onClose, title, fileUrl }) {
                 </button>
               </div>
             </div>
-            <div className="flex-1 bg-slate-100 relative">
-              {loading && (
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Loader2 className="w-6 h-6 animate-spin text-[#c8102e]" />
-                </div>
-              )}
+            <div className="flex-1 bg-slate-100">
               {blobUrl && (
-                <iframe
-                  src={blobUrl}
-                  title={title}
-                  className="w-full h-full border-0"
-                />
+                <iframe src={blobUrl} title={title} className="w-full h-full border-0" />
               )}
             </div>
           </motion.div>
