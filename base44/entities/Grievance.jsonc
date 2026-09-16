@@ -119,6 +119,26 @@
       "type": "string",
       "title": "Violation of Article(s) or Past practice"
     },
+    "evidence_files": {
+      "type": "array",
+      "title": "Evidence Files",
+      "items": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "name": {
+            "type": "string"
+          },
+          "size": {
+            "type": "number"
+          }
+        }
+      },
+      "default": []
+    },
     "auth_personal_records": {
       "type": "boolean",
       "title": "Permission granted for Personal Records",

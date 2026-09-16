@@ -3,6 +3,7 @@ import { Eraser, RotateCw } from "lucide-react";
 
 const SignaturePad = forwardRef((props, ref) => {
   const canvasRef = useRef(null);
+  const containerRef = useRef(null);
   const drawingRef = useRef(false);
   const lastPoint = useRef(null);
   const [hasInk, setHasInk] = useState(false);
@@ -30,41 +31,71 @@ const SignaturePad = forwardRef((props, ref) => {
   const canvasVisible = !isMobile || isLandscape;
   const showRotatePrompt = isMobile && !isLandscape;
 
-  // Setup canvas whenever it becomes visible, preserving ink across orientation changes
+  // Resize canvas resolution to match CSS container dimensions, preserving ink
+  const resizeCanvas = (canvas) => {
+    if (!canvas) return;
+    const ratio = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    if (rect.width < 1 || rect.height < 1) return;
+    const targetW = Math.max(1, Math.round(rect.width * ratio));
+    const targetH = Math.max(1, Math.round(rect.height * ratio));
+    // Preserve current ink before resizing
+    let snap = null;
+    if (canvas.width > 0 && canvas.height > 0) {
+      try { snap = canvas.toDataURL("image/png"); } catch (e) {}
+    } else if (inkBackupRef.current) {
+      snap = inkBackupRef.current;
+    }
+    canvas.width = targetW;
+    canvas.height = targetH;
+    const ctx = canvas.getContext("2d");
+    ctx.scale(ratio, ratio);
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.strokeStyle = "#0b2545";
+    ctx.lineWidth = 2.5;
+    if (snap) {
+      const img = new Image();
+      img.onload = () => ctx.drawImage(img, 0, 0, rect.width, rect.height);
+      img.src = snap;
+      inkBackupRef.current = snap;
+    }
+  };
+
+  // Setup canvas whenever it becomes visible + observe container resizes
   useEffect(() => {
     if (!canvasVisible) return;
     let raf;
     const setup = () => {
       const canvas = canvasRef.current;
       if (!canvas) return;
-      const ratio = window.devicePixelRatio || 1;
       const rect = canvas.getBoundingClientRect();
       if (rect.width < 1 || rect.height < 1) {
         raf = requestAnimationFrame(setup);
         return;
       }
-      canvas.width = Math.max(1, rect.width) * ratio;
-      canvas.height = Math.max(1, rect.height) * ratio;
-      const ctx = canvas.getContext("2d");
-      ctx.scale(ratio, ratio);
-      ctx.lineCap = "round";
-      ctx.lineJoin = "round";
-      ctx.strokeStyle = "#0b2545";
-      ctx.lineWidth = 2.5;
-      if (inkBackupRef.current) {
-        const img = new Image();
-        img.onload = () => ctx.drawImage(img, 0, 0, rect.width, rect.height);
-        img.src = inkBackupRef.current;
-      }
+      resizeCanvas(canvas);
     };
     raf = requestAnimationFrame(setup);
+
+    const canvas = canvasRef.current;
+    const ro = canvas && 'ResizeObserver' in window ? new ResizeObserver(() => resizeCanvas(canvasRef.current)) : null;
+    if (ro && canvas) ro.observe(canvas);
+    const onResize = () => resizeCanvas(canvasRef.current);
+    window.addEventListener('resize', onResize);
+    window.addEventListener('orientationchange', onResize);
+
     return () => {
       cancelAnimationFrame(raf);
-      const canvas = canvasRef.current;
-      if (canvas) {
-        try { inkBackupRef.current = canvas.toDataURL("image/png"); } catch (e) {}
+      if (ro) ro.disconnect();
+      window.removeEventListener('resize', onResize);
+      window.removeEventListener('orientationchange', onResize);
+      const c = canvasRef.current;
+      if (c) {
+        try { inkBackupRef.current = c.toDataURL("image/png"); } catch (e) {}
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [canvasVisible]);
 
   useImperativeHandle(ref, () => ({
@@ -81,7 +112,7 @@ const SignaturePad = forwardRef((props, ref) => {
   const getPos = (e) => {
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
-    const touch = e.touches?.[0];
+    const touch = e.touches?.[0] ?? e.changedTouches?.[0];
     const clientX = touch ? touch.clientX : e.clientX;
     const clientY = touch ? touch.clientY : e.clientY;
     return { x: clientX - rect.left, y: clientY - rect.top };
@@ -115,6 +146,28 @@ const SignaturePad = forwardRef((props, ref) => {
     }
   };
 
+  // Attach native non-passive touch listeners so preventDefault reliably stops scrolling
+  useEffect(() => {
+    if (!canvasVisible) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const opts = { passive: false };
+    const tStart = (e) => start(e);
+    const tMove = (e) => draw(e);
+    const tEnd = (e) => end(e);
+    canvas.addEventListener('touchstart', tStart, opts);
+    canvas.addEventListener('touchmove', tMove, opts);
+    canvas.addEventListener('touchend', tEnd, opts);
+    canvas.addEventListener('touchcancel', tEnd, opts);
+    return () => {
+      canvas.removeEventListener('touchstart', tStart);
+      canvas.removeEventListener('touchmove', tMove);
+      canvas.removeEventListener('touchend', tEnd);
+      canvas.removeEventListener('touchcancel', tEnd);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [canvasVisible, hasInk]);
+
   const clearCanvas = () => {
     const canvas = canvasRef.current;
     if (canvas) {
@@ -126,10 +179,7 @@ const SignaturePad = forwardRef((props, ref) => {
   };
 
   const canvasProps = {
-    style: { touchAction: "none" },
-    onTouchStart: start,
-    onTouchMove: draw,
-    onTouchEnd: end,
+    style: { touchAction: "none", WebkitUserSelect: "none", userSelect: "none" },
     onMouseDown: start,
     onMouseMove: draw,
     onMouseUp: end,
@@ -137,7 +187,7 @@ const SignaturePad = forwardRef((props, ref) => {
   };
 
   return (
-    <div>
+    <div ref={containerRef}>
       {showRotatePrompt ? (
         <div>
           {hasInk && inkBackupRef.current && (

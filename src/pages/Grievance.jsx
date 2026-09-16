@@ -10,6 +10,7 @@ import { Loader2, CheckCircle2, FileText, ArrowLeft } from "lucide-react";
 import SheetSelect from "@/components/mobile/SheetSelect";
 import AddressAutocomplete from "@/components/mobile/AddressAutocomplete";
 import SignaturePad from "@/components/mobile/SignaturePad";
+import EvidenceUploader from "@/components/mobile/EvidenceUploader";
 import { useAuth } from "@/lib/AuthContext";
 
 const INCIDENT_TYPES = ["PN", "WR", "DML", "Susp/Term", "Other"];
@@ -44,7 +45,8 @@ const EMPTY = {
   auth_personal_records: false,
   auth_medical_records: false,
   signature_initials: "",
-  signature_date: ""
+  signature_date: "",
+  evidence_files: []
 };
 
 function Row({ children, className = "" }) {
@@ -165,6 +167,11 @@ export default function Grievance() {
       ["vp_group", "date_of_incident", "signature_date", "gender"].forEach((k) => {
         if (payload[k] === "" || payload[k] === undefined) delete payload[k];
       });
+
+      // Only include evidence files if any were attached
+      if (!Array.isArray(payload.evidence_files) || payload.evidence_files.length === 0) {
+        delete payload.evidence_files;
+      }
 
       const sigDataUrl = sigPadRef.current?.toDataURL();
       if (sigDataUrl) {
@@ -463,6 +470,16 @@ export default function Grievance() {
           <Field label="Signature Date">
             <Input value={form.signature_date} onChange={set("signature_date")} type="date" className="h-9" />
           </Field>
+        </div>
+
+        {/* Evidence files */}
+        <div className="rounded-2xl bg-white p-5 shadow-[0_1px_2px_rgba(11,37,69,0.06),0_8px_24px_-12px_rgba(11,37,69,0.2)] space-y-3">
+          <h3 className="text-sm font-semibold text-[#0b2545]">Evidence (optional)</h3>
+          <p className="text-xs text-slate-500">Attach photos or PDF documents that support your grievance.</p>
+          <EvidenceUploader
+            value={form.evidence_files}
+            onChange={(files) => setForm((f) => ({ ...f, evidence_files: files }))}
+          />
         </div>
 
         {error &&
