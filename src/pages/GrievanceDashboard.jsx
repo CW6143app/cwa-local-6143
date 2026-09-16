@@ -182,10 +182,11 @@ export default function GrievanceDashboard() {
               <table className="w-full text-sm">
                 <thead className="bg-slate-50 border-b border-slate-200">
                   <tr className="text-left text-[11px] uppercase tracking-wide text-slate-400">
+                    <th className="px-4 py-3 font-semibold">Name</th>
+                    <th className="px-4 py-3 font-semibold">Job Title</th>
+                    <th className="px-4 py-3 font-semibold">Year</th>
                     <th className="px-4 py-3 font-semibold">Grievance #</th>
-                    <th className="px-4 py-3 font-semibold">Grievant</th>
-                    <th className="px-4 py-3 font-semibold">Date</th>
-                    <th className="px-4 py-3 font-semibold">VP</th>
+                    <th className="px-4 py-3 font-semibold">VP Group</th>
                     <th className="px-4 py-3 font-semibold">Reason</th>
                     <th className="px-4 py-3 font-semibold">Status</th>
                     <th className="px-4 py-3 font-semibold">Update</th>
@@ -195,15 +196,13 @@ export default function GrievanceDashboard() {
                   {filtered.map((g) => (
                     <tr key={g.id} className="hover:bg-slate-50 transition-colors">
                       <td className="px-4 py-3">
-                        <p className="font-semibold text-slate-900">
-                          {g.grievance_number ? `${g.year || ''}-${g.grievance_number}` : (g.local_grievance_num || '—')}
-                        </p>
-                      </td>
-                      <td className="px-4 py-3">
                         <p className="font-semibold text-slate-900">{g.name_of_grievant || '—'}</p>
-                        <p className="text-xs text-slate-400">{g.job_title || ''}</p>
                       </td>
-                      <td className="px-4 py-3 text-slate-600">{g.date_of_submission || (g.date_of_incident || '—')}</td>
+                      <td className="px-4 py-3 text-slate-600">{g.job_title || '—'}</td>
+                      <td className="px-4 py-3 text-slate-600">{g.year || '—'}</td>
+                      <td className="px-4 py-3 text-slate-600">
+                        {g.grievance_number ? String(g.grievance_number) : (g.local_grievance_num || '—')}
+                      </td>
                       <td className="px-4 py-3 text-slate-600">{g.vp_group || '—'}</td>
                       <td className="px-4 py-3 text-slate-600 max-w-[220px] truncate">{g.reason_for_grievance || g.explain_grievance || '—'}</td>
                       <td className="px-4 py-3"><StatusBadge status={g.status} /></td>
