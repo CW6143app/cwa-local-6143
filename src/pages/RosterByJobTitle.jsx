@@ -281,6 +281,7 @@ export default function RosterByJobTitle() {
                               <th className="px-4 py-2 font-semibold">NCS Date</th>
                               <th className="px-4 py-2 font-semibold">VP</th>
                               <th className="px-4 py-2 font-semibold">Status</th>
+                              <th className="px-4 py-2 font-semibold">Processing Unit</th>
                               <th className="px-4 py-2 font-semibold">City</th>
                               <th className="px-4 py-2 font-semibold text-right">Actions</th>
                             </tr>
@@ -301,6 +302,7 @@ export default function RosterByJobTitle() {
                                 <td className="px-4 py-2 text-slate-600">{m.ncs_date || "—"}</td>
                                 <td className="px-4 py-2 text-slate-600">{m.vp_group || "—"}</td>
                                 <td className="px-4 py-2 text-slate-600">{m.status || "—"}</td>
+                                <td className="px-4 py-2 text-slate-600 truncate max-w-[220px]" title={m.processing_unit || ""}>{m.processing_unit || "—"}</td>
                                 <td className="px-4 py-2 text-slate-600">{m.building_city || "—"}</td>
                                 <td className="px-4 py-2 text-right whitespace-nowrap">
                                   <button
