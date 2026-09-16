@@ -20,6 +20,7 @@ import PmeiDashboard from '@/pages/PmeiDashboard';
 import SyncDashboard from '@/pages/SyncDashboard';
 import Contracts from '@/pages/Contracts';
 import ContractsDashboard from '@/pages/ContractsDashboard';
+import RosterByJobTitle from '@/pages/RosterByJobTitle';
 import AdminRoute from '@/components/AdminRoute';
 
 const AuthenticatedApp = () => {
@@ -57,6 +58,7 @@ const AuthenticatedApp = () => {
         <Route path="/admin/pmei" element={<PmeiDashboard />} />
         <Route path="/admin/sync" element={<SyncDashboard />} />
         <Route path="/admin/contracts" element={<ContractsDashboard />} />
+        <Route path="/admin/roster" element={<RosterByJobTitle />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
