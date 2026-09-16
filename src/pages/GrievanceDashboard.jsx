@@ -199,7 +199,7 @@ export default function GrievanceDashboard() {
                         <p className="font-semibold text-slate-900">{g.name_of_grievant || '—'}</p>
                       </td>
                       <td className="px-4 py-3 text-slate-600">{g.job_title || '—'}</td>
-                      <td className="px-4 py-3 text-slate-600">{g.year || '—'}</td>
+                      <td className="px-4 py-3 text-slate-600">{g.year ? String(g.year).replace(/,/g, '') : '—'}</td>
                       <td className="px-4 py-3 text-slate-600">
                         {g.grievance_number ? String(g.grievance_number) : (g.local_grievance_num || '—')}
                       </td>
