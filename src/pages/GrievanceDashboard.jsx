@@ -50,7 +50,7 @@ export default function GrievanceDashboard() {
     try {
       setLoading(true);
       setError(null);
-      const data = await base44.entities.Grievance.list('grievance_number', 200);
+      const data = await base44.entities.Grievance.list('-grievance_number', 200);
       setGrievances(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error('Failed to load grievances:', err);
