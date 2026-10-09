@@ -39,6 +39,8 @@ export default function SyncDashboard() {
   const lastSync = stories[0]?.updated_date || events[0]?.updated_date;
 
   const [pushMsg, setPushMsg] = useState("");
+  const [pushSending, setPushSending] = useState(false);
+  const [pushResult, setPushResult] = useState(null);
 
   const toggleJoin = async (e) => {
     if (!(e.title || "").includes("Membership Meeting")) return;
@@ -55,6 +57,19 @@ export default function SyncDashboard() {
       );
     } catch {
       // ignore — list refresh keeps stale state
+    }
+  };
+
+  const sendPush = async () => {
+    setPushSending(true);
+    setPushResult(null);
+    try {
+      const res = await base44.functions.invoke("sendMeetingPush", {});
+      setPushResult(res.data);
+    } catch (err) {
+      setPushResult({ error: err?.response?.data?.error || err?.message || "Push failed. Please try again." });
+    } finally {
+      setPushSending(false);
     }
   };
 
@@ -101,7 +116,7 @@ export default function SyncDashboard() {
             <h3 className="text-sm font-bold text-slate-900">Join Meeting Button</h3>
           </div>
           <p className="mt-1 text-xs text-slate-500 leading-relaxed">
-            Toggle the "Join Meeting" button on or off for each event. When on, members see the button on the home and events screens, and a push notification is sent to all opted-in devices.
+            Toggle the "Join Meeting" button on or off for each event. When on, members see the button on the home and events screens. Push notifications are not sent automatically — use the button below to send one when you're ready.
           </p>
           {pushMsg && (
             <div className="mt-3 flex items-center gap-2 rounded-lg bg-green-50 px-3 py-2 text-xs font-medium text-green-700">
@@ -138,6 +153,48 @@ export default function SyncDashboard() {
               ))}
             </ul>
           )}
+
+          {/* Manual push notification */}
+          <div className="mt-5 border-t border-slate-100 pt-4">
+            <div className="flex items-center gap-2">
+              <Smartphone className="w-4 h-4 text-[#c8102e]" />
+              <h4 className="text-xs font-bold text-slate-900">Send push notification</h4>
+            </div>
+            <p className="mt-1 text-xs text-slate-500 leading-relaxed">
+              Broadcast a "Monthly Meeting has started" push to all opted-in devices. Send it when you're ready — nothing goes out automatically.
+            </p>
+            <button
+              onClick={sendPush}
+              disabled={pushSending || loading || tokens.length === 0}
+              className="mt-3 w-full h-11 rounded-xl bg-[#c8102e] text-white text-sm font-semibold flex items-center justify-center gap-2 hover:bg-[#c8102e]/90 disabled:opacity-60 transition-colors"
+            >
+              {pushSending ? (
+                <>
+                  <RefreshCw className="w-4 h-4 animate-spin" />
+                  Sending…
+                </>
+              ) : (
+                <>
+                  <Smartphone className="w-4 h-4" />
+                  Send push to {loading ? "…" : tokens.length} device{tokens.length === 1 ? "" : "s"}
+                </>
+              )}
+            </button>
+            {pushResult && (
+              <div className={`mt-3 flex items-start gap-2 rounded-lg px-3 py-2 text-xs font-medium ${pushResult.error ? "bg-red-50 text-red-700" : "bg-green-50 text-green-700"}`}>
+                {pushResult.error ? (
+                  <AlertTriangle className="w-3.5 h-3.5 mt-0.5 shrink-0" />
+                ) : (
+                  <CheckCircle2 className="w-3.5 h-3.5 mt-0.5 shrink-0" />
+                )}
+                <span>
+                  {pushResult.error
+                    ? pushResult.error
+                    : `Sent to ${pushResult.sent} of ${pushResult.total} device${pushResult.total === 1 ? "" : "s"}${pushResult.failed ? `, ${pushResult.failed} failed` : ""}.`}
+                </span>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Sync card */}
