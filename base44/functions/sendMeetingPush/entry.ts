@@ -7,7 +7,7 @@ const TOKEN_URL = 'https://oauth2.googleapis.com/token';
 const FCM_URL = `https://fcm.googleapis.com/v1/projects/${PROJECT_ID}/messages:send`;
 
 const NOTIFICATION_TITLE = 'CWA Local 6143';
-const NOTIFICATION_BODY = 'CWA Local 6143 Monthly Meeting has started';
+const NOTIFICATION_BODY = 'Local 6143 Monthly Meeting is about to start';
 
 function b64urlStr(str) {
   return btoa(String.fromCharCode(...new TextEncoder().encode(str)))
