@@ -12,7 +12,6 @@ import FollowLocal from "@/components/mobile/FollowLocal";
 import PushOptIn from "@/components/mobile/PushOptIn";
 import InstallPrompt from "@/components/mobile/InstallPrompt";
 import PullToRefresh from "@/components/mobile/PullToRefresh";
-import ElectionBallot from "@/components/mobile/ElectionBallot";
 
 const TABS = [
 { id: "news", label: "News" },
@@ -108,10 +107,6 @@ export default function Home() {
 
           <section className="px-6 pt-6">
             <PushOptIn />
-          </section>
-
-          <section className="px-6 pt-9">
-            <ElectionBallot />
           </section>
 
           <section className="px-6 pt-9">
