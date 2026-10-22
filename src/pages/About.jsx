@@ -4,6 +4,7 @@ import { MapPin, Globe, ArrowUpRight, Phone } from "lucide-react";
 import PageHeader from "@/components/mobile/PageHeader";
 import { SITE } from "@/lib/siteData";
 import AccountSettings from "@/components/mobile/AccountSettings";
+import AdminSection from "@/components/mobile/AdminSection";
 import BoardMembers from "@/components/mobile/BoardMembers";
 
 export default function About() {
@@ -36,6 +37,8 @@ export default function About() {
         </div>
 
         <BoardMembers />
+
+        <AdminSection />
 
         <AccountSettings />
       </div>
