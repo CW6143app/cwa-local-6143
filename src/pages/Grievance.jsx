@@ -86,7 +86,6 @@ export default function Grievance() {
   const [saved, setSaved] = useState(null);
   const [sigDataUrl, setSigDataUrl] = useState("");
   const [error, setError] = useState("");
-  const [vpLoading, setVpLoading] = useState(false);
   const sigPadRef = useRef(null);
 
   useEffect(() => {
@@ -121,7 +120,6 @@ export default function Grievance() {
     }
     let cancelled = false;
     const timer = setTimeout(async () => {
-      setVpLoading(true);
       try {
         const res = await base44.functions.invoke("lookupVpGroup", {
           job_title: form.job_title,
@@ -132,8 +130,6 @@ export default function Grievance() {
         if (!cancelled) setForm((f) => ({ ...f, vp_group: res.data?.vp_group || "" }));
       } catch (err) {
         // ignore — VP group stays empty
-      } finally {
-        if (!cancelled) setVpLoading(false);
       }
     }, 500);
     return () => { cancelled = true; clearTimeout(timer); };
@@ -264,7 +260,7 @@ export default function Grievance() {
 
       <form onSubmit={handleSubmit} className="px-5 pt-6 space-y-5">
 
-        {/* Summary: Name, Job Title, Year, Grievance #, VP Group (matches dashboard order) */}
+        {/* Summary: Name, Job Title */}
         <div className="rounded-2xl bg-white p-5 shadow-[0_1px_2px_rgba(11,37,69,0.06),0_8px_24px_-12px_rgba(11,37,69,0.2)] space-y-4">
           <div>
             <SectionTitle num="1" label="Name of Grievant" />
@@ -286,43 +282,12 @@ export default function Grievance() {
               </Field>
             </Row>
           </div>
-          <Divider />
-          <div>
-            <SectionTitle num="3" label="Year / Grievance # / VP Group" />
-            <Row className="mt-2">
-              <Field label="Year" flex="1">
-                <div className="flex items-center h-9">
-                  <span className="text-sm font-semibold text-[#0b2545]">{form.year || String(new Date().getFullYear())}</span>
-                  <span className="ml-2 text-xs text-slate-400 italic">Auto-assigned</span>
-                </div>
-              </Field>
-              <Field label="Grievance #" flex="1">
-                <div className="flex items-center h-9">
-                  <span className="text-sm text-slate-400 italic">Auto-Assigned</span>
-                </div>
-              </Field>
-              <Field label="VP Group" flex="1">
-                <div className="flex items-center gap-2 h-9">
-                  {vpLoading ? (
-                    <span className="text-sm text-slate-400 italic">Looking up…</span>
-                  ) : (
-                    <>
-                      <span className="text-sm font-semibold text-[#0b2545]">
-                        {form.vp_group ? `VP ${form.vp_group}` : "—"}
-                      </span>
-                      <span className="text-xs text-slate-400 italic">Auto-assigned</span>
-                    </>
-                  )}
-                </div>
-              </Field>
-            </Row>
-          </div>
         </div>
 
         {/* Fields 1–5 */}
         <div className="rounded-2xl bg-white p-5 shadow-[0_1px_2px_rgba(11,37,69,0.06),0_8px_24px_-12px_rgba(11,37,69,0.2)] space-y-4">
           <div>
-            <SectionTitle num="4" label="NCS" />
+            <SectionTitle num="3" label="NCS" />
             <Row className="mt-2">
               <Field label="NCS" flex="1">
                 <Input value={form.ncs} onChange={set("ncs")} className="h-9" />
@@ -331,7 +296,7 @@ export default function Grievance() {
           </div>
           <Divider />
           <div>
-            <SectionTitle num="5" label="Home Address" />
+            <SectionTitle num="4" label="Home Address" />
             <Row className="mt-2">
               <Field label="Address" flex="2">
                 <AddressAutocomplete
@@ -364,7 +329,7 @@ export default function Grievance() {
           </div>
           <Divider />
           <div>
-            <SectionTitle num="6" label="Gender / Email" />
+            <SectionTitle num="5" label="Gender / Email" />
             <Row className="mt-2">
               <Field label="Gender" flex="1">
                 <SheetSelect
@@ -386,7 +351,7 @@ export default function Grievance() {
           </div>
           <Divider />
           <div>
-            <SectionTitle num="7" label="Department / SUITS ID" />
+            <SectionTitle num="6" label="Department / SUITS ID" />
             <Row className="mt-2">
               <Field label="Department" flex="2">
                 <Input value={form.department} onChange={set("department")} className="h-9" />
@@ -398,7 +363,7 @@ export default function Grievance() {
           </div>
           <Divider />
           <div>
-            <SectionTitle num="8" label="Work Location / 1st Level Mgr." />
+            <SectionTitle num="7" label="Work Location / 1st Level Mgr." />
             <Row className="mt-2">
               <Field label="Work Location" flex="2">
                 <Input value={form.work_location} onChange={set("work_location")} className="h-9" />
@@ -412,7 +377,7 @@ export default function Grievance() {
 
         {/* Field 6 */}
         <div className="rounded-2xl bg-white p-5 shadow-[0_1px_2px_rgba(11,37,69,0.06),0_8px_24px_-12px_rgba(11,37,69,0.2)] space-y-4">
-          <SectionTitle num="9" label="Date of Incident & Type" />
+          <SectionTitle num="8" label="Date of Incident & Type" />
           <Row className="mt-2">
             <Field label="Date of Incident" flex="1">
               <Input value={form.date_of_incident} onChange={set("date_of_incident")} type="date" className="h-9" />
@@ -453,7 +418,7 @@ export default function Grievance() {
 
         {/* Field 7 */}
         <div className="rounded-2xl bg-white p-5 shadow-[0_1px_2px_rgba(11,37,69,0.06),0_8px_24px_-12px_rgba(11,37,69,0.2)] space-y-3">
-          <SectionTitle num="10" label="What settlement is expected?" />
+          <SectionTitle num="9" label="What settlement is expected?" />
           <Textarea
             value={form.settlement_expected}
             onChange={set("settlement_expected")}
@@ -465,7 +430,7 @@ export default function Grievance() {
 
         {/* Field 8 */}
         <div className="rounded-2xl bg-white p-5 shadow-[0_1px_2px_rgba(11,37,69,0.06),0_8px_24px_-12px_rgba(11,37,69,0.2)] space-y-3">
-          <SectionTitle num="11" label="Violation of Article(s) or Past Practice" />
+          <SectionTitle num="10" label="Violation of Article(s) or Past Practice" />
           <Textarea
             value={form.violation_of_articles}
             onChange={set("violation_of_articles")}
