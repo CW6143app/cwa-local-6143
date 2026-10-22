@@ -2,8 +2,9 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
-import { ArrowLeft, Shield, ChevronDown, FileText, Inbox, CheckCircle2, Clock } from 'lucide-react';
+import { ArrowLeft, Shield, ChevronDown, FileText, Inbox, CheckCircle2, Clock, Download } from 'lucide-react';
 import SheetSelect from '@/components/mobile/SheetSelect';
+import { downloadGrievancePdf, fetchSignatureDataUrl } from '@/lib/grievancePdf';
 
 const STATUS_OPTIONS = [
   { value: 'open', label: 'Open', color: 'bg-slate-100 text-slate-700', dot: 'bg-slate-500' },
@@ -78,6 +79,15 @@ export default function GrievanceDashboard() {
       alert('Failed to update status. Please try again.');
     } finally {
       setUpdatingId(null);
+    }
+  };
+
+  const downloadPdf = async (g) => {
+    try {
+      const signature = await fetchSignatureDataUrl(g.signature_initials);
+      downloadGrievancePdf(g, signature);
+    } catch (err) {
+      alert('Could not create the PDF. Please try again.');
     }
   };
 
@@ -190,6 +200,7 @@ export default function GrievanceDashboard() {
                     <th className="px-4 py-3 font-semibold">Reason</th>
                     <th className="px-4 py-3 font-semibold">Status</th>
                     <th className="px-4 py-3 font-semibold">Update</th>
+                    <th className="px-4 py-3 font-semibold">PDF</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
@@ -214,6 +225,14 @@ export default function GrievanceDashboard() {
                           options={STATUS_OPTIONS}
                           label="Update Status"
                         />
+                      </td>
+                      <td className="px-4 py-3">
+                        <button
+                          onClick={() => downloadPdf(g)}
+                          className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-[#0b2545] px-2.5 text-xs font-semibold text-white hover:bg-[#0b2545]/90 transition-colors"
+                        >
+                          <Download className="w-3.5 h-3.5" /> PDF
+                        </button>
                       </td>
                     </tr>
                   ))}
@@ -280,6 +299,13 @@ export default function GrievanceDashboard() {
                           ))}
                         </div>
                       </div>
+
+                      <button
+                        onClick={() => downloadPdf(g)}
+                        className="mt-3 w-full h-11 rounded-xl bg-[#0b2545] text-sm font-semibold text-white flex items-center justify-center gap-2 hover:bg-[#0b2545]/90 transition-colors"
+                      >
+                        <Download className="w-4 h-4" /> Download PDF
+                      </button>
                     </div>
                   )}
                 </motion.div>
