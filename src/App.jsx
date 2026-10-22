@@ -14,6 +14,7 @@ import Resources from '@/pages/Resources';
 import About from '@/pages/About';
 import Grievance from '@/pages/Grievance';
 import GrievanceDashboard from '@/pages/GrievanceDashboard';
+import GrievanceDetail from '@/pages/GrievanceDetail';
 import PmeiForm from '@/pages/PmeiForm';
 import CommitteeSignup from '@/pages/CommitteeSignup';
 import PmeiDashboard from '@/pages/PmeiDashboard';
@@ -55,6 +56,7 @@ const AuthenticatedApp = () => {
       </Route>
       <Route element={<AdminRoute />}>
         <Route path="/admin/grievances" element={<GrievanceDashboard />} />
+        <Route path="/admin/grievances/:id" element={<GrievanceDetail />} />
         <Route path="/admin/pmei" element={<PmeiDashboard />} />
         <Route path="/admin/sync" element={<SyncDashboard />} />
         <Route path="/admin/contracts" element={<ContractsDashboard />} />

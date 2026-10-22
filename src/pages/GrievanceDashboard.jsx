@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
-import { ArrowLeft, Shield, ChevronDown, FileText, Inbox, CheckCircle2, Clock, Download } from 'lucide-react';
+import { ArrowLeft, Shield, ChevronDown, FileText, Inbox, CheckCircle2, Clock, Download, Eye } from 'lucide-react';
 import SheetSelect from '@/components/mobile/SheetSelect';
 import { downloadGrievancePdf, fetchSignatureDataUrl } from '@/lib/grievancePdf';
 
@@ -200,7 +200,7 @@ export default function GrievanceDashboard() {
                     <th className="px-4 py-3 font-semibold">Reason</th>
                     <th className="px-4 py-3 font-semibold">Status</th>
                     <th className="px-4 py-3 font-semibold">Update</th>
-                    <th className="px-4 py-3 font-semibold">PDF</th>
+                    <th className="px-4 py-3 font-semibold">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
@@ -227,12 +227,20 @@ export default function GrievanceDashboard() {
                         />
                       </td>
                       <td className="px-4 py-3">
-                        <button
-                          onClick={() => downloadPdf(g)}
-                          className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-[#0b2545] px-2.5 text-xs font-semibold text-white hover:bg-[#0b2545]/90 transition-colors"
-                        >
-                          <Download className="w-3.5 h-3.5" /> PDF
-                        </button>
+                        <div className="flex items-center gap-1.5">
+                          <Link
+                            to={`/admin/grievances/${g.id}`}
+                            className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-[#c8102e] px-2.5 text-xs font-semibold text-white hover:bg-[#c8102e]/90 transition-colors"
+                          >
+                            <Eye className="w-3.5 h-3.5" /> Open
+                          </Link>
+                          <button
+                            onClick={() => downloadPdf(g)}
+                            className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-[#0b2545] px-2.5 text-xs font-semibold text-white hover:bg-[#0b2545]/90 transition-colors"
+                          >
+                            <Download className="w-3.5 h-3.5" /> PDF
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -300,9 +308,16 @@ export default function GrievanceDashboard() {
                         </div>
                       </div>
 
+                      <Link
+                        to={`/admin/grievances/${g.id}`}
+                        className="mt-3 w-full h-11 rounded-xl bg-[#c8102e] text-sm font-semibold text-white flex items-center justify-center gap-2 hover:bg-[#c8102e]/90 transition-colors"
+                      >
+                        <Eye className="w-4 h-4" /> Open Full Grievance
+                      </Link>
+
                       <button
                         onClick={() => downloadPdf(g)}
-                        className="mt-3 w-full h-11 rounded-xl bg-[#0b2545] text-sm font-semibold text-white flex items-center justify-center gap-2 hover:bg-[#0b2545]/90 transition-colors"
+                        className="mt-2 w-full h-11 rounded-xl border border-[#0b2545]/20 text-sm font-semibold text-[#0b2545] flex items-center justify-center gap-2 hover:bg-black/5 transition-colors"
                       >
                         <Download className="w-4 h-4" /> Download PDF
                       </button>
