@@ -116,7 +116,7 @@ export default function GrievanceDashboard() {
             <div>
               <div className="flex items-center gap-2">
                 <Shield className="w-4 h-4 text-[#ff8a9b]" />
-                <h1 className="text-base font-bold">Grievance Dashboard</h1>
+                <h1 className="text-base font-bold">Grievances Submitted Via App</h1>
               </div>
               <p className="text-[11px] text-white/50 mt-0.5">CWA Local 6143 — Admin View</p>
             </div>
@@ -194,9 +194,6 @@ export default function GrievanceDashboard() {
                   <tr className="text-left text-[11px] uppercase tracking-wide text-slate-400">
                     <th className="px-4 py-3 font-semibold">Name</th>
                     <th className="px-4 py-3 font-semibold">Job Title</th>
-                    <th className="px-4 py-3 font-semibold">Year</th>
-                    <th className="px-4 py-3 font-semibold">Grievance #</th>
-                    <th className="px-4 py-3 font-semibold">VP Group</th>
                     <th className="px-4 py-3 font-semibold">Reason</th>
                     <th className="px-4 py-3 font-semibold">Status</th>
                     <th className="px-4 py-3 font-semibold">Update</th>
@@ -210,11 +207,6 @@ export default function GrievanceDashboard() {
                         <p className="font-semibold text-slate-900">{g.name_of_grievant || '—'}</p>
                       </td>
                       <td className="px-4 py-3 text-slate-600">{g.job_title || '—'}</td>
-                      <td className="px-4 py-3 text-slate-600">{g.year ? String(g.year).replace(/,/g, '') : '—'}</td>
-                      <td className="px-4 py-3 text-slate-600">
-                        {g.grievance_number ? String(g.grievance_number) : (g.local_grievance_num || '—')}
-                      </td>
-                      <td className="px-4 py-3 text-slate-600">{g.vp_group || '—'}</td>
                       <td className="px-4 py-3 text-slate-600 max-w-[220px] truncate">{g.reason_for_grievance || g.explain_grievance || '—'}</td>
                       <td className="px-4 py-3"><StatusBadge status={g.status} /></td>
                       <td className="px-4 py-3">
@@ -264,7 +256,7 @@ export default function GrievanceDashboard() {
                     <div className="min-w-0">
                       <p className="font-semibold text-slate-900 truncate">{g.name_of_grievant || '—'}</p>
                       <p className="text-xs text-slate-400 mt-0.5">
-                        {g.grievance_number ? `${String(g.year || '').replace(/,/g, '')}-${g.grievance_number}` : (g.local_grievance_num || 'No #')} · {g.date_of_submission || g.date_of_incident || 'No date'}
+                        {g.date_of_submission || g.date_of_incident || 'No date'}
                       </p>
                     </div>
                     <div className="flex items-center gap-2 flex-shrink-0">
@@ -275,8 +267,6 @@ export default function GrievanceDashboard() {
 
                   {expandedId === g.id && (
                     <div className="px-4 pb-4 space-y-3 border-t border-slate-100 pt-3">
-                      <DetailRow label="Grievance #" value={g.grievance_number ? `${g.year || ''}-${g.grievance_number}` : (g.local_grievance_num || '—')} />
-                      <DetailRow label="VP Group" value={g.vp_group ? String(g.vp_group) : '—'} />
                       <DetailRow label="Reason for Grievance" value={g.reason_for_grievance || g.explain_grievance || '—'} />
                       <DetailRow label="Incident Type" value={Array.isArray(g.incident_type) && g.incident_type.length > 0 ? g.incident_type.join(', ') : '—'} />
                       <DetailRow label="Job Title" value={g.job_title || '—'} />
