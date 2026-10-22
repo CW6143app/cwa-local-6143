@@ -196,8 +196,13 @@ function drawSignatureImage(doc, ctx, signatureDataUrl) {
   if (!signatureDataUrl) return false;
   try {
     const props = doc.getImageProperties(signatureDataUrl);
-    const width = Math.min(ctx.contentW * 0.5, 200);
-    const height = Math.max(1, (props.height / props.width) * width);
+    let width = Math.min(ctx.contentW * 0.5, 200);
+    let height = Math.max(1, (props.height / props.width) * width);
+    // Keep a very tall capture from dominating the page.
+    if (height > 80) {
+      height = 80;
+      width = Math.max(1, (props.width / props.height) * height);
+    }
     ctx.ensure(height + 24);
     const format = (props.fileType || "PNG").toUpperCase();
     doc.addImage(signatureDataUrl, format, ctx.margin, ctx.y, width, height);
