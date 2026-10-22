@@ -113,6 +113,8 @@
 .dark .bg-white\/90 { background-color: hsla(222, 20%, 11%, 0.92); }
 .dark .bg-\[\#f6f5f2\] { background-color: hsl(222 24% 7%); }
 .dark .text-\[\#0b2545\] { color: hsl(220 25% 90%); }
+.dark .text-slate-900 { color: hsl(220 20% 92%); }
+.dark .text-slate-600 { color: hsl(220 12% 76%); }
 .dark .text-slate-500 { color: hsl(220 10% 62%); }
 .dark .text-slate-400 { color: hsl(220 10% 58%); }
 .dark .text-slate-300 { color: hsl(220 10% 72%); }
