@@ -6,11 +6,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Loader2, CheckCircle2, FileText, ArrowLeft } from "lucide-react";
+import { Loader2, CheckCircle2, FileText, ArrowLeft, Download } from "lucide-react";
 import SheetSelect from "@/components/mobile/SheetSelect";
 import AddressAutocomplete from "@/components/mobile/AddressAutocomplete";
 import SignaturePad from "@/components/mobile/SignaturePad";
 import EvidenceUploader from "@/components/mobile/EvidenceUploader";
+import { downloadGrievancePdf, grievancePdfBase64 } from "@/lib/grievancePdf";
 import { useAuth } from "@/lib/AuthContext";
 
 const INCIDENT_TYPES = ["PN", "WR", "DML", "Susp/Term", "Other"];
@@ -82,6 +83,8 @@ export default function Grievance() {
   const [form, setForm] = useState(EMPTY);
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
+  const [saved, setSaved] = useState(null);
+  const [sigDataUrl, setSigDataUrl] = useState("");
   const [error, setError] = useState("");
   const [vpLoading, setVpLoading] = useState(false);
   const sigPadRef = useRef(null);
@@ -173,9 +176,9 @@ export default function Grievance() {
         delete payload.evidence_files;
       }
 
-      const sigDataUrl = sigPadRef.current?.toDataURL();
-      if (sigDataUrl) {
-        const blob = await (await fetch(sigDataUrl)).blob();
+      const signature = sigPadRef.current?.toDataURL();
+      if (signature) {
+        const blob = await (await fetch(signature)).blob();
         const file = new File([blob], "signature.png", { type: "image/png" });
         const { file_url } = await base44.integrations.Core.UploadPublicFile({ file });
         payload.signature_initials = file_url;
@@ -183,9 +186,19 @@ export default function Grievance() {
         payload.signature_initials = "";
       }
 
-      await base44.entities.Grievance.create(payload);
+      const created = await base44.entities.Grievance.create(payload);
+      const record = { ...payload, ...created, signature_initials: payload.signature_initials };
+      setSaved(record);
+      setSigDataUrl(signature || "");
       setDone(true);
-      base44.functions.invoke("notifyGrievance", payload).catch(() => {});
+
+      let pdfBase64 = "";
+      try {
+        pdfBase64 = grievancePdfBase64(record, signature);
+      } catch (err) {
+        pdfBase64 = "";
+      }
+      base44.functions.invoke("notifyGrievance", { ...record, pdf_base64: pdfBase64 || undefined }).catch(() => {});
     } catch (err) {
       setError(err.message || "Could not submit. Please try again.");
     } finally {
@@ -205,8 +218,19 @@ export default function Grievance() {
           <h2 className="mt-4 text-xl font-semibold text-[#0b2545]">Grievance Submitted</h2>
           <p className="mt-2 text-sm text-slate-500 leading-relaxed">
             Your grievance has been filed with Local 6143. A steward will follow up with you.
+            A PDF copy has also been emailed to you{form.email ? ` at ${form.email}` : ""}.
           </p>
-          <Button onClick={() => navigate("/")} className="mt-6 h-11 w-full bg-[#c8102e] text-white hover:bg-[#c8102e]/90">
+          <Button
+            onClick={() => downloadGrievancePdf(saved, sigDataUrl)}
+            className="mt-6 h-11 w-full bg-[#c8102e] text-white hover:bg-[#c8102e]/90">
+            
+            <Download className="mr-2 w-4 h-4" /> Download PDF copy
+          </Button>
+          <Button
+            onClick={() => navigate("/")}
+            variant="outline"
+            className="mt-3 h-11 w-full border-[#0b2545] text-[#0b2545] hover:bg-[#0b2545]/5">
+            
             Back to home
           </Button>
         </motion.div>
