@@ -1,7 +1,7 @@
 import React from "react";
 import { Image } from "@/components/ui/image";
 import { Paperclip } from "lucide-react";
-import { grievanceSections, grievanceNumber } from "@/lib/grievancePdf";
+import { grievanceSections } from "@/lib/grievancePdf";
 
 function Field({ label, value }) {
   const text = value === null || value === undefined || String(value).trim() === "" ? "—" : String(value);
@@ -29,15 +29,18 @@ export default function GrievanceDocument({ grievance }) {
 
   return (
     <div className="overflow-hidden rounded-2xl border border-black/10 bg-white shadow-[0_1px_2px_rgba(11,37,69,0.06),0_12px_32px_-20px_rgba(11,37,69,0.35)] [-webkit-print-color-adjust:exact] [print-color-adjust:exact] print:rounded-none print:border-0 print:shadow-none">
-      <div className="flex items-start justify-between gap-4 bg-[#c8102e] px-6 py-5 text-white">
-        <div>
-          <p className="text-lg font-bold leading-tight">CWA Local 6143</p>
-          <p className="mt-1 text-[11px] font-medium uppercase tracking-[0.24em] text-white/75">Grievance Form</p>
-        </div>
-        <div className="text-right">
-          <p className="text-base font-bold leading-tight">{grievanceNumber(g)}</p>
-          <p className="mt-1 text-[11px] uppercase tracking-[0.18em] text-white/75">Local 6143</p>
-        </div>
+      <div className="bg-[#c8102e] px-6 py-5 text-white">
+        <p className="text-lg font-bold leading-tight">CWA Local 6143</p>
+        <p className="mt-1 text-[11px] font-medium uppercase tracking-[0.24em] text-white/75">Grievance Form</p>
+      </div>
+
+      <div className="grid grid-cols-[22fr_34fr_44fr] border-b border-black/10 bg-[#f6f5f2]">
+        {["Year", "Grievance #", "VP Group"].map((label, i) => (
+          <div key={label} className={`px-4 py-3.5 ${i > 0 ? "border-l border-black/10" : ""}`}>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">{label}</p>
+            <div className="mt-5 h-px w-full bg-black/15" />
+          </div>
+        ))}
       </div>
 
       <div className="px-6 pb-6">

@@ -5,6 +5,7 @@ const RED = [200, 16, 46];
 const MUTED = [113, 113, 122];
 const LINE = [228, 228, 231];
 const RED_TINT = [255, 214, 220];
+const CARD = [246, 245, 242];
 
 const BODY_SIZE = 10.5;
 const LABEL_SIZE = 7.5;
@@ -52,8 +53,6 @@ function grievanceSections(g) {
       fields: [
         ["Name of Grievant", g.name_of_grievant || g.name],
         ["Job Title", g.job_title],
-        ["Grievance Number", grievanceNumber(g)],
-        ["VP Group", g.vp_group ? `VP ${g.vp_group}` : ""],
         ["NCS", g.ncs],
         ["Home Address", address],
         ["Cell #", g.cell],
@@ -90,7 +89,7 @@ function grievanceSections(g) {
   ];
 }
 
-function drawHeader(doc, ctx, g) {
+function drawHeader(doc, ctx) {
   const pageW = ctx.pageW;
   const margin = ctx.margin;
   doc.setFillColor(RED[0], RED[1], RED[2]);
@@ -106,36 +105,60 @@ function drawHeader(doc, ctx, g) {
   doc.setTextColor(RED_TINT[0], RED_TINT[1], RED_TINT[2]);
   doc.text("GRIEVANCE FORM", margin, 64);
 
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(13);
-  doc.setTextColor(255, 255, 255);
-  doc.text(grievanceNumber(g), pageW - margin, 46, { align: "right" });
-
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(9);
-  doc.setTextColor(RED_TINT[0], RED_TINT[1], RED_TINT[2]);
-  doc.text("LOCAL 6143", pageW - margin, 64, { align: "right" });
-
   doc.setDrawColor(LINE[0], LINE[1], LINE[2]);
   doc.setLineWidth(0.6);
-  ctx.y = 128;
+  ctx.y = 114;
+}
+
+// Write-in strip under the header, where the VP assigns the year, number and unit.
+function drawAssignmentTab(doc, ctx) {
+  const cells = [
+    { label: "YEAR", width: 0.22 },
+    { label: "GRIEVANCE #", width: 0.34 },
+    { label: "VP GROUP", width: 0.44 }
+  ];
+  const height = 48;
+  const y0 = ctx.y;
+
+  doc.setFillColor(CARD[0], CARD[1], CARD[2]);
+  doc.setDrawColor(LINE[0], LINE[1], LINE[2]);
+  doc.setLineWidth(0.8);
+  doc.rect(ctx.margin, y0, ctx.contentW, height, "FD");
+
+  let x = ctx.margin;
+  cells.forEach((cell, i) => {
+    const w = ctx.contentW * cell.width;
+    const pad = 12;
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(LABEL_SIZE);
+    doc.setTextColor(MUTED[0], MUTED[1], MUTED[2]);
+    doc.text(cell.label, x + pad, y0 + 17);
+
+    doc.setDrawColor(LINE[0], LINE[1], LINE[2]);
+    doc.setLineWidth(0.6);
+    doc.line(x + pad, y0 + height - 13, x + w - pad, y0 + height - 13);
+
+    x += w;
+    if (i < cells.length - 1) {
+      doc.setLineWidth(0.8);
+      doc.line(x, y0, x, y0 + height);
+    }
+  });
+
+  ctx.y = y0 + height + 24;
 }
 
 // Slim band for pages after the first so the document stays compact.
-function drawContinuationHeader(doc, ctx, g) {
-  const pageW = ctx.pageW;
+function drawContinuationHeader(doc, ctx) {
   const margin = ctx.margin;
   doc.setFillColor(RED[0], RED[1], RED[2]);
-  doc.rect(0, 0, pageW, 46, "F");
+  doc.rect(0, 0, ctx.pageW, 46, "F");
 
   doc.setTextColor(255, 255, 255);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(12);
   doc.text("CWA Local 6143 — Grievance Form", margin, 29);
-
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(11);
-  doc.text(grievanceNumber(g), pageW - margin, 29, { align: "right" });
 
   doc.setDrawColor(LINE[0], LINE[1], LINE[2]);
   doc.setLineWidth(0.6);
@@ -232,11 +255,12 @@ function buildGrievancePdf(grievance, signatureDataUrl) {
   ctx.ensure = (height) => {
     if (ctx.y + height > ctx.bottom) {
       doc.addPage();
-      drawContinuationHeader(doc, ctx, g);
+      drawContinuationHeader(doc, ctx);
     }
   };
 
-  drawHeader(doc, ctx, g);
+  drawHeader(doc, ctx);
+  drawAssignmentTab(doc, ctx);
 
   doc.setFont("helvetica", "normal");
   doc.setFontSize(9.5);
