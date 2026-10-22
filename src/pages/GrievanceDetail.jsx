@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
-import { ArrowLeft, Download, Loader2, Shield } from "lucide-react";
+import { ArrowLeft, Download, Loader2, Printer, Shield } from "lucide-react";
 import GrievanceDocument from "@/components/admin/GrievanceDocument";
 import { downloadGrievancePdf, fetchSignatureDataUrl, grievanceNumber } from "@/lib/grievancePdf";
 
@@ -41,8 +41,8 @@ export default function GrievanceDetail() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <header className="sticky top-0 z-20 bg-[#0b2545] px-5 py-4 text-white shadow-md">
+    <div className="min-h-screen bg-slate-50 print:min-h-0 print:bg-white">
+      <header className="sticky top-0 z-20 bg-[#0b2545] px-5 py-4 text-white shadow-md print:hidden">
         <div className="mx-auto flex max-w-3xl items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-3">
             <Link
@@ -62,17 +62,25 @@ export default function GrievanceDetail() {
             </div>
           </div>
           {grievance && (
-            <button
-              onClick={download}
-              className="flex shrink-0 items-center gap-1.5 rounded-lg bg-[#c8102e] px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-[#c8102e]/90"
-            >
-              <Download className="w-3.5 h-3.5" /> PDF
-            </button>
+            <div className="flex shrink-0 items-center gap-2">
+              <button
+                onClick={() => window.print()}
+                className="flex items-center gap-1.5 rounded-lg bg-white/10 px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-white/20"
+              >
+                <Printer className="w-3.5 h-3.5" /> Print
+              </button>
+              <button
+                onClick={download}
+                className="flex items-center gap-1.5 rounded-lg bg-[#c8102e] px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-[#c8102e]/90"
+              >
+                <Download className="w-3.5 h-3.5" /> PDF
+              </button>
+            </div>
           )}
         </div>
       </header>
 
-      <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6">
+      <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 print:max-w-none print:px-0 print:py-0 print:bg-white">
         {loading && (
           <div className="flex items-center justify-center py-20">
             <Loader2 className="h-8 w-8 animate-spin text-[#c8102e]" />

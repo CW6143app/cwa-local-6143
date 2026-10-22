@@ -28,7 +28,7 @@ export default function GrievanceDocument({ grievance }) {
   const evidence = Array.isArray(g.evidence_files) ? g.evidence_files : [];
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-black/10 bg-white shadow-[0_1px_2px_rgba(11,37,69,0.06),0_12px_32px_-20px_rgba(11,37,69,0.35)]">
+    <div className="overflow-hidden rounded-2xl border border-black/10 bg-white shadow-[0_1px_2px_rgba(11,37,69,0.06),0_12px_32px_-20px_rgba(11,37,69,0.35)] [-webkit-print-color-adjust:exact] [print-color-adjust:exact] print:rounded-none print:border-0 print:shadow-none">
       <div className="flex items-start justify-between gap-4 bg-[#c8102e] px-6 py-5 text-white">
         <div>
           <p className="text-lg font-bold leading-tight">CWA Local 6143</p>
