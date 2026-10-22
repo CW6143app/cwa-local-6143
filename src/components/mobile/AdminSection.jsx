@@ -4,7 +4,7 @@ import { useAuth } from "@/lib/AuthContext";
 import { ShieldCheck, FileText, Lightbulb, Users, RefreshCw, FileStack, ChevronRight } from "lucide-react";
 
 const LINKS = [
-  { to: "/admin/grievances", label: "Grievances", hint: "Submitted grievance forms", icon: FileText },
+  { to: "/admin/grievances", label: "Submitted Grievances", hint: "Submitted grievance forms", icon: FileText },
   { to: "/admin/pmei", label: "PMEI Submissions", hint: "Member ideas and solutions", icon: Lightbulb },
   { to: "/admin/roster", label: "VP Group Roster", hint: "Member roster and CSV tools", icon: Users },
   { to: "/admin/sync", label: "Website Sync", hint: "Pull news, events, meetings", icon: RefreshCw },
