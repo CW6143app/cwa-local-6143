@@ -121,6 +121,27 @@ function drawHeader(doc, ctx, g) {
   ctx.y = 128;
 }
 
+// Slim band for pages after the first so the document stays compact.
+function drawContinuationHeader(doc, ctx, g) {
+  const pageW = ctx.pageW;
+  const margin = ctx.margin;
+  doc.setFillColor(RED[0], RED[1], RED[2]);
+  doc.rect(0, 0, pageW, 46, "F");
+
+  doc.setTextColor(255, 255, 255);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(12);
+  doc.text("CWA Local 6143 — Grievance Form", margin, 29);
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(11);
+  doc.text(grievanceNumber(g), pageW - margin, 29, { align: "right" });
+
+  doc.setDrawColor(LINE[0], LINE[1], LINE[2]);
+  doc.setLineWidth(0.6);
+  ctx.y = 74;
+}
+
 function drawSectionTitle(doc, ctx, title) {
   ctx.ensure(46);
   ctx.y += 6;
@@ -145,22 +166,27 @@ function drawField(doc, ctx, label, value) {
   doc.setFontSize(BODY_SIZE);
   const lines = doc.splitTextToSize(cleanValue(value), contentW);
 
-  const blockH = LABEL_SIZE + 8 + lines.length * LINE_H + 14;
-  ctx.ensure(blockH);
+  // Label plus at least one value line must fit before the block starts.
+  ctx.ensure(46);
 
   doc.setFont("helvetica", "bold");
   doc.setFontSize(LABEL_SIZE);
   doc.setTextColor(MUTED[0], MUTED[1], MUTED[2]);
   doc.text(String(label).toUpperCase(), ctx.margin, ctx.y);
-
   ctx.y += 12;
+
+  // Draw the value one line at a time so a long answer flows onto the next
+  // page instead of running off the bottom or being clipped.
   doc.setFont("helvetica", "normal");
   doc.setFontSize(BODY_SIZE);
   doc.setTextColor(NAVY[0], NAVY[1], NAVY[2]);
   doc.setLineHeightFactor(1.33);
-  doc.text(lines, ctx.margin, ctx.y);
+  lines.forEach((line) => {
+    ctx.ensure(LINE_H + 6);
+    doc.text(line, ctx.margin, ctx.y);
+    ctx.y += LINE_H;
+  });
 
-  ctx.y += (lines.length - 1) * LINE_H + 14;
   doc.setDrawColor(LINE[0], LINE[1], LINE[2]);
   doc.line(ctx.margin, ctx.y, ctx.margin + contentW, ctx.y);
   ctx.y += 13;
@@ -170,7 +196,7 @@ function drawSignatureImage(doc, ctx, signatureDataUrl) {
   if (!signatureDataUrl) return false;
   try {
     const props = doc.getImageProperties(signatureDataUrl);
-    const width = Math.min(ctx.contentW * 0.55, 240);
+    const width = Math.min(ctx.contentW * 0.5, 200);
     const height = Math.max(1, (props.height / props.width) * width);
     ctx.ensure(height + 24);
     const format = (props.fileType || "PNG").toUpperCase();
@@ -201,7 +227,7 @@ function buildGrievancePdf(grievance, signatureDataUrl) {
   ctx.ensure = (height) => {
     if (ctx.y + height > ctx.bottom) {
       doc.addPage();
-      drawHeader(doc, ctx, g);
+      drawContinuationHeader(doc, ctx, g);
     }
   };
 
