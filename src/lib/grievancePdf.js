@@ -123,7 +123,7 @@ function drawHeader(doc, ctx, g) {
 
 function drawSectionTitle(doc, ctx, title) {
   ctx.ensure(46);
-  ctx.y += 8;
+  ctx.y += 6;
   doc.setFont("helvetica", "bold");
   doc.setFontSize(11);
   doc.setTextColor(RED[0], RED[1], RED[2]);
@@ -135,7 +135,7 @@ function drawSectionTitle(doc, ctx, title) {
   doc.line(ctx.margin, ctx.y, ctx.margin + ctx.contentW, ctx.y);
   doc.setLineWidth(0.6);
   doc.setDrawColor(LINE[0], LINE[1], LINE[2]);
-  ctx.y += 18;
+  ctx.y += 15;
 }
 
 function drawField(doc, ctx, label, value) {
@@ -153,7 +153,7 @@ function drawField(doc, ctx, label, value) {
   doc.setTextColor(MUTED[0], MUTED[1], MUTED[2]);
   doc.text(String(label).toUpperCase(), ctx.margin, ctx.y);
 
-  ctx.y += 13;
+  ctx.y += 12;
   doc.setFont("helvetica", "normal");
   doc.setFontSize(BODY_SIZE);
   doc.setTextColor(NAVY[0], NAVY[1], NAVY[2]);
@@ -163,7 +163,7 @@ function drawField(doc, ctx, label, value) {
   ctx.y += (lines.length - 1) * LINE_H + 14;
   doc.setDrawColor(LINE[0], LINE[1], LINE[2]);
   doc.line(ctx.margin, ctx.y, ctx.margin + contentW, ctx.y);
-  ctx.y += 16;
+  ctx.y += 13;
 }
 
 function drawSignatureImage(doc, ctx, signatureDataUrl) {
@@ -216,7 +216,7 @@ function buildGrievancePdf(grievance, signatureDataUrl) {
   );
   doc.setLineHeightFactor(1.33);
   doc.text(intro, margin, ctx.y);
-  ctx.y += intro.length * LINE_H + 10;
+  ctx.y += intro.length * LINE_H + 6;
 
   grievanceSections(g).forEach((section) => {
     drawSectionTitle(doc, ctx, section.title);
@@ -228,14 +228,14 @@ function buildGrievancePdf(grievance, signatureDataUrl) {
         doc.setFontSize(BODY_SIZE);
         doc.setTextColor(MUTED[0], MUTED[1], MUTED[2]);
         doc.text("No signature provided", margin, ctx.y);
-        ctx.y += 20;
+        ctx.y += 18;
         doc.setDrawColor(LINE[0], LINE[1], LINE[2]);
         doc.line(margin, ctx.y, margin + ctx.contentW, ctx.y);
-        ctx.y += 16;
+        ctx.y += 12;
       }
       doc.setDrawColor(LINE[0], LINE[1], LINE[2]);
       doc.line(margin, ctx.y, margin + ctx.contentW, ctx.y);
-      ctx.y += 16;
+      ctx.y += 13;
     }
     section.fields.forEach(([label, value]) => drawField(doc, ctx, label, value));
   });
