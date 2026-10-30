@@ -9,6 +9,7 @@ export default function SaleSettings({ sale, onSaved }) {
   const [form, setForm] = useState({
     title: sale?.title || "",
     description: sale?.description || "",
+    delivery_notice: sale?.delivery_notice || "",
     pickup_info: sale?.pickup_info || "",
     zelle_info: sale?.zelle_info || "",
     active: !!sale?.active,
@@ -29,6 +30,7 @@ export default function SaleSettings({ sale, onSaved }) {
     const payload = {
       title: form.title.trim() || "Pre-Order",
       description: form.description,
+      delivery_notice: form.delivery_notice.trim(),
       pickup_info: form.pickup_info,
       zelle_info: form.zelle_info.trim(),
       active: form.active,
@@ -81,6 +83,17 @@ export default function SaleSettings({ sale, onSaved }) {
       <div className="space-y-1">
         <Label className="text-xs font-medium text-[#0b2545]">Description</Label>
         <Textarea value={form.description} onChange={set("description")} rows={2} className="resize-none" />
+      </div>
+      <div className="space-y-1">
+        <Label className="text-xs font-medium text-[#0b2545]">Delivery notice</Label>
+        <Textarea
+          value={form.delivery_notice}
+          onChange={set("delivery_notice")}
+          rows={2}
+          placeholder="Deliveries are for Call Center and Technician Garages."
+          className="resize-none"
+        />
+        <p className="text-[11px] text-slate-500">Shown in large bold text at the top of the pre-order page.</p>
       </div>
       <div className="space-y-1">
         <Label className="text-xs font-medium text-[#0b2545]">Pickup / payment note</Label>

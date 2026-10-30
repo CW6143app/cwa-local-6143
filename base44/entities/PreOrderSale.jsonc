@@ -10,6 +10,10 @@
       "type": "string",
       "title": "Description"
     },
+    "delivery_notice": {
+      "type": "string",
+      "title": "Delivery Notice (shown big and bold)"
+    },
     "pickup_info": {
       "type": "string",
       "title": "Pickup / Payment Info"

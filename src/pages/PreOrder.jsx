@@ -212,6 +212,11 @@ export default function PreOrder() {
         {sale.description && (
           <p className="mt-2 text-sm text-white/80 leading-relaxed">{sale.description}</p>
         )}
+        {sale.delivery_notice && (
+          <p className="mt-3 rounded-xl bg-white/15 px-4 py-3 text-base font-bold leading-snug text-white">
+            {sale.delivery_notice}
+          </p>
+        )}
       </div>
 
       <form onSubmit={submit} className="px-5 pt-6 space-y-5">
