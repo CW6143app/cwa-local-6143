@@ -2,9 +2,9 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
-import { ArrowLeft, Shield, ChevronDown, FileText, Inbox, CheckCircle2, Clock, Download, Eye } from 'lucide-react';
+import { ArrowLeft, Shield, ChevronDown, FileText, Inbox, CheckCircle2, Clock, Download, Eye, Printer } from 'lucide-react';
 import SheetSelect from '@/components/mobile/SheetSelect';
-import { downloadGrievancePdf, fetchSignatureDataUrl } from '@/lib/grievancePdf';
+import { downloadGrievancePdf, printGrievancePdf, fetchSignatureDataUrl } from '@/lib/grievancePdf';
 
 const STATUS_OPTIONS = [
   { value: 'open', label: 'Open', color: 'bg-slate-100 text-slate-700', dot: 'bg-slate-500' },
@@ -86,6 +86,15 @@ export default function GrievanceDashboard() {
     try {
       const signature = await fetchSignatureDataUrl(g.signature_initials);
       downloadGrievancePdf(g, signature);
+    } catch (err) {
+      alert('Could not create the PDF. Please try again.');
+    }
+  };
+
+  const printPdf = async (g) => {
+    try {
+      const signature = await fetchSignatureDataUrl(g.signature_initials);
+      printGrievancePdf(g, signature);
     } catch (err) {
       alert('Could not create the PDF. Please try again.');
     }
@@ -232,6 +241,12 @@ export default function GrievanceDashboard() {
                           >
                             <Download className="w-3.5 h-3.5" /> PDF
                           </button>
+                          <button
+                            onClick={() => printPdf(g)}
+                            className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-[#0b2545]/20 px-2.5 text-xs font-semibold text-[#0b2545] hover:bg-black/5 transition-colors"
+                          >
+                            <Printer className="w-3.5 h-3.5" /> Print
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -310,6 +325,13 @@ export default function GrievanceDashboard() {
                         className="mt-2 w-full h-11 rounded-xl border border-[#0b2545]/20 text-sm font-semibold text-[#0b2545] flex items-center justify-center gap-2 hover:bg-black/5 transition-colors"
                       >
                         <Download className="w-4 h-4" /> Download PDF
+                      </button>
+
+                      <button
+                        onClick={() => printPdf(g)}
+                        className="mt-2 w-full h-11 rounded-xl border border-[#0b2545]/20 text-sm font-semibold text-[#0b2545] flex items-center justify-center gap-2 hover:bg-black/5 transition-colors"
+                      >
+                        <Printer className="w-4 h-4" /> Print Grievance
                       </button>
                     </div>
                   )}

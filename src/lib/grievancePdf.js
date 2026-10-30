@@ -319,6 +319,35 @@ function downloadGrievancePdf(g, signatureDataUrl) {
   buildGrievancePdf(g, signatureDataUrl).save(pdfFileName(g));
 }
 
+// Prints the generated PDF itself (through the browser's PDF print dialog)
+// without leaving the page. Falls back to opening the file if printing is
+// not allowed by the browser.
+function printGrievancePdf(g, signatureDataUrl) {
+  const blob = buildGrievancePdf(g, signatureDataUrl).output("blob");
+  const url = URL.createObjectURL(blob);
+  const frame = document.createElement("iframe");
+  frame.style.position = "fixed";
+  frame.style.right = "0";
+  frame.style.bottom = "0";
+  frame.style.width = "0";
+  frame.style.height = "0";
+  frame.style.border = "0";
+  frame.style.opacity = "0";
+  frame.src = url;
+  frame.onload = () => {
+    try {
+      frame.contentWindow.focus();
+      frame.contentWindow.print();
+    } catch (err) {
+      window.open(url, "_blank");
+    }
+  };
+  document.body.appendChild(frame);
+  setTimeout(() => {
+    if (frame.parentNode) frame.parentNode.removeChild(frame);
+  }, 60000);
+}
+
 function grievancePdfBase64(g, signatureDataUrl) {
   const dataUri = buildGrievancePdf(g, signatureDataUrl).output("datauristring");
   return dataUri.split(",")[1] || "";
@@ -350,6 +379,7 @@ export {
   submittedStamp,
   buildGrievancePdf,
   downloadGrievancePdf,
+  printGrievancePdf,
   grievancePdfBase64,
   fetchSignatureDataUrl
 };
