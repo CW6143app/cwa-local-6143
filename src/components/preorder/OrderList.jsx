@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, FileDown } from "lucide-react";
 import SheetSelect from "@/components/mobile/SheetSelect";
+import { downloadPreOrderPdf } from "@/lib/preOrderPdf";
 
 export const ORDER_STATUS = [
   { value: "submitted", label: "Submitted", color: "bg-blue-100 text-blue-700", dot: "bg-blue-500" },
@@ -27,6 +28,20 @@ const itemsSummary = (order) =>
   (order.items || [])
     .map((i) => `${i.quantity}× ${i.name}${i.size ? ` (${i.size})` : ""}`)
     .join(", ") || "—";
+
+function PdfButton({ orderId, full }) {
+  return (
+    <button
+      type="button"
+      onClick={() => downloadPreOrderPdf(orderId)}
+      className={`inline-flex items-center justify-center gap-1.5 rounded-full bg-black/5 px-3 py-1.5 text-xs font-semibold text-[#0b2545] transition-colors hover:bg-black/10 ${
+        full ? "w-full" : ""
+      }`}
+    >
+      <FileDown className="w-3.5 h-3.5" /> PDF
+    </button>
+  );
+}
 
 function PaidToggle({ paid, disabled, onToggle }) {
   return (
@@ -56,6 +71,7 @@ export default function OrderList({ orders, updatingId, onStatusChange, onPaidTo
               <th className="px-4 py-3 font-semibold">Items</th>
               <th className="px-4 py-3 font-semibold">Total</th>
               <th className="px-4 py-3 font-semibold">Paid</th>
+              <th className="px-4 py-3 font-semibold">Ticket</th>
               <th className="px-4 py-3 font-semibold">Status</th>
               <th className="px-4 py-3 font-semibold">Update</th>
             </tr>
@@ -75,6 +91,9 @@ export default function OrderList({ orders, updatingId, onStatusChange, onPaidTo
                     disabled={updatingId === order.id}
                     onToggle={() => onPaidToggle(order)}
                   />
+                </td>
+                <td className="px-4 py-3">
+                  <PdfButton orderId={order.id} />
                 </td>
                 <td className="px-4 py-3">
                   <StatusBadge status={order.status} />
@@ -146,6 +165,7 @@ export default function OrderList({ orders, updatingId, onStatusChange, onPaidTo
                     {order.created_date ? new Date(order.created_date).toLocaleString() : "—"}
                   </p>
                 </div>
+                <PdfButton orderId={order.id} full />
                 <div className="flex items-center justify-between pt-1">
                   <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Paid</span>
                   <PaidToggle

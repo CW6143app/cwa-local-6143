@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { CheckCircle2, Loader2, ShoppingBag } from "lucide-react";
+import { CheckCircle2, Download, Loader2, ShoppingBag } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import { downloadPreOrderPdf } from "@/lib/preOrderPdf";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -79,6 +80,7 @@ export default function PreOrder() {
         paid: false,
         status: "submitted",
       });
+      base44.functions.invoke("notifyPreOrder", { orderId: created.id }).catch(() => {});
       setPlaced({ ...created, items: lines, total });
     } catch (err) {
       setError("Could not submit your pre-order. Please try again.");
@@ -127,6 +129,13 @@ export default function PreOrder() {
           <div className="mt-4 text-left">
             <ZelleNote zelleInfo={sale?.zelle_info} amount={placed.total} />
           </div>
+          <button
+            type="button"
+            onClick={() => downloadPreOrderPdf(placed.id)}
+            className="mt-5 flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-[#0b2545]/15 text-sm font-semibold text-[#0b2545] transition-colors hover:bg-black/5"
+          >
+            <Download className="w-4 h-4" /> Download / Print Ticket
+          </button>
         </motion.div>
       </div>
     );
