@@ -2,9 +2,9 @@
   "name": "Grievance",
   "type": "object",
   "properties": {
-    "grievance_number": {
-      "type": "number",
-      "title": "Grievance #"
+    "name_of_grievant": {
+      "type": "string",
+      "title": "Name of Grievant"
     },
     "year": {
       "type": "string",
@@ -13,10 +13,6 @@
     "vp_group": {
       "type": "number",
       "title": "VP Group"
-    },
-    "name_of_grievant": {
-      "type": "string",
-      "title": "Name of Grievant"
     },
     "job_title": {
       "type": "string",

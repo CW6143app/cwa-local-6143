@@ -17,11 +17,11 @@ function cleanValue(value) {
   return text.length ? text : "—";
 }
 
-function grievanceNumber(g) {
-  const year = g.year ? String(g.year).replace(/,/g, "") : "";
-  const num = g.grievance_number === 0 || g.grievance_number ? String(g.grievance_number) : "";
-  if (num) return year ? `${year}-${num}` : num;
-  return g.local_grievance_num ? String(g.local_grievance_num) : "—";
+// A grievance is identified by the grievant's name.
+function grievanceName(g) {
+  const raw = g.name_of_grievant || g.name;
+  const text = raw === null || raw === undefined ? "" : String(raw).trim();
+  return text.length ? text : "Grievance";
 }
 
 function recordsPermission(g) {
@@ -306,13 +306,12 @@ function buildGrievancePdf(grievance, signatureDataUrl) {
   }
 
   doc.setPage(1);
-  doc.setProperties({ title: `Grievance ${grievanceNumber(g)}` });
+  doc.setProperties({ title: `Grievance - ${grievanceName(g)}` });
   return doc;
 }
 
 function pdfFileName(g) {
-  const raw = grievanceNumber(g) === "—" ? "grievance" : grievanceNumber(g);
-  return `Grievance_${String(raw).replace(/[^A-Za-z0-9._-]/g, "")}.pdf`;
+  return `Grievance_${grievanceName(g).replace(/[^A-Za-z0-9._-]+/g, "_")}.pdf`;
 }
 
 function downloadGrievancePdf(g, signatureDataUrl) {
@@ -374,7 +373,7 @@ async function fetchSignatureDataUrl(url) {
 
 export {
   grievanceSections,
-  grievanceNumber,
+  grievanceName,
   recordsPermission,
   submittedStamp,
   buildGrievancePdf,

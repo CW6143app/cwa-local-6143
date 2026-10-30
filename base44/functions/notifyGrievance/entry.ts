@@ -9,10 +9,10 @@ function cleanValue(value) {
   return text.length ? text : "—";
 }
 
-function grievanceNumber(b) {
-  const year = b.year ? String(b.year).replace(/,/g, "") : "";
-  if (b.grievance_number) return year ? `${year}-${b.grievance_number}` : String(b.grievance_number);
-  return b.local_grievance_num ? String(b.local_grievance_num) : "—";
+function grievanceName(b) {
+  const raw = b.name_of_grievant || b.name || "";
+  const text = String(raw).trim();
+  return text.length ? text : "Grievance";
 }
 
 function recordsPermission(b) {
@@ -45,7 +45,6 @@ function sections(b) {
       fields: [
         ["Name of Grievant", b.name_of_grievant || b.name],
         ["Job Title", b.job_title],
-        ["Grievance Number", grievanceNumber(b)],
         ["VP Group", b.vp_group ? `VP ${b.vp_group}` : ""],
         ["NCS", b.ncs],
         ["Home Address", address],
@@ -134,7 +133,7 @@ function documentHtml(b, intro, tag) {
                 <p style="margin:3px 0 0;color:#ffd6dc;font-size:10px;font-weight:bold;text-transform:uppercase;letter-spacing:2px;">Grievance Form</p>
               </td>
               <td align="right" style="vertical-align:middle;">
-                <p style="margin:0;color:#ffffff;font-size:15px;font-weight:bold;">${escapeHtml(grievanceNumber(b))}</p>
+                <p style="margin:0;color:#ffffff;font-size:15px;font-weight:bold;">${escapeHtml(grievanceName(b))}</p>
                 <p style="margin:3px 0 0;color:#ffd6dc;font-size:10px;font-weight:bold;text-transform:uppercase;letter-spacing:2px;">${escapeHtml(tag)}</p>
               </td>
             </tr>
@@ -186,17 +185,16 @@ export default async function (req: Request): Promise<Response> {
     const pdfBase64 = typeof b.pdf_base64 === "string" ? b.pdf_base64 : "";
     if (pdfBase64.startsWith("JVBER") && pdfBase64.length < MAX_PDF_BASE64) {
       attachments.push({
-        filename: `Grievance_${grievanceNumber(b).replace(/[^A-Za-z0-9._-]/g, "")}.pdf`,
+        filename: `Grievance_${grievanceName(b).replace(/[^A-Za-z0-9._-]+/g, "_")}.pdf`,
         content: pdfBase64,
       });
     }
 
-    const gNumber = grievanceNumber(b);
     const subject = `Grievance Filed: ${name}`;
 
     const notifyHtml = documentHtml(
       b,
-      `A member has submitted a new grievance. Below is the complete grievance record, numbered <strong>${escapeHtml(gNumber)}</strong>.`,
+      `A member has submitted a new grievance. Below is the complete grievance record for <strong>${escapeHtml(name)}</strong>.`,
       "New Grievance Filed"
     );
 
@@ -212,7 +210,7 @@ export default async function (req: Request): Promise<Response> {
         reply_to: email,
         subject,
         html: notifyHtml,
-        text: documentText(b, `A member has submitted a new grievance (${gNumber}).`),
+        text: documentText(b, `A member has submitted a new grievance (${name}).`),
         attachments,
       }),
       sendEmail(apiKey, {

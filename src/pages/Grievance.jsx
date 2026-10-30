@@ -17,7 +17,6 @@ import { useAuth } from "@/lib/AuthContext";
 const INCIDENT_TYPES = ["PN", "WR", "DML", "Susp/Term", "Other"];
 
 const EMPTY = {
-  grievance_number: null,
   year: String(new Date().getFullYear()),
   vp_group: "",
   reason_for_grievance: "",
@@ -99,19 +98,6 @@ export default function Grievance() {
       }));
     }
   }, [user]);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const existing = await base44.entities.Grievance.list("-grievance_number", 200);
-        const nums = (existing || []).map((g) => Number(g.grievance_number)).filter((n) => !Number.isNaN(n));
-        const nextNum = nums.length ? Math.max(...nums) + 1 : 1;
-        setForm((f) => ({ ...f, grievance_number: nextNum, year: String(new Date().getFullYear()) }));
-      } catch (err) {
-        setForm((f) => ({ ...f, grievance_number: 1, year: String(new Date().getFullYear()) }));
-      }
-    })();
-  }, []);
 
   useEffect(() => {
     if (!form.job_title || !form.department) {

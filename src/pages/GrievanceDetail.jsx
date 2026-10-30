@@ -3,7 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { ArrowLeft, Download, Loader2, Printer, Shield } from "lucide-react";
 import GrievanceDocument from "@/components/admin/GrievanceDocument";
-import { downloadGrievancePdf, fetchSignatureDataUrl, grievanceNumber } from "@/lib/grievancePdf";
+import { downloadGrievancePdf, fetchSignatureDataUrl, grievanceName } from "@/lib/grievancePdf";
 
 export default function GrievanceDetail() {
   const { id } = useParams();
@@ -55,7 +55,7 @@ export default function GrievanceDetail() {
               <div className="flex items-center gap-2">
                 <Shield className="w-4 h-4 shrink-0 text-[#ff8a9b]" />
                 <h1 className="truncate text-base font-bold">
-                  {grievance ? `Grievance ${grievanceNumber(grievance)}` : "Grievance"}
+                  {grievance ? `Grievance — ${grievanceName(grievance)}` : "Grievance"}
                 </h1>
               </div>
               <p className="mt-0.5 text-[11px] text-white/50">CWA Local 6143 — Admin View</p>
