@@ -1,18 +1,40 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useLocation, useOutlet } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { Home, CalendarDays, BookOpen, Info } from "lucide-react";
+import { Home, CalendarDays, BookOpen, Info, ShoppingBag } from "lucide-react";
+import { base44 } from "@/api/base44Client";
 
-const TABS = [
+const BASE_TABS = [
   { to: "/", label: "Home", icon: Home },
   { to: "/events", label: "Events", icon: CalendarDays },
   { to: "/resources", label: "Resources", icon: BookOpen },
   { to: "/about", label: "About", icon: Info },
 ];
 
+const PREORDER_TAB = { to: "/preorder", label: "Order", icon: ShoppingBag };
+
 export default function Shell() {
   const { pathname } = useLocation();
   const outlet = useOutlet();
+  const [preorderOpen, setPreorderOpen] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    base44.entities.PreOrderSale
+      .filter({ active: true }, { limit: 1 })
+      .then((page) => {
+        if (!cancelled) setPreorderOpen((page?.items || []).length > 0);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [pathname]);
+
+  const tabs = preorderOpen
+    ? [BASE_TABS[0], BASE_TABS[1], PREORDER_TAB, BASE_TABS[2], BASE_TABS[3]]
+    : BASE_TABS;
+
   return (
     <div className="min-h-screen bg-[#f6f5f2] flex justify-center">
       <div className="w-full max-w-[480px] bg-[#f6f5f2] pb-24 shadow-sm relative dark:bg-[#0a1420] no-scrollbar" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
@@ -28,8 +50,8 @@ export default function Shell() {
           </motion.div>
         </AnimatePresence>
         <nav className="fixed bottom-0 w-full max-w-[480px] border-t border-black/10 bg-white/90 backdrop-blur-xl dark:border-white/10 dark:bg-[#0a1420]/90" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
-          <div className="grid grid-cols-4">
-            {TABS.map(({ to, label, icon: Icon }) => {
+          <div className={preorderOpen ? "grid grid-cols-5" : "grid grid-cols-4"}>
+            {tabs.map(({ to, label, icon: Icon }) => {
               const active = pathname === to;
               return (
                 <Link

@@ -22,6 +22,8 @@ import SyncDashboard from '@/pages/SyncDashboard';
 import Contracts from '@/pages/Contracts';
 import ContractsDashboard from '@/pages/ContractsDashboard';
 import RosterByJobTitle from '@/pages/RosterByJobTitle';
+import PreOrder from '@/pages/PreOrder';
+import PreOrdersDashboard from '@/pages/PreOrdersDashboard';
 import AdminRoute from '@/components/AdminRoute';
 
 const AuthenticatedApp = () => {
@@ -53,6 +55,7 @@ const AuthenticatedApp = () => {
         <Route path="/pmei" element={<PmeiForm />} />
         <Route path="/committee-signup" element={<CommitteeSignup />} />
         <Route path="/contracts" element={<Contracts />} />
+        <Route path="/preorder" element={<PreOrder />} />
       </Route>
       <Route element={<AdminRoute />}>
         <Route path="/admin/grievances" element={<GrievanceDashboard />} />
@@ -61,6 +64,7 @@ const AuthenticatedApp = () => {
         <Route path="/admin/sync" element={<SyncDashboard />} />
         <Route path="/admin/contracts" element={<ContractsDashboard />} />
         <Route path="/admin/roster" element={<RosterByJobTitle />} />
+        <Route path="/admin/preorders" element={<PreOrdersDashboard />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>

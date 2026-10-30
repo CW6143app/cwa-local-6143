@@ -1,0 +1,97 @@
+{
+  "name": "PreOrder",
+  "type": "object",
+  "properties": {
+    "sale_id": {
+      "type": "string",
+      "title": "Sale ID"
+    },
+    "sale_title": {
+      "type": "string",
+      "title": "Sale"
+    },
+    "buyer_name": {
+      "type": "string",
+      "title": "Name"
+    },
+    "email": {
+      "type": "string",
+      "format": "email",
+      "title": "Email"
+    },
+    "phone": {
+      "type": "string",
+      "title": "Phone"
+    },
+    "items": {
+      "type": "array",
+      "title": "Order Items",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "size": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "number"
+          },
+          "unit_price": {
+            "type": "number"
+          },
+          "line_total": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "total": {
+      "type": "number",
+      "title": "Total"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Notes"
+    },
+    "paid": {
+      "type": "boolean",
+      "title": "Paid",
+      "default": false
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "submitted",
+        "ready",
+        "picked_up",
+        "cancelled"
+      ],
+      "default": "submitted",
+      "title": "Status"
+    }
+  },
+  "required": [
+    "buyer_name",
+    "email"
+  ],
+  "rls": {
+    "create": null,
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

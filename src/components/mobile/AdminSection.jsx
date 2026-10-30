@@ -1,11 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/lib/AuthContext";
-import { ShieldCheck, FileText, Lightbulb, Users, RefreshCw, FileStack, ChevronRight } from "lucide-react";
+import { ShieldCheck, FileText, Lightbulb, Users, RefreshCw, FileStack, ChevronRight, ShoppingBag } from "lucide-react";
 
 const LINKS = [
   { to: "/admin/grievances", label: "Submitted Grievances", hint: "Submitted grievance forms", icon: FileText },
   { to: "/admin/pmei", label: "PMEI Submissions", hint: "Member ideas and solutions", icon: Lightbulb },
+  { to: "/admin/preorders", label: "Pre-Orders", hint: "Open a sale and see orders", icon: ShoppingBag },
   { to: "/admin/roster", label: "VP Group Roster", hint: "Member roster and CSV tools", icon: Users },
   { to: "/admin/sync", label: "Website Sync", hint: "Pull news, events, meetings", icon: RefreshCw },
   { to: "/admin/contracts", label: "Contracts", hint: "Published contract files", icon: FileStack },

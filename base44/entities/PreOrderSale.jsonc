@@ -1,0 +1,65 @@
+{
+  "name": "PreOrderSale",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "title": "Sale Title"
+    },
+    "description": {
+      "type": "string",
+      "title": "Description"
+    },
+    "pickup_info": {
+      "type": "string",
+      "title": "Pickup / Payment Info"
+    },
+    "active": {
+      "type": "boolean",
+      "title": "Pre-Order Open",
+      "default": false
+    },
+    "items": {
+      "type": "array",
+      "title": "Items",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number"
+          },
+          "sizes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "title"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": null,
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
