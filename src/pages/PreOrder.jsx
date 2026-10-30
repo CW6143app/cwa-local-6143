@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import OrderItems from "@/components/preorder/OrderItems";
+import ZelleNote from "@/components/preorder/ZelleNote";
 
 const money = (n) => `$${Number(n || 0).toFixed(2)}`;
 
@@ -123,6 +124,9 @@ export default function PreOrder() {
               <span>{money(placed.total)}</span>
             </div>
           </div>
+          <div className="mt-4 text-left">
+            <ZelleNote zelleInfo={sale?.zelle_info} amount={placed.total} />
+          </div>
         </motion.div>
       </div>
     );
@@ -204,6 +208,8 @@ export default function PreOrder() {
             />
           </div>
         </div>
+
+        {sale.zelle_info && <ZelleNote zelleInfo={sale.zelle_info} amount={total} />}
 
         <div className="rounded-2xl bg-white p-5 flex items-center justify-between shadow-[0_1px_2px_rgba(11,37,69,0.06),0_8px_24px_-12px_rgba(11,37,69,0.2)]">
           <span className="text-sm font-semibold text-[#0b2545]">Total</span>

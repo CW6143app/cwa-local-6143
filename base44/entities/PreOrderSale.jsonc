@@ -14,6 +14,10 @@
       "type": "string",
       "title": "Pickup / Payment Info"
     },
+    "zelle_info": {
+      "type": "string",
+      "title": "Zelle Email or Phone"
+    },
     "active": {
       "type": "boolean",
       "title": "Pre-Order Open",

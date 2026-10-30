@@ -10,6 +10,7 @@ export default function SaleSettings({ sale, onSaved }) {
     title: sale?.title || "",
     description: sale?.description || "",
     pickup_info: sale?.pickup_info || "",
+    zelle_info: sale?.zelle_info || "",
     active: !!sale?.active,
     items: (sale?.items || []).map((i) => ({
       name: i.name || "",
@@ -29,6 +30,7 @@ export default function SaleSettings({ sale, onSaved }) {
       title: form.title.trim() || "Pre-Order",
       description: form.description,
       pickup_info: form.pickup_info,
+      zelle_info: form.zelle_info.trim(),
       active: form.active,
       items: form.items
         .filter((i) => i.name.trim())
@@ -88,6 +90,16 @@ export default function SaleSettings({ sale, onSaved }) {
           rows={2}
           placeholder="Pick up at the union hall on Nov 14, 11am–2pm."
           className="resize-none"
+        />
+      </div>
+
+      <div className="space-y-1">
+        <Label className="text-xs font-medium text-[#0b2545]">Zelle email or phone</Label>
+        <Input
+          value={form.zelle_info}
+          onChange={set("zelle_info")}
+          placeholder="treasurer@cwa6143.org"
+          className="h-9"
         />
       </div>
 
