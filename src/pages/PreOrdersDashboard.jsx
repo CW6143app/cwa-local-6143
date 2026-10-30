@@ -65,7 +65,22 @@ export default function PreOrdersDashboard() {
   };
 
   const exportCsv = () => {
-    const rows = [["Date", "Name", "Email", "Phone", "Items", "Total", "Paid", "Status"]];
+    const rows = [
+      [
+        "Date",
+        "Name",
+        "Email",
+        "Phone",
+        "Pick-Up or Delivery",
+        "Time Needed",
+        "Delivery Address",
+        "Where to Leave Food",
+        "Items",
+        "Total",
+        "Paid",
+        "Status",
+      ],
+    ];
     orders.forEach((o) => {
       const items = (o.items || [])
         .map((i) => `${i.quantity}x ${i.name}${i.size ? ` (${i.size})` : ""}`)
@@ -75,6 +90,10 @@ export default function PreOrdersDashboard() {
         o.buyer_name || "",
         o.email || "",
         o.phone || "",
+        o.fulfillment === "delivery" ? "Delivery" : "Pick-up",
+        o.pickup_time || "",
+        o.delivery_address || "",
+        o.delivery_instructions || "",
         items,
         Number(o.total || 0).toFixed(2),
         o.paid ? "Yes" : "No",

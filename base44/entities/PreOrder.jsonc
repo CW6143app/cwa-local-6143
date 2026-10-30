@@ -23,9 +23,26 @@
       "type": "string",
       "title": "Phone"
     },
+    "fulfillment": {
+      "type": "string",
+      "enum": [
+        "pickup",
+        "delivery"
+      ],
+      "default": "pickup",
+      "title": "Pick-Up or Delivery"
+    },
     "pickup_time": {
       "type": "string",
-      "title": "Pick-Up Time"
+      "title": "Time Needed"
+    },
+    "delivery_address": {
+      "type": "string",
+      "title": "Delivery Address"
+    },
+    "delivery_instructions": {
+      "type": "string",
+      "title": "Where to Leave the Food"
     },
     "items": {
       "type": "array",

@@ -8,6 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import OrderItems from "@/components/preorder/OrderItems";
+import FulfillmentToggle from "@/components/preorder/FulfillmentToggle";
+import DeliveryFields from "@/components/preorder/DeliveryFields";
 import PickupTime from "@/components/preorder/PickupTime";
 import ZelleNote from "@/components/preorder/ZelleNote";
 
@@ -27,6 +29,9 @@ export default function PreOrder() {
   const [selections, setSelections] = useState({});
   const [buyer, setBuyer] = useState({ name: "", email: "", phone: "", notes: "" });
   const [pickupTime, setPickupTime] = useState("");
+  const [fulfillment, setFulfillment] = useState("pickup");
+  const [address, setAddress] = useState("");
+  const [instructions, setInstructions] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [placed, setPlaced] = useState(null);
@@ -77,7 +82,15 @@ export default function PreOrder() {
       return;
     }
     if (!pickupTime) {
-      setError("Please choose the time you need your food by.");
+      setError(
+        fulfillment === "delivery"
+          ? "Please choose the time you need the food delivered."
+          : "Please choose the time you need your food by."
+      );
+      return;
+    }
+    if (fulfillment === "delivery" && !address.trim()) {
+      setError("Please enter the address where the food should be delivered.");
       return;
     }
     setSubmitting(true);
@@ -88,7 +101,10 @@ export default function PreOrder() {
         buyer_name: buyer.name.trim(),
         email: buyer.email.trim(),
         phone: buyer.phone.trim(),
+        fulfillment,
         pickup_time: pickupTime,
+        delivery_address: fulfillment === "delivery" ? address.trim() : "",
+        delivery_instructions: fulfillment === "delivery" ? instructions.trim() : "",
         notes: buyer.notes.trim(),
         items: lines.map(({ needsSize, ...line }) => line),
         total,
@@ -141,9 +157,25 @@ export default function PreOrder() {
               <span>{money(placed.total)}</span>
             </div>
             <div className="flex items-center justify-between pt-1 text-sm text-[#0b2545]">
-              <span className="text-slate-500">Pick-up time</span>
+              <span className="text-slate-500">{placed.fulfillment === "delivery" ? "Delivery time" : "Pick-up time"}</span>
               <span className="font-semibold">{prettyTime(placed.pickup_time)}</span>
             </div>
+            {placed.fulfillment === "delivery" && (placed.delivery_address || placed.delivery_instructions) && (
+              <div className="space-y-1 border-t border-black/10 pt-2 text-sm text-[#0b2545]">
+                {placed.delivery_address && (
+                  <div>
+                    <span className="text-slate-500">Delivering to</span>
+                    <p className="font-semibold">{placed.delivery_address}</p>
+                  </div>
+                )}
+                {placed.delivery_instructions && (
+                  <div>
+                    <span className="text-slate-500">Where to leave it</span>
+                    <p className="font-semibold">{placed.delivery_instructions}</p>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
           <div className="mt-4 text-left">
             <ZelleNote zelleInfo={sale?.zelle_info} amount={placed.total} />
@@ -184,13 +216,22 @@ export default function PreOrder() {
 
       <form onSubmit={submit} className="px-5 pt-6 space-y-5">
         <div className="rounded-2xl bg-white p-5 space-y-3 shadow-[0_1px_2px_rgba(11,37,69,0.06),0_8px_24px_-12px_rgba(11,37,69,0.2)]">
-          <h2 className="text-sm font-semibold text-[#0b2545]">Choose your items</h2>
+          <FulfillmentToggle value={fulfillment} onChange={setFulfillment} />
+          <h2 className="pt-2 text-sm font-semibold text-[#0b2545]">Choose your items</h2>
           {saleItems.length === 0 ? (
             <p className="text-xs text-slate-500">Items will be posted soon.</p>
           ) : (
             <OrderItems items={saleItems} selections={selections} onChange={updateSelection} />
           )}
-          <PickupTime value={pickupTime} onChange={setPickupTime} />
+          <PickupTime value={pickupTime} onChange={setPickupTime} mode={fulfillment} />
+          {fulfillment === "delivery" && (
+            <DeliveryFields
+              address={address}
+              instructions={instructions}
+              onAddressChange={setAddress}
+              onInstructionsChange={setInstructions}
+            />
+          )}
         </div>
 
         <div className="rounded-2xl bg-white p-5 space-y-4 shadow-[0_1px_2px_rgba(11,37,69,0.06),0_8px_24px_-12px_rgba(11,37,69,0.2)]">

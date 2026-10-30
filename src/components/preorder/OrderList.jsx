@@ -77,7 +77,7 @@ export default function OrderList({ orders, updatingId, onStatusChange, onPaidTo
               <th className="px-4 py-3 font-semibold">Name</th>
               <th className="px-4 py-3 font-semibold">Items</th>
               <th className="px-4 py-3 font-semibold">Total</th>
-              <th className="px-4 py-3 font-semibold">Pick-Up</th>
+              <th className="px-4 py-3 font-semibold">Fulfillment</th>
               <th className="px-4 py-3 font-semibold">Paid</th>
               <th className="px-4 py-3 font-semibold">Ticket</th>
               <th className="px-4 py-3 font-semibold">Status</th>
@@ -93,7 +93,18 @@ export default function OrderList({ orders, updatingId, onStatusChange, onPaidTo
                 </td>
                 <td className="px-4 py-3 text-slate-600 max-w-[260px]">{itemsSummary(order)}</td>
                 <td className="px-4 py-3 font-semibold text-slate-900">{money(order.total)}</td>
-                <td className="px-4 py-3 text-slate-600">{prettyTime(order.pickup_time)}</td>
+                <td className="px-4 py-3 text-slate-600">
+                  <p className="font-medium text-slate-700">
+                    {order.fulfillment === "delivery" ? "Delivery" : "Pick-up"}
+                  </p>
+                  <p className="text-xs text-slate-500">{prettyTime(order.pickup_time)}</p>
+                  {order.fulfillment === "delivery" && order.delivery_address && (
+                    <p className="mt-1 max-w-[200px] text-xs text-slate-500">{order.delivery_address}</p>
+                  )}
+                  {order.fulfillment === "delivery" && order.delivery_instructions && (
+                    <p className="max-w-[200px] text-xs italic text-slate-400">{order.delivery_instructions}</p>
+                  )}
+                </td>
                 <td className="px-4 py-3">
                   <PaidToggle
                     paid={!!order.paid}
@@ -157,9 +168,23 @@ export default function OrderList({ orders, updatingId, onStatusChange, onPaidTo
                   <p className="mt-0.5 text-sm text-slate-700">{itemsSummary(order)}</p>
                 </div>
                 <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Pick-Up Time</p>
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+                    {order.fulfillment === "delivery" ? "Delivery Time" : "Pick-Up Time"}
+                  </p>
                   <p className="mt-0.5 text-sm text-slate-700">{prettyTime(order.pickup_time)}</p>
                 </div>
+                {order.fulfillment === "delivery" && order.delivery_address && (
+                  <div>
+                    <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Delivery Address</p>
+                    <p className="mt-0.5 text-sm text-slate-700">{order.delivery_address}</p>
+                  </div>
+                )}
+                {order.fulfillment === "delivery" && order.delivery_instructions && (
+                  <div>
+                    <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Where to Leave Food</p>
+                    <p className="mt-0.5 text-sm text-slate-700">{order.delivery_instructions}</p>
+                  </div>
+                )}
                 <div>
                   <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Contact</p>
                   <p className="mt-0.5 text-sm text-slate-700">

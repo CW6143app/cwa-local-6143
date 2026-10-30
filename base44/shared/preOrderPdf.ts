@@ -49,6 +49,8 @@ export function toBase64(bytes) {
 }
 
 export function buildPreOrderPdf(order = {}, sale = {}) {
+  const isDelivery = order?.fulfillment === "delivery";
+  const timeLabel = isDelivery ? "Delivery time" : "Pick-up time";
   const doc = new jsPDF({ unit: "pt", format: "letter" });
   const pageW = doc.internal.pageSize.getWidth();
   const pageH = doc.internal.pageSize.getHeight();
@@ -89,7 +91,7 @@ export function buildPreOrderPdf(order = {}, sale = {}) {
   doc.text("CWA Local 6143", margin, 44);
   doc.setFont("helvetica", "normal");
   doc.setFontSize(10.5);
-  doc.text("Pre-Order Pick-Up Ticket", margin, 64);
+  doc.text(isDelivery ? "Pre-Order Delivery Ticket" : "Pre-Order Pick-Up Ticket", margin, 64);
   doc.setFontSize(8.5);
   doc.text(stamp(order), pageW - margin, 44, { align: "right" });
   doc.text(
@@ -115,7 +117,7 @@ export function buildPreOrderPdf(order = {}, sale = {}) {
   label("Sale", margin + half);
   value(order.sale_title || sale.title, margin + half, colW);
   y += 34;
-  label("Pick-up time", margin + 16);
+  label(timeLabel, margin + 16);
   value(prettyTime(order.pickup_time), margin + 16, colW);
   label("Order total", margin + half);
   value(money(order.total), margin + half, colW);
@@ -173,7 +175,9 @@ export function buildPreOrderPdf(order = {}, sale = {}) {
   doc.setFont("helvetica", "bold");
   doc.setFontSize(9);
   doc.setTextColor(MUTED[0], MUTED[1], MUTED[2]);
-  doc.text(order.paid ? "PAID" : "PAYMENT DUE AT PICK-UP", pageW - margin - 8, y, { align: "right" });
+  doc.text(order.paid ? "PAID" : isDelivery ? "PAYMENT DUE AT DELIVERY" : "PAYMENT DUE AT PICK-UP", pageW - margin - 8, y, {
+    align: "right",
+  });
   y += 30;
 
   const block = (title, body, tint) => {
@@ -194,6 +198,10 @@ export function buildPreOrderPdf(order = {}, sale = {}) {
     y += height + 12;
   };
 
+  if (isDelivery) {
+    block("Deliver to", order.delivery_address, WARM);
+    block("Where to leave the food", order.delivery_instructions, CARD);
+  }
   block("Pick-up / Payment", sale.pickup_info, CARD);
   if (sale.zelle_info) {
     const code = orderCode(order);

@@ -58,6 +58,34 @@ export default async function (req: Request): Promise<Response> {
     const notesBlock = order.notes
       ? `<p style="margin:16px 0 0;font-size:13px;color:#52525b;"><strong>Notes:</strong> ${escapeHtml(order.notes)}</p>`
       : "";
+    const isDelivery = order.fulfillment === "delivery";
+    const timeLabel = isDelivery ? "Delivery time" : "Pick-up time";
+    const deliveryHtml =
+      isDelivery && (order.delivery_address || order.delivery_instructions)
+        ? `<div style="margin:12px 0 0;padding:12px 16px;background-color:#f6f5f2;border-radius:10px;">
+            <p style="margin:0;font-size:12px;font-weight:bold;text-transform:uppercase;letter-spacing:1px;color:#71717a;">Delivery</p>
+            ${
+              order.delivery_address
+                ? `<p style="margin:6px 0 0;font-size:13px;color:#0b2545;"><strong>Address:</strong> ${escapeHtml(
+                    order.delivery_address
+                  )}</p>`
+                : ""
+            }
+            ${
+              order.delivery_instructions
+                ? `<p style="margin:4px 0 0;font-size:13px;color:#0b2545;"><strong>Where to leave the food:</strong> ${escapeHtml(
+                    order.delivery_instructions
+                  )}</p>`
+                : ""
+            }
+          </div>`
+        : "";
+    const deliveryText =
+      isDelivery && (order.delivery_address || order.delivery_instructions)
+        ? `\nDelivery address: ${order.delivery_address || "—"}${
+            order.delivery_instructions ? `\nWhere to leave the food: ${order.delivery_instructions}` : ""
+          }`
+        : "";
     const zelleBlock = sale?.zelle_info
       ? `<p style="margin:12px 0 0;font-size:13px;color:#52525b;"><strong>Zelle:</strong> ${escapeHtml(
           sale.zelle_info
@@ -87,9 +115,10 @@ export default async function (req: Request): Promise<Response> {
               )}</td>
             </tr>
           </table>
-          <p style="margin:16px 0 0;font-size:13px;color:#52525b;"><strong>Pick-up time:</strong> ${escapeHtml(
-            prettyTime(order.pickup_time)
-          )}</p>
+          <p style="margin:16px 0 0;font-size:13px;color:#52525b;"><strong>${escapeHtml(
+            timeLabel
+          )}:</strong> ${escapeHtml(prettyTime(order.pickup_time))}</p>
+          ${deliveryHtml}
           <p style="margin:8px 0 0;font-size:13px;color:#52525b;"><strong>Contact:</strong> ${escapeHtml(
             [order.email, order.phone].filter(Boolean).join(" · ") || "—"
           )}</p>
@@ -112,9 +141,9 @@ export default async function (req: Request): Promise<Response> {
 </body>
 </html>`;
 
-    const notifyText = `CWA Local 6143 — New Pre-Order\n\nSale: ${saleTitle}\nName: ${buyerName}\nPick-up time: ${prettyTime(
+    const notifyText = `CWA Local 6143 — New Pre-Order\n\nSale: ${saleTitle}\nName: ${buyerName}\n${timeLabel}: ${prettyTime(
       order.pickup_time
-    )}\nContact: ${
+    )}${deliveryText}\nContact: ${
       [order.email, order.phone].filter(Boolean).join(" · ") || "—"
     }\n\n${items
       .map((i) => `${i.quantity}x ${i.name}${i.size ? ` (${i.size})` : ""} — ${money(i.line_total)}`)
@@ -145,9 +174,10 @@ export default async function (req: Request): Promise<Response> {
               )}</td>
             </tr>
           </table>
-          <p style="margin:18px 0 0;font-size:14px;color:#0b2545;"><strong>Pick-up time:</strong> ${escapeHtml(
-            prettyTime(order.pickup_time)
-          )}</p>
+          <p style="margin:18px 0 0;font-size:14px;color:#0b2545;"><strong>${escapeHtml(
+            timeLabel
+          )}:</strong> ${escapeHtml(prettyTime(order.pickup_time))}</p>
+          ${deliveryHtml}
           ${zelleBlock}
           <p style="margin:20px 0 0;font-size:13px;color:#52525b;">Your printable pick-up ticket is attached as a PDF. Bring it with you, or show it on your phone.</p>
           <p style="margin:16px 0 0;font-size:14px;color:#52525b;line-height:1.6;">In Solidarity,<br><strong>CWA Local 6143</strong></p>
@@ -163,9 +193,9 @@ export default async function (req: Request): Promise<Response> {
 
     const confirmText = `Hello ${buyerName},\n\nThank you for your pre-order for ${saleTitle}. Your order: ${items
       .map((i) => `${i.quantity}x ${i.name}${i.size ? ` (${i.size})` : ""}`)
-      .join(", ")}. Total: ${money(order.total)}.\nPick-up time: ${prettyTime(
+      .join(", ")}. Total: ${money(order.total)}.\n${timeLabel}: ${prettyTime(
       order.pickup_time
-    )}.\n\nYour printable pick-up ticket is attached as a PDF.\n\nIn Solidarity,\nCWA Local 6143`;
+    )}.${deliveryText}\n\nYour printable ticket is attached as a PDF.\n\nIn Solidarity,\nCWA Local 6143`;
 
     const [notifyRes, confirmRes] = await Promise.all([
       sendEmail(apiKey, {
