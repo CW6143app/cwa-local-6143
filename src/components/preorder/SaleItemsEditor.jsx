@@ -1,56 +1,64 @@
-import React from "react";
-import { Plus, X } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import React, { useState } from "react";
+import { Textarea } from "@/components/ui/textarea";
+
+const toText = (items) =>
+  items
+    .map((i) => [i.name, i.price, i.sizes].filter((v) => v !== "" && v !== undefined && v !== null).join(" | "))
+    .join("\n");
+
+const parse = (text) =>
+  text
+    .split("\n")
+    .map((line) => {
+      const parts = line.split("|").map((p) => p.trim());
+      let name = parts[0] || "";
+      let price = parts[1] || "";
+      const sizes = parts[2] || "";
+      if (parts.length === 1) {
+        const match = name.match(/^(.*?)[\s,\-–—]*\$?(\d+(?:\.\d{1,2})?)$/);
+        if (match) {
+          name = match[1].trim();
+          price = match[2];
+        }
+      }
+      return { name, price: price.replace(/[^0-9.]/g, ""), sizes };
+    })
+    .filter((item) => item.name);
 
 export default function SaleItemsEditor({ items, onChange }) {
-  const patch = (index, changes) => {
-    onChange(items.map((item, i) => (i === index ? { ...item, ...changes } : item)));
+  const [text, setText] = useState(() => toText(items));
+
+  const handleChange = (value) => {
+    setText(value);
+    onChange(parse(value));
   };
 
   return (
-    <div className="space-y-3">
-      {items.map((item, index) => (
-        <div key={index} className="rounded-xl border border-black/10 p-3 space-y-2">
-          <div className="flex gap-2">
-            <Input
-              value={item.name || ""}
-              onChange={(e) => patch(index, { name: e.target.value })}
-              placeholder="Item name (e.g. BBQ Plate)"
-              className="h-9 flex-1"
-            />
-            <Input
-              value={item.price ?? ""}
-              onChange={(e) => patch(index, { price: e.target.value })}
-              type="number"
-              min="0"
-              step="0.01"
-              placeholder="0.00"
-              className="h-9 w-24"
-            />
-            <button
-              type="button"
-              onClick={() => onChange(items.filter((_, i) => i !== index))}
-              aria-label="Remove item"
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-black/5 text-[#c8102e]"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-          <Input
-            value={item.sizes || ""}
-            onChange={(e) => patch(index, { sizes: e.target.value })}
-            placeholder="Sizes (optional): S, M, L, XL"
-            className="h-9"
-          />
-        </div>
-      ))}
-      <button
-        type="button"
-        onClick={() => onChange([...items, { name: "", price: "", sizes: "" }])}
-        className="flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-dashed border-black/15 text-xs font-semibold text-[#0b2545]"
-      >
-        <Plus className="w-4 h-4" /> Add item
-      </button>
+    <div className="space-y-2">
+      <Textarea
+        value={text}
+        onChange={(e) => handleChange(e.target.value)}
+        rows={5}
+        placeholder={"BBQ Plate | 12\nLocal 6143 T-Shirt | 20 | S, M, L, XL\nExtra Side | 4"}
+        className="resize-y text-xs"
+      />
+      <p className="text-[11px] leading-relaxed text-slate-500">
+        One item per line: <span className="font-medium text-[#0b2545]">name | price | sizes</span> — sizes only if
+        the item has them.
+      </p>
+      {items.length > 0 && (
+        <ul className="rounded-xl bg-black/5 p-3 space-y-1">
+          {items.map((item, index) => (
+            <li key={index} className="flex justify-between gap-3 text-xs text-[#0b2545]">
+              <span>
+                {item.name}
+                {item.sizes ? ` (${item.sizes})` : ""}
+              </span>
+              <span className="font-semibold">${Number(item.price || 0).toFixed(2)}</span>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
