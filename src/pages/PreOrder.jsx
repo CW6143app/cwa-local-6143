@@ -8,15 +8,25 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import OrderItems from "@/components/preorder/OrderItems";
+import PickupTime from "@/components/preorder/PickupTime";
 import ZelleNote from "@/components/preorder/ZelleNote";
 
 const money = (n) => `$${Number(n || 0).toFixed(2)}`;
+
+const prettyTime = (time) => {
+  if (!time) return "—";
+  const [h, m] = String(time).split(":").map(Number);
+  if (Number.isNaN(h)) return time;
+  const suffix = h >= 12 ? "PM" : "AM";
+  return `${h % 12 || 12}:${String(Number.isNaN(m) ? 0 : m).padStart(2, "0")} ${suffix}`;
+};
 
 export default function PreOrder() {
   const [sale, setSale] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selections, setSelections] = useState({});
   const [buyer, setBuyer] = useState({ name: "", email: "", phone: "", notes: "" });
+  const [pickupTime, setPickupTime] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [placed, setPlaced] = useState(null);
@@ -66,6 +76,10 @@ export default function PreOrder() {
       setError(`Please choose a size for ${missingSize.name}.`);
       return;
     }
+    if (!pickupTime) {
+      setError("Please choose the time you need your food by.");
+      return;
+    }
     setSubmitting(true);
     try {
       const created = await base44.entities.PreOrder.create({
@@ -74,6 +88,7 @@ export default function PreOrder() {
         buyer_name: buyer.name.trim(),
         email: buyer.email.trim(),
         phone: buyer.phone.trim(),
+        pickup_time: pickupTime,
         notes: buyer.notes.trim(),
         items: lines.map(({ needsSize, ...line }) => line),
         total,
@@ -125,6 +140,10 @@ export default function PreOrder() {
               <span>Total</span>
               <span>{money(placed.total)}</span>
             </div>
+            <div className="flex items-center justify-between pt-1 text-sm text-[#0b2545]">
+              <span className="text-slate-500">Pick-up time</span>
+              <span className="font-semibold">{prettyTime(placed.pickup_time)}</span>
+            </div>
           </div>
           <div className="mt-4 text-left">
             <ZelleNote zelleInfo={sale?.zelle_info} amount={placed.total} />
@@ -171,6 +190,7 @@ export default function PreOrder() {
           ) : (
             <OrderItems items={saleItems} selections={selections} onChange={updateSelection} />
           )}
+          <PickupTime value={pickupTime} onChange={setPickupTime} />
         </div>
 
         <div className="rounded-2xl bg-white p-5 space-y-4 shadow-[0_1px_2px_rgba(11,37,69,0.06),0_8px_24px_-12px_rgba(11,37,69,0.2)]">

@@ -23,6 +23,10 @@
       "type": "string",
       "title": "Phone"
     },
+    "pickup_time": {
+      "type": "string",
+      "title": "Pick-Up Time"
+    },
     "items": {
       "type": "array",
       "title": "Order Items",

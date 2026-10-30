@@ -9,6 +9,14 @@ const WARM = [255, 245, 235];
 
 const money = (n) => `$${Number(n || 0).toFixed(2)}`;
 
+const prettyTime = (time: any) => {
+  if (!time) return "—";
+  const [h, m] = String(time).split(":").map(Number);
+  if (Number.isNaN(h)) return String(time);
+  const suffix = h >= 12 ? "PM" : "AM";
+  return `${h % 12 || 12}:${String(Number.isNaN(m) ? 0 : m).padStart(2, "0")} ${suffix}`;
+};
+
 function stamp(order) {
   const raw = order?.created_date;
   const date = raw ? new Date(raw) : new Date();
@@ -94,7 +102,7 @@ export function buildPreOrderPdf(order = {}, sale = {}) {
 
   // Buyer + sale
   doc.setFillColor(CARD[0], CARD[1], CARD[2]);
-  doc.roundedRect(margin, y - 16, contentW, 78, 8, 8, "F");
+  doc.roundedRect(margin, y - 16, contentW, 112, 8, 8, "F");
   const half = contentW / 2;
   const colW = half - 40;
   label("Name", margin + 16);
@@ -106,6 +114,11 @@ export function buildPreOrderPdf(order = {}, sale = {}) {
   value(order.phone, margin + 16, colW);
   label("Sale", margin + half);
   value(order.sale_title || sale.title, margin + half, colW);
+  y += 34;
+  label("Pick-up time", margin + 16);
+  value(prettyTime(order.pickup_time), margin + 16, colW);
+  label("Order total", margin + half);
+  value(money(order.total), margin + half, colW);
   y += 56;
 
   // Items table

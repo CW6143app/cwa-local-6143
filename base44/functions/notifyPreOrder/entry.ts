@@ -7,6 +7,14 @@ const NOTIFY_EMAIL = "mail@cwa6143.org";
 
 const money = (n) => `$${Number(n || 0).toFixed(2)}`;
 
+function prettyTime(time: any) {
+  if (!time) return "—";
+  const [h, m] = String(time).split(":").map(Number);
+  if (Number.isNaN(h)) return String(time);
+  const suffix = h >= 12 ? "PM" : "AM";
+  return `${h % 12 || 12}:${String(Number.isNaN(m) ? 0 : m).padStart(2, "0")} ${suffix}`;
+}
+
 function itemRows(items) {
   return (items || [])
     .map(
@@ -79,7 +87,10 @@ export default async function (req: Request): Promise<Response> {
               )}</td>
             </tr>
           </table>
-          <p style="margin:16px 0 0;font-size:13px;color:#52525b;"><strong>Contact:</strong> ${escapeHtml(
+          <p style="margin:16px 0 0;font-size:13px;color:#52525b;"><strong>Pick-up time:</strong> ${escapeHtml(
+            prettyTime(order.pickup_time)
+          )}</p>
+          <p style="margin:8px 0 0;font-size:13px;color:#52525b;"><strong>Contact:</strong> ${escapeHtml(
             [order.email, order.phone].filter(Boolean).join(" · ") || "—"
           )}</p>
           <p style="margin:8px 0 0;font-size:13px;color:#52525b;"><strong>Payment:</strong> ${
@@ -101,7 +112,9 @@ export default async function (req: Request): Promise<Response> {
 </body>
 </html>`;
 
-    const notifyText = `CWA Local 6143 — New Pre-Order\n\nSale: ${saleTitle}\nName: ${buyerName}\nContact: ${
+    const notifyText = `CWA Local 6143 — New Pre-Order\n\nSale: ${saleTitle}\nName: ${buyerName}\nPick-up time: ${prettyTime(
+      order.pickup_time
+    )}\nContact: ${
       [order.email, order.phone].filter(Boolean).join(" · ") || "—"
     }\n\n${items
       .map((i) => `${i.quantity}x ${i.name}${i.size ? ` (${i.size})` : ""} — ${money(i.line_total)}`)
@@ -132,6 +145,9 @@ export default async function (req: Request): Promise<Response> {
               )}</td>
             </tr>
           </table>
+          <p style="margin:18px 0 0;font-size:14px;color:#0b2545;"><strong>Pick-up time:</strong> ${escapeHtml(
+            prettyTime(order.pickup_time)
+          )}</p>
           ${zelleBlock}
           <p style="margin:20px 0 0;font-size:13px;color:#52525b;">Your printable pick-up ticket is attached as a PDF. Bring it with you, or show it on your phone.</p>
           <p style="margin:16px 0 0;font-size:14px;color:#52525b;line-height:1.6;">In Solidarity,<br><strong>CWA Local 6143</strong></p>
@@ -147,7 +163,9 @@ export default async function (req: Request): Promise<Response> {
 
     const confirmText = `Hello ${buyerName},\n\nThank you for your pre-order for ${saleTitle}. Your order: ${items
       .map((i) => `${i.quantity}x ${i.name}${i.size ? ` (${i.size})` : ""}`)
-      .join(", ")}. Total: ${money(order.total)}.\n\nYour printable pick-up ticket is attached as a PDF.\n\nIn Solidarity,\nCWA Local 6143`;
+      .join(", ")}. Total: ${money(order.total)}.\nPick-up time: ${prettyTime(
+      order.pickup_time
+    )}.\n\nYour printable pick-up ticket is attached as a PDF.\n\nIn Solidarity,\nCWA Local 6143`;
 
     const [notifyRes, confirmRes] = await Promise.all([
       sendEmail(apiKey, {

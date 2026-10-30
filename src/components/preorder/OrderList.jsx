@@ -13,6 +13,13 @@ export const ORDER_STATUS = [
 
 const statusMeta = (status) => ORDER_STATUS.find((s) => s.value === status) || ORDER_STATUS[0];
 const money = (n) => `$${Number(n || 0).toFixed(2)}`;
+const prettyTime = (time) => {
+  if (!time) return "—";
+  const [h, m] = String(time).split(":").map(Number);
+  if (Number.isNaN(h)) return time;
+  const suffix = h >= 12 ? "PM" : "AM";
+  return `${h % 12 || 12}:${String(Number.isNaN(m) ? 0 : m).padStart(2, "0")} ${suffix}`;
+};
 
 function StatusBadge({ status }) {
   const meta = statusMeta(status);
@@ -70,6 +77,7 @@ export default function OrderList({ orders, updatingId, onStatusChange, onPaidTo
               <th className="px-4 py-3 font-semibold">Name</th>
               <th className="px-4 py-3 font-semibold">Items</th>
               <th className="px-4 py-3 font-semibold">Total</th>
+              <th className="px-4 py-3 font-semibold">Pick-Up</th>
               <th className="px-4 py-3 font-semibold">Paid</th>
               <th className="px-4 py-3 font-semibold">Ticket</th>
               <th className="px-4 py-3 font-semibold">Status</th>
@@ -85,6 +93,7 @@ export default function OrderList({ orders, updatingId, onStatusChange, onPaidTo
                 </td>
                 <td className="px-4 py-3 text-slate-600 max-w-[260px]">{itemsSummary(order)}</td>
                 <td className="px-4 py-3 font-semibold text-slate-900">{money(order.total)}</td>
+                <td className="px-4 py-3 text-slate-600">{prettyTime(order.pickup_time)}</td>
                 <td className="px-4 py-3">
                   <PaidToggle
                     paid={!!order.paid}
@@ -146,6 +155,10 @@ export default function OrderList({ orders, updatingId, onStatusChange, onPaidTo
                 <div>
                   <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Items</p>
                   <p className="mt-0.5 text-sm text-slate-700">{itemsSummary(order)}</p>
+                </div>
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Pick-Up Time</p>
+                  <p className="mt-0.5 text-sm text-slate-700">{prettyTime(order.pickup_time)}</p>
                 </div>
                 <div>
                   <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Contact</p>
