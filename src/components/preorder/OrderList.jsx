@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { ChevronDown, FileDown } from "lucide-react";
+import { ChevronDown, FileDown, Pencil, Trash2 } from "lucide-react";
 import SheetSelect from "@/components/mobile/SheetSelect";
+import EditOrderDialog from "@/components/preorder/EditOrderDialog";
 import { downloadPreOrderPdf } from "@/lib/preOrderPdf";
 
 export const ORDER_STATUS = [
@@ -65,8 +66,41 @@ function PaidToggle({ paid, disabled, onToggle }) {
   );
 }
 
-export default function OrderList({ orders, updatingId, onStatusChange, onPaidToggle }) {
+function RowActions({ order, disabled, onEdit, onDelete }) {
+  return (
+    <div className="flex items-center gap-1">
+      <button
+        type="button"
+        disabled={disabled}
+        onClick={() => onEdit(order)}
+        aria-label="Edit order"
+        className="flex h-8 w-8 items-center justify-center rounded-lg bg-black/5 text-[#0b2545] transition-colors hover:bg-black/10 disabled:opacity-50"
+      >
+        <Pencil className="h-3.5 w-3.5" />
+      </button>
+      <button
+        type="button"
+        disabled={disabled}
+        onClick={() => onDelete(order)}
+        aria-label="Delete order"
+        className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-red-50 hover:text-red-600 disabled:opacity-50"
+      >
+        <Trash2 className="h-3.5 w-3.5" />
+      </button>
+    </div>
+  );
+}
+
+export default function OrderList({
+  orders,
+  updatingId,
+  onStatusChange,
+  onPaidToggle,
+  onSaveOrder,
+  onDeleteOrder,
+}) {
   const [expandedId, setExpandedId] = useState(null);
+  const [editing, setEditing] = useState(null);
 
   return (
     <>
@@ -82,6 +116,7 @@ export default function OrderList({ orders, updatingId, onStatusChange, onPaidTo
               <th className="px-4 py-3 font-semibold">Ticket</th>
               <th className="px-4 py-3 font-semibold">Status</th>
               <th className="px-4 py-3 font-semibold">Update</th>
+              <th className="px-4 py-3 font-semibold">Edit</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
@@ -125,6 +160,14 @@ export default function OrderList({ orders, updatingId, onStatusChange, onPaidTo
                     disabled={updatingId === order.id}
                     options={ORDER_STATUS}
                     label="Update Status"
+                  />
+                </td>
+                <td className="px-4 py-3">
+                  <RowActions
+                    order={order}
+                    disabled={updatingId === order.id}
+                    onEdit={setEditing}
+                    onDelete={onDeleteOrder}
                   />
                 </td>
               </tr>
@@ -204,6 +247,25 @@ export default function OrderList({ orders, updatingId, onStatusChange, onPaidTo
                   </p>
                 </div>
                 <PdfButton orderId={order.id} full />
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    disabled={updatingId === order.id}
+                    onClick={() => setEditing(order)}
+                    className="flex h-10 flex-1 items-center justify-center gap-1.5 rounded-xl bg-black/5 text-xs font-semibold text-[#0b2545] transition-colors hover:bg-black/10 disabled:opacity-50"
+                  >
+                    <Pencil className="h-3.5 w-3.5" /> Edit order
+                  </button>
+                  <button
+                    type="button"
+                    disabled={updatingId === order.id}
+                    onClick={() => onDeleteOrder(order)}
+                    aria-label="Delete order"
+                    className="flex h-10 w-11 items-center justify-center rounded-xl text-slate-400 transition-colors hover:bg-red-50 hover:text-red-600 disabled:opacity-50"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
                 <div className="flex items-center justify-between pt-1">
                   <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Paid</span>
                   <PaidToggle
@@ -229,6 +291,13 @@ export default function OrderList({ orders, updatingId, onStatusChange, onPaidTo
           </motion.div>
         ))}
       </div>
+
+      <EditOrderDialog
+        order={editing}
+        open={!!editing}
+        onOpenChange={(next) => setEditing(next ? editing : null)}
+        onSave={onSaveOrder}
+      />
     </>
   );
 }

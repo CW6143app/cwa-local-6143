@@ -64,6 +64,20 @@ export default function PreOrdersDashboard() {
     }
   };
 
+  const deleteOrder = async (order) => {
+    const label = order.buyer_name ? `the pre-order from ${order.buyer_name}` : "this pre-order";
+    if (!window.confirm(`Delete ${label}? This cannot be undone.`)) return;
+    setUpdatingId(order.id);
+    try {
+      await base44.entities.PreOrder.delete(order.id);
+      setOrders((prev) => prev.filter((o) => o.id !== order.id));
+    } catch (err) {
+      alert("Failed to delete the order. Please try again.");
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
   const exportCsv = () => {
     const rows = [
       [
@@ -184,6 +198,8 @@ export default function PreOrdersDashboard() {
                   updatingId={updatingId}
                   onStatusChange={(order, status) => updateOrder(order, { status })}
                   onPaidToggle={(order) => updateOrder(order, { paid: !order.paid })}
+                  onSaveOrder={(order, changes) => updateOrder(order, changes)}
+                  onDeleteOrder={deleteOrder}
                 />
               )}
             </div>
