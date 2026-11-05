@@ -12,6 +12,7 @@ export default function SaleSettings({ sale, onSaved }) {
     delivery_notice: sale?.delivery_notice || "",
     pickup_info: sale?.pickup_info || "",
     zelle_info: sale?.zelle_info || "",
+    cashapp_info: sale?.cashapp_info || "",
     active: !!sale?.active,
     items: (sale?.items || []).map((i) => ({
       name: i.name || "",
@@ -33,6 +34,7 @@ export default function SaleSettings({ sale, onSaved }) {
       delivery_notice: form.delivery_notice.trim(),
       pickup_info: form.pickup_info,
       zelle_info: form.zelle_info.trim(),
+      cashapp_info: form.cashapp_info.trim(),
       active: form.active,
       items: form.items
         .filter((i) => i.name.trim())
@@ -114,6 +116,19 @@ export default function SaleSettings({ sale, onSaved }) {
           placeholder="treasurer@cwa6143.org"
           className="h-9"
         />
+      </div>
+
+      <div className="space-y-1">
+        <Label className="text-xs font-medium text-[#0b2545]">Cash App $tag or phone</Label>
+        <Input
+          value={form.cashapp_info}
+          onChange={set("cashapp_info")}
+          placeholder="$CWALocal6143"
+          className="h-9"
+        />
+        <p className="text-[11px] text-slate-500">
+          Leave a payment method blank to hide it. Filled-in methods show as clickable links.
+        </p>
       </div>
 
       <div className="space-y-2">

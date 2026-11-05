@@ -11,7 +11,7 @@ import OrderItems from "@/components/preorder/OrderItems";
 import FulfillmentToggle from "@/components/preorder/FulfillmentToggle";
 import DeliveryFields from "@/components/preorder/DeliveryFields";
 import PickupTime from "@/components/preorder/PickupTime";
-import ZelleNote from "@/components/preorder/ZelleNote";
+import PaymentOptions from "@/components/preorder/PaymentOptions";
 
 const money = (n) => `$${Number(n || 0).toFixed(2)}`;
 
@@ -178,7 +178,7 @@ export default function PreOrder() {
             )}
           </div>
           <div className="mt-4 text-left">
-            <ZelleNote zelleInfo={sale?.zelle_info} amount={placed.total} />
+            <PaymentOptions sale={sale} amount={placed.total} />
           </div>
           <button
             type="button"
@@ -284,7 +284,7 @@ export default function PreOrder() {
           </div>
         </div>
 
-        {sale.zelle_info && <ZelleNote zelleInfo={sale.zelle_info} amount={total} />}
+        <PaymentOptions sale={sale} amount={total} />
 
         <div className="rounded-2xl bg-white p-5 flex items-center justify-between shadow-[0_1px_2px_rgba(11,37,69,0.06),0_8px_24px_-12px_rgba(11,37,69,0.2)]">
           <span className="text-sm font-semibold text-[#0b2545]">Total</span>

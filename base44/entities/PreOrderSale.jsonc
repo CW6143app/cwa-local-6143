@@ -22,6 +22,10 @@
       "type": "string",
       "title": "Zelle Email or Phone"
     },
+    "cashapp_info": {
+      "type": "string",
+      "title": "Cash App $tag or Phone"
+    },
     "active": {
       "type": "boolean",
       "title": "Pre-Order Open",
