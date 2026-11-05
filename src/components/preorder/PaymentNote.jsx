@@ -34,6 +34,10 @@ export default function PaymentNote({ label, info, amount }) {
         )}{" "}
         and put your name in the memo so we can match it to your order.
       </p>
+      <p className="mt-2 text-xs text-[#0b2545]/70 leading-relaxed">
+        You can also make a donation with {label.replace("Pay by ", "")} — just write{" "}
+        <span className="font-semibold">Donation</span> in the memo.
+      </p>
     </div>
   );
 }
