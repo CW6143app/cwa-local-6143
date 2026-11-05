@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { ArrowLeft, Shield, RefreshCw, CheckCircle2, AlertTriangle, FileText, CalendarDays, Video, Smartphone } from "lucide-react";
@@ -43,6 +43,39 @@ export default function SyncDashboard() {
   const [pushResult, setPushResult] = useState(null);
   const [pushTitle, setPushTitle] = useState("");
   const [pushBody, setPushBody] = useState("");
+  const [deduping, setDeduping] = useState(false);
+
+  const uniqueTokens = useMemo(
+    () => new Set(tokens.map((t) => t.token).filter(Boolean)).size,
+    [tokens]
+  );
+  const duplicateCount = Math.max(tokens.length - uniqueTokens, 0);
+  const uniqueTokenList = useMemo(() => {
+    const seen = new Set();
+    return tokens.filter((t) => {
+      if (!t.token || seen.has(t.token)) return false;
+      seen.add(t.token);
+      return true;
+    });
+  }, [tokens]);
+
+  const dedupeTokens = async () => {
+    setDeduping(true);
+    setPushResult(null);
+    try {
+      const res = await base44.functions.invoke("sendMeetingPush", { action: "dedupe" });
+      setPushResult({
+        dedupe: true,
+        removed: res.data?.removed ?? 0,
+        unique: res.data?.unique ?? 0,
+      });
+      await load();
+    } catch (err) {
+      setPushResult({ error: err?.response?.data?.error || err?.message || "Clean-up failed. Please try again." });
+    } finally {
+      setDeduping(false);
+    }
+  };
 
   const toggleJoin = async (e) => {
     if (!(e.title || "").includes("Membership Meeting")) return;
@@ -187,9 +220,28 @@ export default function SyncDashboard() {
               />
               <p className="text-right text-[10px] text-slate-400">{pushBody.length}/240</p>
             </div>
+            {!loading && (
+              <div className="mt-3 rounded-lg bg-slate-50 px-3 py-2 text-[11px] font-medium text-slate-600">
+                {duplicateCount > 0 ? (
+                  <>
+                    {uniqueTokens} unique device{uniqueTokens === 1 ? "" : "s"} — {duplicateCount} duplicate
+                    token{duplicateCount === 1 ? "" : "s"} saved.
+                    <button
+                      onClick={dedupeTokens}
+                      disabled={deduping}
+                      className="ml-1 font-semibold text-[#c8102e] underline disabled:opacity-60"
+                    >
+                      {deduping ? "Cleaning up…" : "Remove duplicates"}
+                    </button>
+                  </>
+                ) : (
+                  <>{uniqueTokens} unique device{uniqueTokens === 1 ? "" : "s"}, no duplicates.</>
+                )}
+              </div>
+            )}
             <button
               onClick={sendPush}
-              disabled={pushSending || loading || tokens.length === 0 || !pushBody.trim()}
+              disabled={pushSending || loading || uniqueTokens === 0 || !pushBody.trim()}
               className="mt-3 w-full h-11 rounded-xl bg-[#c8102e] text-white text-sm font-semibold flex items-center justify-center gap-2 hover:bg-[#c8102e]/90 disabled:opacity-60 transition-colors"
             >
               {pushSending ? (
@@ -200,7 +252,7 @@ export default function SyncDashboard() {
               ) : (
                 <>
                   <Smartphone className="w-4 h-4" />
-                  Send push to {loading ? "…" : tokens.length} device{tokens.length === 1 ? "" : "s"}
+                  Send push to {loading ? "…" : uniqueTokens} device{uniqueTokens === 1 ? "" : "s"}
                 </>
               )}
             </button>
@@ -214,7 +266,9 @@ export default function SyncDashboard() {
                 <span>
                   {pushResult.error
                     ? pushResult.error
-                    : `Sent to ${pushResult.sent} of ${pushResult.total} device${pushResult.total === 1 ? "" : "s"}${pushResult.failed ? `, ${pushResult.failed} failed` : ""}.`}
+                    : pushResult.dedupe
+                      ? `Removed ${pushResult.removed} duplicate token${pushResult.removed === 1 ? "" : "s"}. ${pushResult.unique} unique device${pushResult.unique === 1 ? "" : "s"} saved.`
+                      : `Sent to ${pushResult.sent} of ${pushResult.total} device${pushResult.total === 1 ? "" : "s"}${pushResult.failed ? `, ${pushResult.failed} failed` : ""}.`}
                 </span>
               </div>
             )}
@@ -306,7 +360,7 @@ export default function SyncDashboard() {
             <Smartphone className="w-4 h-4 text-[#c8102e]" />
             <h3 className="text-sm font-bold text-slate-900">Push opt-ins</h3>
             <span className="ml-auto rounded-full bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-600">
-              {loading ? "—" : tokens.length}
+              {loading ? "—" : uniqueTokens}
             </span>
           </div>
           <p className="mt-1 text-xs text-slate-500 leading-relaxed">
@@ -320,7 +374,7 @@ export default function SyncDashboard() {
             </p>
           ) : (
             <ul className="mt-4 divide-y divide-slate-100">
-              {tokens.map((t) => {
+              {uniqueTokenList.map((t) => {
                 const ua = t.user_agent || "";
                 const isIOS = /iPhone|iPad|iPod/i.test(ua);
                 const isAndroid = /Android/i.test(ua);

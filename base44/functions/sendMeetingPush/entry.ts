@@ -116,7 +116,12 @@ function resolveCredentials() {
 
 async function broadcastPush(base44, clientEmail, privateKey, title, body) {
   const tokens = await base44.asServiceRole.entities.PushToken.list('-created_date', 1000);
-  const list = Array.isArray(tokens) ? tokens : [];
+  const seen = new Set();
+  const list = (Array.isArray(tokens) ? tokens : []).filter((t) => {
+    if (!t.token || seen.has(t.token)) return false;
+    seen.add(t.token);
+    return true;
+  });
   if (list.length === 0) {
     return { sent: 0, failed: 0, total: 0, message: 'No devices registered for push.' };
   }
@@ -161,6 +166,22 @@ export default async function(req) {
     if (!user || user.role !== 'admin') {
       return Response.json({ error: 'Forbidden' }, { status: 403 });
     }
+    if (body.action === 'dedupe') {
+      const all = await base44.asServiceRole.entities.PushToken.list('-created_date', 1000);
+      const records = Array.isArray(all) ? all : [];
+      const seen = new Set();
+      let removed = 0;
+      for (const t of records) {
+        if (seen.has(t.token)) {
+          await base44.asServiceRole.entities.PushToken.delete(t.id);
+          removed++;
+        } else {
+          seen.add(t.token);
+        }
+      }
+      return Response.json({ removed, unique: seen.size, total: records.length });
+    }
+
     const title = (body.title || '').trim() || DEFAULT_TITLE;
     const message = (body.body || '').trim() || DEFAULT_BODY;
     const result = await broadcastPush(base44, clientEmail, privateKey, title.slice(0, 80), message.slice(0, 240));
