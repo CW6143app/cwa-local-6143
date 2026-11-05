@@ -6,8 +6,8 @@ const SCOPE = 'https://www.googleapis.com/auth/firebase.messaging';
 const TOKEN_URL = 'https://oauth2.googleapis.com/token';
 const FCM_URL = `https://fcm.googleapis.com/v1/projects/${PROJECT_ID}/messages:send`;
 
-const NOTIFICATION_TITLE = 'CWA Local 6143';
-const NOTIFICATION_BODY = 'Local 6143 Monthly Meeting is about to start';
+const DEFAULT_TITLE = 'CWA Local 6143';
+const DEFAULT_BODY = 'Local 6143 Monthly Meeting is about to start';
 
 function b64urlStr(str) {
   return btoa(String.fromCharCode(...new TextEncoder().encode(str)))
@@ -70,7 +70,7 @@ async function getAccessToken(clientEmail, privateKey) {
   return data.access_token;
 }
 
-async function sendToToken(accessToken, token) {
+async function sendToToken(accessToken, token, title, body) {
   const res = await fetch(FCM_URL, {
     method: 'POST',
     headers: {
@@ -81,8 +81,8 @@ async function sendToToken(accessToken, token) {
       message: {
         token,
         data: {
-          title: NOTIFICATION_TITLE,
-          body: NOTIFICATION_BODY,
+          title,
+          body,
           url: 'https://cwa6143.base44.app/events',
         },
       },
@@ -114,7 +114,7 @@ function resolveCredentials() {
   return { clientEmail, privateKey };
 }
 
-async function broadcastPush(base44, clientEmail, privateKey) {
+async function broadcastPush(base44, clientEmail, privateKey, title, body) {
   const tokens = await base44.asServiceRole.entities.PushToken.list('-created_date', 1000);
   const list = Array.isArray(tokens) ? tokens : [];
   if (list.length === 0) {
@@ -125,7 +125,7 @@ async function broadcastPush(base44, clientEmail, privateKey) {
   let failed = 0;
   for (const t of list) {
     try {
-      const ok = await sendToToken(accessToken, t.token);
+      const ok = await sendToToken(accessToken, t.token, title, body);
       if (ok) sent++; else failed++;
     } catch {
       failed++;
@@ -151,7 +151,7 @@ export default async function(req) {
       if (!event.join_meeting_url) {
         return Response.json({ sent: 0, skipped: true, message: 'Join meeting not enabled.' });
       }
-      const result = await broadcastPush(base44, clientEmail, privateKey);
+      const result = await broadcastPush(base44, clientEmail, privateKey, DEFAULT_TITLE, DEFAULT_BODY);
       await base44.asServiceRole.entities.SyncedEvent.update(body.event_id, { meeting_notified: true });
       return Response.json(result);
     }
@@ -161,7 +161,9 @@ export default async function(req) {
     if (!user || user.role !== 'admin') {
       return Response.json({ error: 'Forbidden' }, { status: 403 });
     }
-    const result = await broadcastPush(base44, clientEmail, privateKey);
+    const title = (body.title || '').trim() || DEFAULT_TITLE;
+    const message = (body.body || '').trim() || DEFAULT_BODY;
+    const result = await broadcastPush(base44, clientEmail, privateKey, title.slice(0, 80), message.slice(0, 240));
     return Response.json(result);
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });

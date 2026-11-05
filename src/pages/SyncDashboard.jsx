@@ -41,6 +41,8 @@ export default function SyncDashboard() {
   const [pushMsg, setPushMsg] = useState("");
   const [pushSending, setPushSending] = useState(false);
   const [pushResult, setPushResult] = useState(null);
+  const [pushTitle, setPushTitle] = useState("");
+  const [pushBody, setPushBody] = useState("");
 
   const toggleJoin = async (e) => {
     if (!(e.title || "").includes("Membership Meeting")) return;
@@ -64,7 +66,10 @@ export default function SyncDashboard() {
     setPushSending(true);
     setPushResult(null);
     try {
-      const res = await base44.functions.invoke("sendMeetingPush", {});
+      const res = await base44.functions.invoke("sendMeetingPush", {
+        title: pushTitle,
+        body: pushBody,
+      });
       setPushResult(res.data);
     } catch (err) {
       setPushResult({ error: err?.response?.data?.error || err?.message || "Push failed. Please try again." });
@@ -161,11 +166,30 @@ export default function SyncDashboard() {
               <h4 className="text-xs font-bold text-slate-900">Send push notification</h4>
             </div>
             <p className="mt-1 text-xs text-slate-500 leading-relaxed">
-              Broadcast a "Monthly Meeting has started" push to all opted-in devices. Send it when you're ready — nothing goes out automatically.
+              Write your own message and send it to all opted-in devices whenever you're ready — nothing goes out automatically.
             </p>
+            <div className="mt-3 space-y-2">
+              <input
+                type="text"
+                value={pushTitle}
+                onChange={(e) => setPushTitle(e.target.value)}
+                placeholder="Title (optional) — CWA Local 6143"
+                maxLength={80}
+                className="w-full h-10 rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#c8102e]/30"
+              />
+              <textarea
+                value={pushBody}
+                onChange={(e) => setPushBody(e.target.value)}
+                placeholder="Message — e.g. Monthly Meeting starts at 6:00 PM. Tap to join."
+                rows={3}
+                maxLength={240}
+                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#c8102e]/30 resize-none"
+              />
+              <p className="text-right text-[10px] text-slate-400">{pushBody.length}/240</p>
+            </div>
             <button
               onClick={sendPush}
-              disabled={pushSending || loading || tokens.length === 0}
+              disabled={pushSending || loading || tokens.length === 0 || !pushBody.trim()}
               className="mt-3 w-full h-11 rounded-xl bg-[#c8102e] text-white text-sm font-semibold flex items-center justify-center gap-2 hover:bg-[#c8102e]/90 disabled:opacity-60 transition-colors"
             >
               {pushSending ? (
