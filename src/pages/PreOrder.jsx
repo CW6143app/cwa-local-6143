@@ -35,17 +35,12 @@ export default function PreOrder() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [placed, setPlaced] = useState(null);
-  const [payment, setPayment] = useState({ zelle_info: "", cashapp_info: "" });
 
   useEffect(() => {
     (async () => {
       try {
-        const [page, payRes] = await Promise.all([
-          base44.entities.PreOrderSale.filter({ active: true }, { limit: 1 }),
-          base44.functions.invoke("getSalePaymentInfo", {}).catch(() => null),
-        ]);
+        const page = await base44.entities.PreOrderSale.filter({ active: true }, { limit: 1 });
         setSale((page?.items || [])[0] || null);
-        if (payRes?.data) setPayment(payRes.data);
       } catch (err) {
         setError("Unable to load the pre-order right now.");
       } finally {
@@ -183,7 +178,7 @@ export default function PreOrder() {
             )}
           </div>
           <div className="mt-4 text-left">
-            <PaymentOptions payment={payment} amount={placed.total} />
+            <PaymentOptions sale={sale} amount={placed.total} />
           </div>
           <button
             type="button"
@@ -289,7 +284,7 @@ export default function PreOrder() {
           </div>
         </div>
 
-        <PaymentOptions payment={payment} amount={total} />
+        <PaymentOptions sale={sale} amount={total} />
 
         <div className="rounded-2xl bg-white p-5 flex items-center justify-between shadow-[0_1px_2px_rgba(11,37,69,0.06),0_8px_24px_-12px_rgba(11,37,69,0.2)]">
           <span className="text-sm font-semibold text-[#0b2545]">Total</span>

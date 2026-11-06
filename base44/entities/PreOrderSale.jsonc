@@ -20,39 +20,11 @@
     },
     "zelle_info": {
       "type": "string",
-      "title": "Zelle Email or Phone",
-      "rls": {
-        "read": {
-          "$or": [
-            {
-              "created_by_id": "{{user.id}}"
-            },
-            {
-              "user_condition": {
-                "role": "admin"
-              }
-            }
-          ]
-        }
-      }
+      "title": "Zelle Email or Phone"
     },
     "cashapp_info": {
       "type": "string",
-      "title": "Cash App $tag or Phone",
-      "rls": {
-        "read": {
-          "$or": [
-            {
-              "created_by_id": "{{user.id}}"
-            },
-            {
-              "user_condition": {
-                "role": "admin"
-              }
-            }
-          ]
-        }
-      }
+      "title": "Cash App $tag or Phone"
     },
     "active": {
       "type": "boolean",
