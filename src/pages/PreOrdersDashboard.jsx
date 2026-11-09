@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Download, Inbox, PackageCheck, Shield, ShoppingBag, DollarSign } from "lucide-react";
+import { ArrowLeft, Download, Inbox, PackageCheck, Printer, Shield, ShoppingBag, DollarSign } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import { printPreOrderList } from "@/lib/preOrderListPrint";
 import SaleSettings from "@/components/preorder/SaleSettings";
 import OrderList from "@/components/preorder/OrderList";
 
@@ -149,12 +150,21 @@ export default function PreOrdersDashboard() {
               <p className="text-[11px] text-white/50 mt-0.5">CWA Local 6143 — Admin View</p>
             </div>
           </div>
-          <button
-            onClick={exportCsv}
-            className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-white/10 px-3 text-xs font-semibold hover:bg-white/20 transition-colors"
-          >
-            <Download className="w-3.5 h-3.5" /> CSV
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => printPreOrderList(sale, orders)}
+              disabled={orders.length === 0}
+              className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-white/10 px-3 text-xs font-semibold hover:bg-white/20 transition-colors disabled:opacity-40 disabled:hover:bg-white/10"
+            >
+              <Printer className="w-3.5 h-3.5" /> Print List
+            </button>
+            <button
+              onClick={exportCsv}
+              className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-white/10 px-3 text-xs font-semibold hover:bg-white/20 transition-colors"
+            >
+              <Download className="w-3.5 h-3.5" /> CSV
+            </button>
+          </div>
         </div>
       </header>
 
