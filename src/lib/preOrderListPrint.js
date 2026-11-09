@@ -48,24 +48,69 @@ export function printPreOrderList(sale, orders) {
     })
     .join("");
 
-  const body = rows
-    .map(
-      (o, index) => `
+  const byTime = (a, b) =>
+    (a.pickup_time || "99:99").localeCompare(b.pickup_time || "99:99") ||
+    (a.buyer_name || "").localeCompare(b.buyer_name || "");
+
+  const deliveries = rows.filter((o) => o.fulfillment === "delivery");
+  const pickups = rows.filter((o) => o.fulfillment !== "delivery");
+
+  const orderRow = (o, { withTime = false, instructions = false } = {}) => `
       <tr>
-        <td class="num">${index + 1}</td>
+        ${withTime ? `<td class="time">${o.pickup_time ? escapeHtml(formatTime(o.pickup_time)) : "—"}</td>` : ""}
         <td>
           <div class="name">${escapeHtml(o.buyer_name || "—")}</div>
           ${o.phone ? `<div class="sub">${escapeHtml(o.phone)}</div>` : ""}
-        </td>
-        <td>
-          <div class="type">${o.fulfillment === "delivery" ? "Delivery" : "Pick-up"}</div>
-          ${o.pickup_time ? `<div class="sub">${escapeHtml(formatTime(o.pickup_time))}</div>` : ""}
-          ${o.fulfillment === "delivery" && o.delivery_address ? `<div class="sub">${escapeHtml(o.delivery_address)}</div>` : ""}
+          ${instructions && o.delivery_instructions ? `<div class="sub">Leave: ${escapeHtml(o.delivery_instructions)}</div>` : ""}
         </td>
         <td class="items">${formatItems(o)}</td>
         <td class="num">${money(o.total)}</td>
         <td class="paid">${o.paid ? "Paid" : "&nbsp;"}</td>
-      </tr>`
+      </tr>`;
+
+  const groupBlock = (title, list, columns, options) => `
+    <div class="group">
+      <h3 class="group-title">${escapeHtml(title)} <span class="group-count">${list.length} order${list.length === 1 ? "" : "s"}</span></h3>
+      <table>
+        <thead><tr>${columns.map((c) => `<th${c.cls ? ` class="${c.cls}"` : ""}>${c.label}</th>`).join("")}</tr></thead>
+        <tbody>${list.map((o) => orderRow(o, options)).join("")}</tbody>
+      </table>
+    </div>`;
+
+  const deliveryGroups = new Map();
+  deliveries.forEach((o) => {
+    const key = (o.delivery_address || "").trim() || "No address given";
+    if (!deliveryGroups.has(key)) deliveryGroups.set(key, []);
+    deliveryGroups.get(key).push(o);
+  });
+  const deliveriesHtml = [...deliveryGroups.entries()]
+    .sort((a, b) => a[0].localeCompare(b[0]))
+    .map(([location, list]) =>
+      groupBlock(location, [...list].sort(byTime), [
+        { label: "Time", cls: "time" },
+        { label: "Name" },
+        { label: "What They Ordered" },
+        { label: "Total", cls: "num" },
+        { label: "Paid", cls: "paid" },
+      ], { withTime: true, instructions: true })
+    )
+    .join("");
+
+  const pickupGroups = new Map();
+  pickups.forEach((o) => {
+    const key = o.pickup_time || "";
+    if (!pickupGroups.has(key)) pickupGroups.set(key, []);
+    pickupGroups.get(key).push(o);
+  });
+  const pickupsHtml = [...pickupGroups.entries()]
+    .sort((a, b) => (a[0] || "99:99").localeCompare(b[0] || "99:99"))
+    .map(([time, list]) =>
+      groupBlock(time ? formatTime(time) : "No time given", [...list].sort((a, b) => (a.buyer_name || "").localeCompare(b.buyer_name || "")), [
+        { label: "Name" },
+        { label: "What They Ordered" },
+        { label: "Total", cls: "num" },
+        { label: "Paid", cls: "paid" },
+      ])
     )
     .join("");
 
@@ -90,9 +135,15 @@ export function printPreOrderList(sale, orders) {
     tr { page-break-inside: avoid; }
     th { text-align: left; background: #f1f5f9; border: 1px solid #cbd5e1; padding: 6px 8px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; }
     td { border: 1px solid #cbd5e1; padding: 6px 8px; vertical-align: top; }
-    .num { width: 34px; text-align: center; }
+    .num { width: 60px; text-align: right; }
     .name { font-weight: bold; }
-    .type { font-weight: bold; }
+    .time { width: 72px; font-weight: bold; white-space: nowrap; }
+    .section-title { margin: 22px 0 8px; font-size: 14px; text-transform: uppercase; letter-spacing: 0.1em; color: #c8102e; border-bottom: 2px solid #c8102e; padding-bottom: 4px; }
+    .section-title:first-of-type { margin-top: 6px; }
+    .group { margin-bottom: 14px; page-break-inside: avoid; }
+    .group-title { margin: 0 0 4px; font-size: 12px; background: #e2e8f0; border: 1px solid #cbd5e1; border-bottom: none; padding: 6px 8px; }
+    .group-count { float: right; font-weight: normal; font-size: 10px; color: #475569; text-transform: uppercase; letter-spacing: 0.06em; }
+    .empty { font-size: 11px; color: #64748b; margin: 0 0 8px; }
     .sub { font-size: 10px; color: #475569; margin-top: 1px; }
     .items { line-height: 1.4; }
     .paid { width: 44px; text-align: center; font-size: 10px; font-weight: bold; }
@@ -118,19 +169,10 @@ export function printPreOrderList(sale, orders) {
     <span>Order total: <strong>${money(total)}</strong></span>
     <span>Outstanding: <strong>${money(unpaid)}</strong></span>
   </div>
-  <table>
-    <thead>
-      <tr>
-        <th class="num">#</th>
-        <th>Name</th>
-        <th>Pick-Up / Delivery</th>
-        <th>What They Ordered</th>
-        <th class="num">Total</th>
-        <th class="paid">Paid</th>
-      </tr>
-    </thead>
-    <tbody>${body}</tbody>
-  </table>
+  <h2 class="section-title">Deliveries &mdash; ${deliveries.length}</h2>
+  ${deliveriesHtml || '<p class="empty">No deliveries for this sale.</p>'}
+  <h2 class="section-title">Pick-Ups &mdash; ${pickups.length}</h2>
+  ${pickupsHtml || '<p class="empty">No pick-ups for this sale.</p>'}
   <h2 class="totals-title">Product totals &mdash; ${itemCount} item${itemCount === 1 ? "" : "s"}</h2>
   <table class="totals">
     <thead>
