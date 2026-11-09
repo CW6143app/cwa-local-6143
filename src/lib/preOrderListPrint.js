@@ -23,6 +23,31 @@ export function printPreOrderList(sale, orders) {
   const total = rows.reduce((sum, o) => sum + Number(o.total || 0), 0);
   const unpaid = rows.filter((o) => !o.paid).reduce((sum, o) => sum + Number(o.total || 0), 0);
 
+  const productTotals = [];
+  const byName = new Map();
+  rows.forEach((o) =>
+    (o.items || []).forEach((i) => {
+      const name = i.name || "Item";
+      const qty = Number(i.quantity || 0);
+      if (!byName.has(name)) byName.set(name, { name, qty: 0, sizes: new Map() });
+      const entry = byName.get(name);
+      entry.qty += qty;
+      if (i.size) entry.sizes.set(i.size, (entry.sizes.get(i.size) || 0) + qty);
+    })
+  );
+  byName.forEach((entry) => productTotals.push(entry));
+  productTotals.sort((a, b) => b.qty - a.qty);
+  const itemCount = productTotals.reduce((sum, p) => sum + p.qty, 0);
+
+  const totalsRows = productTotals
+    .map((p) => {
+      const sizeLines = [...p.sizes.entries()]
+        .map(([size, qty]) => `<div class="sub">${escapeHtml(size)}: ${qty}</div>`)
+        .join("");
+      return `<tr><td><div class="name">${escapeHtml(p.name)}</div>${sizeLines}</td><td class="num qty">${p.qty}</td></tr>`;
+    })
+    .join("");
+
   const body = rows
     .map(
       (o, index) => `
@@ -72,6 +97,10 @@ export function printPreOrderList(sale, orders) {
     .items { line-height: 1.4; }
     .paid { width: 44px; text-align: center; font-size: 10px; font-weight: bold; }
     .paid { border-left: 2px solid #cbd5e1; }
+    .totals { width: 100%; border-collapse: collapse; font-size: 11px; page-break-inside: avoid; }
+    .totals th { background: #f1f5f9; }
+    .totals .qty { width: 60px; font-weight: bold; }
+    .totals-title { margin: 20px 0 6px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; }
     footer { margin-top: 14px; font-size: 10px; color: #64748b; }
     @media print { body { padding: 0; } }
   </style>
@@ -101,6 +130,13 @@ export function printPreOrderList(sale, orders) {
       </tr>
     </thead>
     <tbody>${body}</tbody>
+  </table>
+  <h2 class="totals-title">Product totals &mdash; ${itemCount} item${itemCount === 1 ? "" : "s"}</h2>
+  <table class="totals">
+    <thead>
+      <tr><th>Product</th><th class="num qty">Qty</th></tr>
+    </thead>
+    <tbody>${totalsRows}</tbody>
   </table>
   <footer>Check off the Paid column as payments are collected.</footer>
 </body>
